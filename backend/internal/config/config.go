@@ -20,7 +20,7 @@ type Config struct {
 var AppConfig *Config
 
 func LoadConfig() {
-	godotenv.Load("./.env")
+	godotenv.Load()
 	
 	AppConfig = &Config{
 		Port:      getEnv("PORT", "3000"),
@@ -29,7 +29,7 @@ func LoadConfig() {
 		DBUser:    getEnv("DB_USER", "postgres"),
 		DBPass:    getEnv("DB_PASS", ""),
 		DBName:    getEnv("DB_NAME", "chat_db"),
-		JWTSecret: getEnv("JWT_SECRET", ""),
+		JWTSecret: getEnv("JWT_SECRET", "aa"),
 	}
 	
 	if AppConfig.JWTSecret == "" {

@@ -1,7 +1,7 @@
 package model
 
 type RegisterRequest struct {
-	UserID        string `json:"user-id" validate:"required, min=5, max=50"`
+	UserID        string `json:"user_id" validate:"required, min=5, max=50"`
 	FirstName     string `json:"first_name" validate:"required"`
 	LastName      string `json:"last_name" validate:"required"`
 	Password      string `json:"password" validate:"required,min=8"`

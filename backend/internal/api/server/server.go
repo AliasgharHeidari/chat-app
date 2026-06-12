@@ -1,7 +1,8 @@
 package server
 
 import (
-	"github.com/AliasgharHeidari/chat-app/internal/api/handler/auth"
+	authHandler "github.com/AliasgharHeidari/chat-app/internal/api/handler/auth"
+	profileHandler "github.com/AliasgharHeidari/chat-app/internal/api/handler/profile"
 	middleware "github.com/AliasgharHeidari/chat-app/internal/api/middleware/auth"
 	"github.com/AliasgharHeidari/chat-app/internal/config"
 	"github.com/gofiber/fiber/v2"
@@ -19,12 +20,11 @@ func Start() {
 		Format: "[${time}] ${status} - ${method} ${path}\n",
 	}))
 	api := app.Group("/auth")
-	api.Post("/register", handler.Register)
-	api.Post("/login", handler.Login)
+	api.Post("/register", authHandler.Register)
+	api.Post("/login", authHandler.Login)
 
-
-	protected := api.Group("/chat", middleware.Protected)
-	protected.Get("/me", )
+	protected := app.Group("/chat", middleware.Protected)
+	protected.Get("/me", profileHandler.GetProfile)
 	/*
 
 		protected.Put("/me")

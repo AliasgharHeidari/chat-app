@@ -1,7 +1,7 @@
 package model
 
 type RegisterRequest struct {
-	UserID        string `json:"user_id" validate:"required, min=5, max=50"`
+	Username      string `json:"username" validate:"required, min=5, max=50"`
 	FirstName     string `json:"first_name" validate:"required"`
 	LastName      string `json:"last_name" validate:"required"`
 	Password      string `json:"password" validate:"required,min=8"`
@@ -10,7 +10,7 @@ type RegisterRequest struct {
 }
 
 type LoginRequest struct {
-	UserID   string `json:"user_id" validate:"required"`
+	Username   string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
 
@@ -34,6 +34,7 @@ type DeleteMessageRequest struct {
 }
 
 type UpdateProfileRequest struct {
+	Username      string `json:"username" validate:"min=5, max=50"`
 	FirstName     string `json:"first_name"`
 	LastName      string `json:"last_name"`
 	Bio           string `json:"bio"`

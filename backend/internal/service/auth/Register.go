@@ -11,7 +11,7 @@ import (
 )
 
 func Register(input model.RegisterRequest) error {
-	if len(input.UserID) < 5 {
+	if len(input.Username) < 5 {
 		return customError.ShortUserIDErr
 	}
 

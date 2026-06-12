@@ -14,7 +14,7 @@ func CheckAvailability(input model.RegisterRequest) error {
 
 	db := postgres.GetDB()
 
-	res := db.Where("user_id = ?", input.UserID).First(&user)
+	res := db.Where("username = ?", input.Username).First(&user)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		return nil
 	}
@@ -27,7 +27,7 @@ func Register(input model.RegisterRequest, hashedpassword string) error {
 	tx := db.Begin()
 
 	user := &model.User{
-		UserID:       input.UserID,
+		Username:       input.Username,
 		FirstName:    input.FirstName,
 		LastName:     input.LastName,
 		Bio:          input.Bio,

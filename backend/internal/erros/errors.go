@@ -3,10 +3,11 @@ package customError
 import "errors"
 
 var (
-	ShortUserIDErr         = errors.New("short user ID error")
+	ShortUsernameErr         = errors.New("short username error")
 	ShortPasswordErr       = errors.New("short password error")
 	TooLongBioErr          = errors.New("too long bio error")
-	UserIDAlreadyExistErr  = errors.New("user ID already exist error")
+	UsernameAlreadyExistErr  = errors.New("user ID already exist error")
 	InternalErr            = errors.New("internal server error")
 	InvalidCredenntialsErr = errors.New("invalid credentials error")
+	InvalidUsernameErr   = errors.New("invalid username error")
 )

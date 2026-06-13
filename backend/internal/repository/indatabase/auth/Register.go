@@ -18,7 +18,7 @@ func CheckAvailability(input model.RegisterRequest) error {
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		return nil
 	}
-	return customError.UserIDAlreadyExistErr
+	return customError.UsernameAlreadyExistErr
 
 }
 

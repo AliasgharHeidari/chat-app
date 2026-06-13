@@ -12,7 +12,7 @@ import (
 
 func Register(input model.RegisterRequest) error {
 	if len(input.Username) < 5 {
-		return customError.ShortUserIDErr
+		return customError.ShortUsernameErr
 	}
 
 	if len(input.Password) < 8 {
@@ -24,8 +24,8 @@ func Register(input model.RegisterRequest) error {
 	}
 
 	err := indatabase.CheckAvailability(input)
-	if errors.Is(err, customError.UserIDAlreadyExistErr) {
-		return customError.UserIDAlreadyExistErr
+	if errors.Is(err, customError.UsernameAlreadyExistErr) {
+		return customError.UsernameAlreadyExistErr
 	}
 
 	hashedPassword, err := HashPassword(input.Password)

@@ -24,7 +24,7 @@ func Register(c *fiber.Ctx) error {
 			"error": "internal server error, pleasy try again later",
 		})
 	}
-	if errors.Is(err, customError.ShortUserIDErr) {
+	if errors.Is(err, customError.ShortUsernameErr) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "user ID must have atleast 5 character",
 		})
@@ -42,7 +42,7 @@ func Register(c *fiber.Ctx) error {
 		})
 	}
 
-	if errors.Is(err, customError.UserIDAlreadyExistErr) {
+	if errors.Is(err, customError.UsernameAlreadyExistErr) {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
 			"error": "this ID is already used by another account",
 		})

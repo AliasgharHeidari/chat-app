@@ -25,9 +25,9 @@ func Start() {
 
 	protected := app.Group("/chat", middleware.Protected)
 	protected.Get("/me", profileHandler.GetProfile)
+	protected.Put("/me",profileHandler.ModifyProfile)
 	/*
 
-		protected.Put("/me")
 		protected.Get("/users/search")
 		protected.Get("/users/:user_id")
 

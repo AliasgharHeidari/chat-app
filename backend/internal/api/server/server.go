@@ -2,6 +2,7 @@ package server
 
 import (
 	authHandler "github.com/AliasgharHeidari/chat-app/internal/api/handler/auth"
+	handler "github.com/AliasgharHeidari/chat-app/internal/api/handler/chat"
 	profileHandler "github.com/AliasgharHeidari/chat-app/internal/api/handler/profile"
 	middleware "github.com/AliasgharHeidari/chat-app/internal/api/middleware/auth"
 	"github.com/AliasgharHeidari/chat-app/internal/config"
@@ -26,9 +27,9 @@ func Start() {
 	protected := app.Group("/chat", middleware.Protected)
 	protected.Get("/me", profileHandler.GetProfile)
 	protected.Put("/me",profileHandler.ModifyProfile)
+	protected.Get("/users/search", handler.SearchUsers)
 	/*
 
-		protected.Get("/users/search")
 		protected.Get("/users/:user_id")
 
 		protected.Post("/chats/init")

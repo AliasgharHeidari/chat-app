@@ -15,7 +15,7 @@ type LoginRequest struct {
 }
 
 type InitChatRequest struct {
-	TargetUserID string `json:"target_user_id" validate:"required"`
+	TargetUsername string `json:"target_username" validate:"required"`
 }
 
 type SendMessageRequest struct {

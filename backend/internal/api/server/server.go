@@ -29,11 +29,11 @@ func Start() {
 	protected.Put("/me",profileHandler.ModifyProfile)
 	protected.Get("/users/search", handler.SearchUsers)
 	protected.Get("/users/:username", handler.GetUserByUsername)
+	
+	protected.Post("/chats/init", handler.InitChat)
 
 	/*
 
-
-		protected.Post("/chats/init")
 		protected.Get("/chats")
 		protected.Get("/chats/:chat_id")
 		protected.Get("/chats/:chat_id/messages")

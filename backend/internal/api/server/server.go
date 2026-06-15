@@ -28,9 +28,10 @@ func Start() {
 	protected.Get("/me", profileHandler.GetProfile)
 	protected.Put("/me",profileHandler.ModifyProfile)
 	protected.Get("/users/search", handler.SearchUsers)
+	protected.Get("/users/:username", handler.GetUserByUsername)
+
 	/*
 
-		protected.Get("/users/:user_id")
 
 		protected.Post("/chats/init")
 		protected.Get("/chats")

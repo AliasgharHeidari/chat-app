@@ -1,4 +1,4 @@
-# 💬 Chat App - Real-time Messaging Platform
+# 💬 Chat App - Messaging Platform
 
 A real-time private messaging application built with **Go Fiber**, **WebSocket**, **PostgreSQL**, and **GORM**. Features JWT authentication, private chats, message status tracking, typing indicators, and online status.
 

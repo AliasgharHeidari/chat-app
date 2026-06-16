@@ -3,7 +3,7 @@ package handler
 import (
 	"errors"
 
-	customError "github.com/AliasgharHeidari/chat-app/internal/erros"
+	customError "github.com/AliasgharHeidari/chat-app/internal/errors"
 	"github.com/AliasgharHeidari/chat-app/internal/model"
 	service "github.com/AliasgharHeidari/chat-app/internal/service/profile"
 	"github.com/gofiber/fiber/v2"

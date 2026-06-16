@@ -8,28 +8,26 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetUserByUsername(c *fiber.Ctx) error {
+func GetAllChats(c *fiber.Ctx) error {
 
-	username := c.Params("username")
+	CurrentUserID := c.Locals("id").(uint)
 
-	currentUserID := c.Locals("id").(uint)
-	_ = currentUserID
-
-	user, err := service.GetUserByUsername(username)
+	chats, err := service.GetAllChats(CurrentUserID)
 	if errors.Is(err, customError.InternalErr) {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "internal server error",
 		})
 	}
 
-	if errors.Is(err, customError.NotFoundErr) {
-		return c.Status(404).JSON(fiber.Map{
-			"error": "not found",
+	if len(chats) == 0 {
+		return c.Status(200).JSON(fiber.Map{
+			"chats" : []interface{}{},
+			"count": 0, 
 		})
 	}
 
 	return c.Status(200).JSON(fiber.Map{
-		"user" : user,
+		"chats" : chats,
+		"count" : len(chats),
 	})
-
 }

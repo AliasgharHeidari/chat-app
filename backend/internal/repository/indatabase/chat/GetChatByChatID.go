@@ -9,12 +9,15 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetUserByUsername(username string) (*model.SearchUsersResponse, error) {
+func GetChatByChatID(currentUserID uint, chatID uint) (*model.Chat, error) {
+
 	db := postgres.GetDB()
+	var chat model.Chat
 
-	var user model.SearchUsersResponse
-
-	res := db.Model(&model.User{}).Select("id, username, first_name, last_name, bio, profile_pic_url, is_online").Where("username ILIKE ?", username).First(&user)
+	res := db.
+		Preload("User1").
+		Preload("User2").
+		First(&chat, chatID)
 
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
@@ -22,9 +25,7 @@ func GetUserByUsername(username string) (*model.SearchUsersResponse, error) {
 		}
 		return nil, customError.InternalErr
 	}
-	
-	return &user, nil
+
+	return &chat, nil
 
 }
-
-

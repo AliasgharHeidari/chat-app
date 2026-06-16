@@ -31,14 +31,15 @@ func Start() {
 	protected.Get("/users/:username", handler.GetUserByUsername)
 	
 	protected.Post("/chats/init", handler.InitChat)
+	protected.Get("/chats", handler.GetAllChats)
+	protected.Get("/chats/:chat_id", handler.GetChatByChatID)
+	protected.Get("/chats/:chat_id/messages", handler.GetChatMessages)
+
+	protected.Post("/messages", handler.SendMessage)
 
 	/*
 
-		protected.Get("/chats")
-		protected.Get("/chats/:chat_id")
-		protected.Get("/chats/:chat_id/messages")
 
-		protected.Post("/messages")
 		protected.Put("/messages/:message_id")
 		protected.Delete("/messages/:message_id")
 

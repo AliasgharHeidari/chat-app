@@ -12,4 +12,5 @@ var (
 	InvalidUsernameErr        = errors.New("invalid username error")
 	NotFoundErr               = errors.New("not found error")
 	CanNotChatWithYourselfErr = errors.New("can not chat with yourself error")
+	AccessDeniedErr           = errors.New("access denied error")
 )

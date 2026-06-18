@@ -13,4 +13,6 @@ var (
 	NotFoundErr               = errors.New("not found error")
 	CanNotChatWithYourselfErr = errors.New("can not chat with yourself error")
 	AccessDeniedErr           = errors.New("access denied error")
+	MessageDeletedErr         = errors.New("message deleted error")
+	MessageNotFoundErr        = errors.New("message not found error")
 )

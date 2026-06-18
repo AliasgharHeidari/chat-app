@@ -36,11 +36,11 @@ func Start() {
 	protected.Get("/chats/:chat_id/messages", handler.GetChatMessages)
 
 	protected.Post("/messages", handler.SendMessage)
+	protected.Put("/messages/:message_id", handler.ModifyMessage)
 
 	/*
 
 
-		protected.Put("/messages/:message_id")
 		protected.Delete("/messages/:message_id")
 
 		app.Get("/ws/chat") */

@@ -24,7 +24,6 @@ type SendMessageRequest struct {
 }
 
 type EditMessageRequest struct {
-	MessageID uint   `json:"message_id" validate:"required"`
 	NewText   string `json:"new_text" validate:"required,max=1000"`
 }
 

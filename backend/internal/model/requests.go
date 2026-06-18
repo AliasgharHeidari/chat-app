@@ -28,7 +28,6 @@ type EditMessageRequest struct {
 }
 
 type DeleteMessageRequest struct {
-	MessageID         uint `json:"message_id" validate:"required"`
 	DeleteForEveryone bool `json:"delete_for_everyone"`
 }
 

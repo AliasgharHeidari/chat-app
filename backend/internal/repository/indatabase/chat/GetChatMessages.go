@@ -6,14 +6,14 @@ import (
 	postgres "github.com/AliasgharHeidari/chat-app/internal/repository"
 )
 
-func GetChatMessages(chatID uint, limit, offset int) ([]model.Message, error) {
+func GetChatMessages(chatID uint, currentUserID uint, limit, offset int) ([]model.Message, error) {
 
 	db := postgres.GetDB()
 	var messages []model.Message
 
 	res := db.
 	Preload("Sender").
-	Where("chat_id = ? AND is_deleted = ?", chatID, false).
+	Where("chat_id = ? AND is_deleted = ? AND deleted_for IS NULL OR deleted_for != ?", chatID, false, currentUserID).
 	Limit(limit).
 	Offset(offset).
 	Find(&messages)

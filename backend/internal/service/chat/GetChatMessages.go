@@ -22,7 +22,7 @@ func GetChatMessages(chatID uint, currentUserID uint, limit, offset int) ([]mode
 		return nil, customError.AccessDeniedErr
 	}
 
-	messages, err := indatabase.GetChatMessages(chatID, limit, offset)
+	messages, err := indatabase.GetChatMessages(chatID, currentUserID, limit, offset)
 	if err != nil {
 		return nil, customError.InternalErr
 	}

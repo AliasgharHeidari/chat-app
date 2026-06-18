@@ -15,4 +15,5 @@ var (
 	AccessDeniedErr           = errors.New("access denied error")
 	MessageDeletedErr         = errors.New("message deleted error")
 	MessageNotFoundErr        = errors.New("message not found error")
+	MessageAlreadyDeletedErr  = errors.New("message already deleted error")
 )

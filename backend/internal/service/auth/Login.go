@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/AliasgharHeidari/chat-app/internal/config"
-	customError "github.com/AliasgharHeidari/chat-app/internal/erros"
+	customError "github.com/AliasgharHeidari/chat-app/internal/errors"
 	"github.com/AliasgharHeidari/chat-app/internal/model"
 	indatabase "github.com/AliasgharHeidari/chat-app/internal/repository/indatabase/auth"
 	"github.com/golang-jwt/jwt"

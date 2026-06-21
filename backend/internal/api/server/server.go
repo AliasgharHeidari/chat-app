@@ -3,6 +3,7 @@ package server
 import (
 	authHandler "github.com/AliasgharHeidari/chat-app/internal/api/handler/auth"
 	handler "github.com/AliasgharHeidari/chat-app/internal/api/handler/chat"
+	Websocket "github.com/AliasgharHeidari/chat-app/internal/api/handler/websocket"
 	profileHandler "github.com/AliasgharHeidari/chat-app/internal/api/handler/profile"
 	middleware "github.com/AliasgharHeidari/chat-app/internal/api/middleware/auth"
 	"github.com/AliasgharHeidari/chat-app/internal/config"
@@ -24,23 +25,21 @@ func Start() {
 	api.Post("/register", authHandler.Register)
 	api.Post("/login", authHandler.Login)
 
+	app.Get("/ws/chat", Websocket.WebSocketHandler)
+
 	protected := app.Group("/chat", middleware.Protected)
-	protected.Get("/me", profileHandler.GetProfile)
-	protected.Put("/me",profileHandler.ModifyProfile)
+	protected.Get("/me", profileHandler.GetProfile) 
+	protected.Put("/me", profileHandler.ModifyProfile)
 	protected.Get("/users/search", handler.SearchUsers)
-	/*
+	protected.Get("/users/:username", handler.GetUserByUsername)
 
-		protected.Get("/users/:user_id")
+	protected.Post("/chats/init", handler.InitChat)
+	protected.Get("/chats", handler.GetAllChats)
+	protected.Get("/chats/:chat_id", handler.GetChatByChatID)
+	protected.Get("/chats/:chat_id/messages", handler.GetChatMessages)
 
-		protected.Post("/chats/init")
-		protected.Get("/chats")
-		protected.Get("/chats/:chat_id")
-		protected.Get("/chats/:chat_id/messages")
-
-		protected.Post("/messages")
-		protected.Put("/messages/:message_id")
-		protected.Delete("/messages/:message_id")
-
-		app.Get("/ws/chat") */
+	protected.Post("/messages", handler.SendMessage)
+	protected.Put("/messages/:message_id", handler.ModifyMessage)
+	protected.Delete("/messages/:message_id", handler.DeleteMessage)
 	app.Listen(cfg.Port)
 }

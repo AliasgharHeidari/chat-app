@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log"
 
-	customError "github.com/AliasgharHeidari/chat-app/internal/erros"
+	customError "github.com/AliasgharHeidari/chat-app/internal/errors"
 	"github.com/AliasgharHeidari/chat-app/internal/model"
 	indatabase "github.com/AliasgharHeidari/chat-app/internal/repository/indatabase/auth"
 	"golang.org/x/crypto/bcrypt"

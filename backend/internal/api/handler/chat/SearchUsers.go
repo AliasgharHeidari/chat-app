@@ -1,9 +1,9 @@
-package service
+package handler
 
 import (
 	"errors"
 
-	customError "github.com/AliasgharHeidari/chat-app/internal/erros"
+	customError "github.com/AliasgharHeidari/chat-app/internal/errors"
 	service "github.com/AliasgharHeidari/chat-app/internal/service/chat"
 	"github.com/gofiber/fiber/v2"
 )

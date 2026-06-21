@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 
-	customError "github.com/AliasgharHeidari/chat-app/internal/erros"
+	customError "github.com/AliasgharHeidari/chat-app/internal/errors"
 	"github.com/AliasgharHeidari/chat-app/internal/model"
 	Profileindatabase "github.com/AliasgharHeidari/chat-app/internal/repository/indatabase/profile"
 )

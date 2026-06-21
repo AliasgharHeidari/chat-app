@@ -1,7 +1,7 @@
 package indatabase
 
 import (
-	customError "github.com/AliasgharHeidari/chat-app/internal/erros"
+	customError "github.com/AliasgharHeidari/chat-app/internal/errors"
 	"github.com/AliasgharHeidari/chat-app/internal/model"
 	postgres "github.com/AliasgharHeidari/chat-app/internal/repository"
 )

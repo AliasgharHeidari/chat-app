@@ -8,15 +8,19 @@ import (
 	indatabase "github.com/AliasgharHeidari/chat-app/internal/repository/indatabase/chat"
 )
 
-func SearchUsers(query string, currentUserID uint) ([]model.SearchUsersResponse, error) {
-	if query == "" {
-		return []model.SearchUsersResponse{}, nil
+func GetUserByUsername(username string) (*model.SearchUsersResponse, error) {
+	if len(username) < 5 {
+		return nil, nil
 	}
 
-	users, err := indatabase.SearchUsers(query, currentUserID)
+	user, err := indatabase.GetUserByUsername(username)
+	if errors.Is(err, customError.NotFoundErr) {
+		return nil, customError.NotFoundErr
+	}
 	if errors.Is(err, customError.InternalErr) {
 		return nil, customError.InternalErr
 	}
 
-	return users, nil
+	return user, nil
+
 }

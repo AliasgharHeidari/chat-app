@@ -15,7 +15,7 @@ type LoginRequest struct {
 }
 
 type InitChatRequest struct {
-	TargetUserID string `json:"target_user_id" validate:"required"`
+	TargetUsername string `json:"target_username" validate:"required"`
 }
 
 type SendMessageRequest struct {
@@ -24,12 +24,10 @@ type SendMessageRequest struct {
 }
 
 type EditMessageRequest struct {
-	MessageID uint   `json:"message_id" validate:"required"`
 	NewText   string `json:"new_text" validate:"required,max=1000"`
 }
 
 type DeleteMessageRequest struct {
-	MessageID         uint `json:"message_id" validate:"required"`
 	DeleteForEveryone bool `json:"delete_for_everyone"`
 }
 

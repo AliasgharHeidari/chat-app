@@ -1,0 +1,33 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+  background-color: white;
+}
+
+.info {
+  flex: 1;
+}
+
+.name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.status {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #999;
+}
+
+.online {
+  color: #4caf50;
+}
+
+.offline {
+  color: #999;
+}

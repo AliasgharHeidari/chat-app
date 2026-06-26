@@ -3,8 +3,8 @@ package server
 import (
 	authHandler "github.com/AliasgharHeidari/chat-app/internal/api/handler/auth"
 	handler "github.com/AliasgharHeidari/chat-app/internal/api/handler/chat"
-	Websocket "github.com/AliasgharHeidari/chat-app/internal/api/handler/websocket"
 	profileHandler "github.com/AliasgharHeidari/chat-app/internal/api/handler/profile"
+	Websocket "github.com/AliasgharHeidari/chat-app/internal/api/handler/websocket"
 	middleware "github.com/AliasgharHeidari/chat-app/internal/api/middleware/auth"
 	"github.com/AliasgharHeidari/chat-app/internal/config"
 	"github.com/gofiber/fiber/v2"
@@ -16,7 +16,13 @@ func Start() {
 	cfg := config.AppConfig
 	app := fiber.New()
 
-	app.Use(cors.New())
+	// Enable CORS for local development (Vite default port 5173)
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:5173,https://localhost:5173",
+		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
+		AllowCredentials: true,
+	}))
 
 	app.Use(logger.New(logger.Config{
 		Format: "[${time}] ${status} - ${method} ${path}\n",
@@ -28,7 +34,7 @@ func Start() {
 	app.Get("/ws/chat", Websocket.WebSocketHandler)
 
 	protected := app.Group("/chat", middleware.Protected)
-	protected.Get("/me", profileHandler.GetProfile) 
+	protected.Get("/me", profileHandler.GetProfile)
 	protected.Put("/me", profileHandler.ModifyProfile)
 	protected.Get("/users/search", handler.SearchUsers)
 	protected.Get("/users/:username", handler.GetUserByUsername)

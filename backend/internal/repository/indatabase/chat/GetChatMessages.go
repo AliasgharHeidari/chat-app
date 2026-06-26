@@ -13,7 +13,7 @@ func GetChatMessages(chatID uint, currentUserID uint, limit, offset int) ([]mode
 
 	res := db.
 	Preload("Sender").
-	Where("chat_id = ? AND is_deleted = ? AND deleted_for IS NULL OR deleted_for != ?", chatID, false, currentUserID).
+	Where("chat_id = ? AND is_deleted = ? AND (deleted_for IS NULL OR deleted_for != ?)", chatID, false, currentUserID).
 	Limit(limit).
 	Offset(offset).
 	Find(&messages)

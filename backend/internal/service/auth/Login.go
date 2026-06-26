@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"log"
 	"time"
 
 	"github.com/AliasgharHeidari/chat-app/internal/config"
@@ -41,7 +40,7 @@ func Login(input model.LoginRequest) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	t, err := token.SignedString([]byte(cfg.JWTSecret))
-	log.Println(cfg.JWTSecret)
+
 
 	if err != nil {
 		return "", customError.InternalErr

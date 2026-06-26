@@ -12,7 +12,7 @@ import (
 func CheckIfUserExist(input model.LoginRequest) (model.User, error) {
 	db := postgres.GetDB()
 	var user model.User
-	res := db.Model(&model.User{}).Where("username = ?", input.Username).First(&user)
+	res := db.Model(&model.User{}).Where("username ILIKE ?", input.Username).First(&user)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		return model.User{}, customError.InvalidCredenntialsErr
 	}

@@ -19,7 +19,7 @@ func GetChatMessages(c *fiber.Ctx) error {
 		})
 	}
 
-	limit, _ := strconv.Atoi(c.Query("limit", "50"))
+	limit, _ := strconv.Atoi(c.Query("limit", "20"))
 	offset, _ := strconv.Atoi(c.Query("offset", "0"))
 
 	if limit > 100 {

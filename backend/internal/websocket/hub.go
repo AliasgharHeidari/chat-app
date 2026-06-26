@@ -5,18 +5,19 @@ import (
 	"sync"
 )
 
-
 type Hub struct {
 	Clients map[uint]*Client
-	mu      sync.RWMutex   
+	mu      sync.RWMutex
 }
-
 
 func NewHub() *Hub {
 	return &Hub{
 		Clients: make(map[uint]*Client),
 	}
 }
+
+// HubInstance is the shared hub used across the application.
+var HubInstance = NewHub()
 
 func (h *Hub) Register(client *Client) {
 	h.mu.Lock()
@@ -31,7 +32,6 @@ func (h *Hub) Register(client *Client) {
 	log.Printf("✅ User %d is ONLINE", client.ID)
 }
 
-
 func (h *Hub) Unregister(client *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -40,13 +40,13 @@ func (h *Hub) Unregister(client *Client) {
 	log.Printf("❌ User %d is OFFLINE", client.ID)
 }
 
-
 func (h *Hub) SendToUser(userID uint, message []byte) bool {
 	h.mu.RLock()
 	client, ok := h.Clients[userID]
 	h.mu.RUnlock()
 
 	if !ok {
+		log.Printf("⚠️ No websocket client for user %d", userID)
 		return false
 	}
 
@@ -54,6 +54,7 @@ func (h *Hub) SendToUser(userID uint, message []byte) bool {
 	case client.Send <- message:
 		return true
 	default:
+		log.Printf("⚠️ Dropping message to user %d: send buffer full", userID)
 		return false
 	}
 }
@@ -69,11 +70,10 @@ func (h *Hub) Broadcast(message []byte, excludeUserID uint) {
 		select {
 		case client.Send <- message:
 		default:
-			
+
 		}
 	}
 }
-
 
 func (h *Hub) GetOnlineUsers() []uint {
 	h.mu.RLock()
@@ -85,7 +85,6 @@ func (h *Hub) GetOnlineUsers() []uint {
 	}
 	return users
 }
-
 
 func (h *Hub) IsOnline(userID uint) bool {
 	h.mu.RLock()

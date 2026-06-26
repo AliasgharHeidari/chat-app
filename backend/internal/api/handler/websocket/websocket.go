@@ -6,15 +6,15 @@ import (
 	"time"
 
 	"github.com/AliasgharHeidari/chat-app/internal/model"
+	messageService "github.com/AliasgharHeidari/chat-app/internal/service/chat"
 	"github.com/AliasgharHeidari/chat-app/internal/utils"
 	websocketPkg "github.com/AliasgharHeidari/chat-app/internal/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
-	messageService 	"github.com/AliasgharHeidari/chat-app/internal/service/chat"
 )
 
-
-var hub = websocketPkg.NewHub()
+// use the shared hub instance from websocket package
+var hub = websocketPkg.HubInstance
 
 func WebSocketHandler(c *fiber.Ctx) error {
 	if !websocket.IsWebSocketUpgrade(c) {
@@ -36,12 +36,58 @@ func WebSocketHandler(c *fiber.Ctx) error {
 	return websocket.New(func(conn *websocket.Conn) {
 		client := websocketPkg.NewClient(userID, conn)
 		hub.Register(client)
-		defer hub.Unregister(client)
+
+		// Notify existing clients about this user's online status (exclude self)
+		// and send current online users to newly connected client
+		online := hub.GetOnlineUsers()
+		// Send existing online users to the new client
+		for _, uid := range online {
+			if uid == client.ID {
+				continue
+			}
+			msg := model.WSMessage{
+				Type: model.WSMessageUserStatus,
+				Data: model.WSUserStatusData{
+					UserID:   uid,
+					IsOnline: true,
+				},
+			}
+			b, _ := json.Marshal(msg)
+			client.Send <- b
+		}
+
+		// Broadcast that this client is now online to others
+		onlineMsg := model.WSMessage{
+			Type: model.WSMessageUserStatus,
+			Data: model.WSUserStatusData{
+				UserID:   client.ID,
+				IsOnline: true,
+			},
+		}
+		onlineBytes, _ := json.Marshal(onlineMsg)
+		hub.Broadcast(onlineBytes, client.ID)
+
+		defer func() {
+			// On disconnect, unregister and broadcast offline status
+			hub.Unregister(client)
+			lastSeen := time.Now().Format(time.RFC3339)
+			offlineMsg := model.WSMessage{
+				Type: model.WSMessageUserStatus,
+				Data: model.WSUserStatusData{
+					UserID:   client.ID,
+					IsOnline: false,
+					LastSeen: &lastSeen,
+				},
+			}
+			offlineBytes, _ := json.Marshal(offlineMsg)
+			hub.Broadcast(offlineBytes, client.ID)
+		}()
 
 		go func() {
 			for {
 				var msg model.WSMessage
-				if err := conn.ReadJSON(&msg); err != nil {
+				err := conn.ReadJSON(&msg)
+				if err != nil {
 					break
 				}
 				handleMessage(client, msg)
@@ -49,7 +95,8 @@ func WebSocketHandler(c *fiber.Ctx) error {
 		}()
 
 		for msg := range client.Send {
-			conn.WriteJSON(msg)
+			// msg is already a JSON []byte
+			conn.WriteMessage(websocket.TextMessage, msg)
 		}
 	})(c)
 }
@@ -58,46 +105,81 @@ func handleMessage(client *websocketPkg.Client, msg model.WSMessage) {
 	log.Printf("📩 User %d sent: %s", client.ID, msg.Type)
 
 	switch msg.Type {
-case "new_message":
-    data, ok := msg.Data.(map[string]interface{})
-    if !ok {
-        log.Println("❌ Invalid data")
-        return
-    }
+	case "new_message":
+		data, ok := msg.Data.(map[string]interface{})
+		if !ok {
+			log.Println("❌ Invalid data")
+			return
+		}
 
-    chatID := uint(data["chat_id"].(float64))
-    text := data["message"].(string)
+		chatID := uint(data["chat_id"].(float64))
+		text := data["message"].(string)
 
+		savedMsg, err := messageService.SendMessage(chatID, client.ID, text)
+		if err != nil {
+			log.Println("❌ Save error:", err)
+			return
+		}
 
-    savedMsg, err := messageService.SendMessage(chatID, client.ID, text)
-    if err != nil {
-        log.Println("❌ Save error:", err)
-        return
-    }
+		chat, err := messageService.GetChatByChatID(client.ID, chatID)
+		if err != nil {
+			log.Printf("❌ Chat not found: %v", err)
+			client.Send <- []byte(`{"type":"error","data":"Chat not found"}`)
+			return
+		}
+		receiverID := chat.GetOtherUser(client.ID)
 
+		response := model.WSMessage{
+			Type: "new_message",
+			Data: model.WSNewMessageData{
+				MessageID:   savedMsg.ID,
+				ChatID:      savedMsg.ChatID,
+				SenderID:    savedMsg.SenderID,
+				SenderName:  savedMsg.Sender.FirstName + " " + savedMsg.Sender.LastName,
+				MessageText: savedMsg.MessageText,
+				Status:      string(savedMsg.Status),
+				CreatedAt:   savedMsg.CreatedAt.Format(time.RFC3339),
+			},
+		}
 
-    chat, _ := messageService.GetChatByChatID(chatID, client.ID)
-    receiverID := chat.GetOtherUser(client.ID)
+		responseBytes, _ := json.Marshal(response)
 
+		client.Send <- responseBytes
+		if ok := hub.SendToUser(receiverID, responseBytes); !ok {
+			log.Printf("❌ Failed to deliver message to user %d", receiverID)
+		}
 
-    response := model.WSMessage{
-        Type: "new_message",
-        Data: model.WSNewMessageData{
-            MessageID:   savedMsg.ID,
-            ChatID:      savedMsg.ChatID,
-            SenderID:    savedMsg.SenderID,
-            SenderName:  savedMsg.Sender.FirstName + " " + savedMsg.Sender.LastName,
-            MessageText: savedMsg.MessageText,
-            Status:      string(savedMsg.Status),
-            CreatedAt:   savedMsg.CreatedAt.Format(time.RFC3339),
-        },
-    }
+	case "typing":
+		data, ok := msg.Data.(map[string]interface{})
+		if !ok {
+			log.Println("❌ Invalid typing data")
+			return
+		}
 
-    responseBytes, _ := json.Marshal(response)
+		chatID := uint(data["chat_id"].(float64))
+		isTyping := data["is_typing"].(bool)
 
+		// Find other user in the chat
+		chat, err := messageService.GetChatByChatID(client.ID, chatID)
+		if err != nil {
+			log.Printf("❌ Chat not found for typing: %v", err)
+			return
+		}
+		receiverID := chat.GetOtherUser(client.ID)
 
-    client.Send <- responseBytes
-    hub.SendToUser(receiverID, responseBytes)
+		typingMsg := model.WSMessage{
+			Type: "typing",
+			Data: model.WSTypingData{
+				ChatID:   chatID,
+				UserID:   client.ID,
+				IsTyping: isTyping,
+			},
+		}
+		tb, _ := json.Marshal(typingMsg)
+		// Send to other participant
+		if ok := hub.SendToUser(receiverID, tb); !ok {
+			log.Printf("❌ Failed to deliver typing event to user %d", receiverID)
+		}
 
 	case "ping":
 		client.Send <- []byte(`{"type":"pong"}`)

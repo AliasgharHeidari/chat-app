@@ -20,7 +20,9 @@ export function useSocket() {
     currentChat,
   } = useChat();
 
-  const updateChatLastMessage = useChatStore((state) => state.updateChatLastMessage);
+  const updateChatLastMessage = useChatStore(
+    (state) => state.updateChatLastMessage,
+  );
 
   useEffect(() => {
     if (!token) return;
@@ -96,14 +98,15 @@ export function useSocket() {
       }
     });
 
-const unsubMessageDeleted = wsManager.on("message_deleted", (data) => {
-  console.log("🗑️ WS message_deleted RECEIVED:", data);
-  console.log("🗑️ currentChat:", currentChat);
-  if (currentChat?.id === data.chat_id) {
-    console.log("🗑️ Removing message from WS:", data.message_id);
-    removeMessage(data.chat_id, data.message_id);
-  }
-});
+    const unsubMessageDeleted = wsManager.on("message_deleted", (data) => {
+      console.log("🗑️ WS message_deleted RECEIVED:", data);
+      console.log("🗑️ currentChat:", currentChat);
+      if (currentChat?.id === data.chat_id) {
+        console.log("🗑️ Removing message from WS:", data.message_id);
+        removeMessage(data.chat_id, data.message_id);
+      }
+    });
+
     const unsubMessageEdited = wsManager.on("message_edited", (data) => {
       console.debug("WS message_edited:", data);
       if (currentChat) {
@@ -137,7 +140,6 @@ const unsubMessageDeleted = wsManager.on("message_deleted", (data) => {
     updateChatLastMessage,
   ]);
 
-  // ✅ sendMessage فقط یک بار تعریف شده
   const sendMessage = useCallback((chatId: number, messageText: string) => {
     console.log("📤 sendMessage called in useSocket:", { chatId, messageText });
     wsManager.send("new_message", {
@@ -158,6 +160,7 @@ const unsubMessageDeleted = wsManager.on("message_deleted", (data) => {
   );
 
   const markAsSeen = useCallback((messageId: number) => {
+    console.log("👁️ markAsSeen called for message:", messageId);
     wsManager.send("message_status", {
       message_id: messageId,
       status: "seen",

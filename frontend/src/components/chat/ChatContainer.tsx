@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import type { Chat } from "@/types";
 import { MessageList } from "./MessageList";
 import { useChat } from "@/hooks/useChat";
-import { useChatStore } from "@/store/chatStore"; // ✅ اضافه شد
+import { useChatStore } from "@/store/chatStore";
+import { useSocket } from "@/hooks/useSocket"; // ✅ اضافه شد
 import { MessageInput } from "./MessageInput";
 import { UserStatus } from "./UserStatus";
 import { TypingIndicator } from "./TypingIndicator";
@@ -34,6 +35,9 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
 
   // ✅ messages رو مستقیم از store بگیر
   const messages = useChatStore((state) => state.messages[chat.id] || []);
+
+  // ✅ markAsSeen رو از useSocket بگیر
+  const { markAsSeen } = useSocket();
 
   const otherUser = chat.user1_id === currentUserId ? chat.user2 : chat.user1;
   const otherUserInitials = otherUser
@@ -72,21 +76,20 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     }
   };
 
-const handleDeleteMessage = async (messageId: number, forEveryone = false) => {
-  const ok = confirm(
-    forEveryone
-      ? "Delete this message for everyone?"
-      : "Delete this message for me?",
-  );
-  if (!ok) return;
-  try {
-    await api.deleteMessage(messageId, { delete_for_everyone: forEveryone });
-    // ❌ این خط رو حذف کن (چون WebSocket خودش رو صدا میزنه)
-    // onDeleteMessage?.(messageId, forEveryone);
-  } catch (error) {
-    console.error("Failed to delete message:", error);
-  }
-};
+  const handleDeleteMessage = async (messageId: number, forEveryone = false) => {
+    console.log("📤 ChatContainer - forEveryone:", forEveryone);
+    const ok = confirm(
+      forEveryone
+        ? "Delete this message for everyone?"
+        : "Delete this message for me?",
+    );
+    if (!ok) return;
+    try {
+      await api.deleteMessage(messageId, { delete_for_everyone: forEveryone });
+    } catch (error) {
+      console.error("Failed to delete message:", error);
+    }
+  };
 
   if (!otherUser) {
     return (
@@ -113,11 +116,12 @@ const handleDeleteMessage = async (messageId: number, forEveryone = false) => {
       <TypingIndicator userNames={typingUserNames} />
 
       <MessageList
-        messages={messages} // ✅ messages از store میاد
+        messages={messages}
         currentUserId={currentUserId}
         isLoading={isLoadingMessages}
         onEdit={handleEditMessage}
         onDelete={handleDeleteMessage}
+        onSeen={markAsSeen} // ✅ پاس بده
       />
       <MessageInput
         onSendMessage={handleSendMessage}

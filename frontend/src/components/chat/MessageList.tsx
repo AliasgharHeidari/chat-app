@@ -10,7 +10,8 @@ interface MessageListProps {
   currentUserId: number;
   isLoading?: boolean;
   onEdit?: (messageId: number, newText: string) => void;
-  onDelete?: (messageId: number) => void;
+  onDelete?: (messageId: number, forEveryone: boolean) => void;
+  onSeen?: (messageId: number) => void; // ✅ اضافه شد
 }
 
 export const MessageList: React.FC<MessageListProps> = ({
@@ -19,16 +20,47 @@ export const MessageList: React.FC<MessageListProps> = ({
   isLoading = false,
   onEdit,
   onDelete,
+  onSeen, // ✅ اضافه شد
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const seenTimeoutRef = useRef<number | null>(null);
 
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    // Auto-scroll to bottom when new messages arrive
     if (containerRef.current) {
       const scrollHeight = containerRef.current.scrollHeight;
       containerRef.current.scrollTop = scrollHeight;
     }
   }, [messages]);
+
+  // ✅ وقتی پیام جدید میاد، تمام پیام‌های دیده نشده رو seen کن
+  useEffect(() => {
+    if (messages.length > 0 && onSeen) {
+      // تمام پیام‌های دیده نشده از کاربر دیگر رو پیدا کن
+      const unseenMessages = messages.filter(
+        (msg) => msg.sender_id !== currentUserId && msg.status !== "seen",
+      );
+
+      if (unseenMessages.length > 0) {
+        // با تأخیر کوچک برای جلوگیری از ارسال همزمان
+        if (seenTimeoutRef.current) {
+          clearTimeout(seenTimeoutRef.current);
+        }
+        seenTimeoutRef.current = setTimeout(() => {
+          // تمام پیام‌های دیده نشده رو mark کن
+          unseenMessages.forEach((msg) => {
+            onSeen(msg.id);
+          });
+        }, 500);
+      }
+    }
+
+    return () => {
+      if (seenTimeoutRef.current) {
+        clearTimeout(seenTimeoutRef.current);
+      }
+    };
+  }, [messages, currentUserId, onSeen]);
 
   const getDateLabel = (dateString: string): string => {
     if (isToday(dateString)) return "Today";
@@ -83,7 +115,7 @@ export const MessageList: React.FC<MessageListProps> = ({
               key={message.id}
               message={message}
               isOwn={message.sender_id === currentUserId}
-               currentUserId={currentUserId}
+              currentUserId={currentUserId}
               showAvatar={
                 index === 0 ||
                 group.messages[index - 1].sender_id !== message.sender_id

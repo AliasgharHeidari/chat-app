@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"strconv"
 
 	customError "github.com/AliasgharHeidari/chat-app/internal/errors"
@@ -16,6 +17,8 @@ func DeleteMessage(c *fiber.Ctx) error {
 	userID := c.Locals("id").(uint)
 
 	var input model.DeleteMessageRequest
+
+	log.Printf("🔍 DeleteForEveryone from body: %v", input.DeleteForEveryone)
 
 	err := c.BodyParser(&input)
 	if err != nil {
@@ -67,9 +70,9 @@ func DeleteMessage(c *fiber.Ctx) error {
 		message = "Message deleted for everyone"
 	}
 
-	// Broadcast deletion to participants
+	// Broadcast deletion to participants (only if delete for everyone)
 	chat, err2 := service.GetChatByChatID(userID, msg.ChatID)
-	if err2 == nil {
+	if err2 == nil && input.DeleteForEveryone {
 		otherID := chat.GetOtherUser(userID)
 		wsMsg := model.WSMessage{
 			Type: model.WSMessageMessageDeleted,

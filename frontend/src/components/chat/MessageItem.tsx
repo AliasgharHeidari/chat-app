@@ -21,15 +21,22 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   onEdit,
   onDelete,
 }) => {
+
+  console.log("🔍 MessageItem:", {
+  id: message.id,
+  deleted_for: message.deleted_for,
+  currentUserId: currentUserId,
+  shouldHide: message.deleted_for && message.deleted_for === currentUserId,
+});
+
   const [isEditing, setIsEditing] = React.useState(false);
   const [editText, setEditText] = React.useState(message.message_text);
   const [showMenu, setShowMenu] = React.useState(false);
 
   // ✅ اگر پیام برای کاربر فعلی حذف شده، نشون نده
-  if (message.deleted_for === currentUserId) {
-    return null;
-  }
-
+if (message.deleted_for && message.deleted_for === currentUserId) {
+  return null;
+}
   const handleEditSubmit = () => {
     if (editText.trim() && editText !== message.message_text) {
       onEdit?.(message.id, editText);

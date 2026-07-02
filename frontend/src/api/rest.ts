@@ -150,12 +150,16 @@ class ChatAPI {
     return response.data;
   }
 
-  async deleteMessage(
-    messageId: number,
-    data: DeleteMessageRequest,
-  ): Promise<void> {
-    await this.client.delete(`/chat/messages/${messageId}`, { data });
-  }
+async deleteMessage(
+  messageId: number,
+  data: DeleteMessageRequest,
+): Promise<void> {
+  await this.client({
+    method: 'delete',
+    url: `/chat/messages/${messageId}`,
+    data: data,
+  });
+}
 
   // User endpoints
   async searchUsers(query: string): Promise<SearchUsersResponse[]> {

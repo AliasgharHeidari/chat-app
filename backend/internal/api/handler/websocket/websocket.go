@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/AliasgharHeidari/chat-app/internal/model"
+	indatabase "github.com/AliasgharHeidari/chat-app/internal/repository/indatabase/chat"
 	messageService "github.com/AliasgharHeidari/chat-app/internal/service/chat"
 	"github.com/AliasgharHeidari/chat-app/internal/utils"
 	websocketPkg "github.com/AliasgharHeidari/chat-app/internal/websocket"
@@ -183,6 +184,44 @@ func handleMessage(client *websocketPkg.Client, msg model.WSMessage) {
 
 	case "ping":
 		client.Send <- []byte(`{"type":"pong"}`)
+
+	case "message_status":
+		data, ok := msg.Data.(map[string]interface{})
+		if !ok {
+			log.Println("❌ Invalid message_status data")
+			return
+		}
+
+		messageID := uint(data["message_id"].(float64))
+		status := data["status"].(string)
+
+		// Get the message to find which chat it belongs to
+		dbMsg, err := indatabase.GetMessageByID(messageID)
+		if err != nil {
+			log.Printf("❌ Message not found: %v", err)
+			return
+		}
+
+		// Update the message status in database
+		err = messageService.MarkMessageAsSeen(messageID)
+		if err != nil {
+			log.Printf("❌ Failed to update message status: %v", err)
+			return
+		}
+
+		// Broadcast status update to the sender
+		statusMsg := model.WSMessage{
+			Type: "message_status",
+			Data: model.WSMessageStatusData{
+				MessageID: messageID,
+				Status:    status,
+				SeenAt:    time.Now().Format(time.RFC3339),
+			},
+		}
+		sb, _ := json.Marshal(statusMsg)
+		if ok := hub.SendToUser(dbMsg.SenderID, sb); !ok {
+			log.Printf("❌ Failed to deliver status update to user %d", dbMsg.SenderID)
+		}
 
 	default:
 		log.Printf("❌ Unknown type: %s", msg.Type)

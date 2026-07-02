@@ -173,5 +173,7 @@ export interface SearchUsersResponse {
 
 export interface GetMessagesResponse {
   messages: Message[];
-  total: number;
+  count: number;
+  limit: number;
+  offset: number;
 }

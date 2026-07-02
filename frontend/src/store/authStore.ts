@@ -54,7 +54,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
         token: result.token,
         isLoading: false,
       });
-      setToken(result.token);
+      api.setToken(result.token);
     } catch (error) {
       set({
         error: api.getErrorMessage(error),
@@ -73,7 +73,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
         token: result.token,
         isLoading: false,
       });
-      setToken(result.token);
+      api.setToken(result.token);
     } catch (error) {
       set({
         error: api.getErrorMessage(error),
@@ -89,7 +89,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       token: null,
       error: null,
     });
-    setToken(null);
+    api.setToken(null);
   },
 
   getCurrentUser: async () => {

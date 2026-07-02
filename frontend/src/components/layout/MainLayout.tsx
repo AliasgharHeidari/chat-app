@@ -13,7 +13,6 @@ export const MainLayout: React.FC = () => {
   const {
     chats,
     currentChat,
-    currentMessages,
     isLoadingChats,
     setCurrentChat,
     loadChats,
@@ -31,7 +30,8 @@ export const MainLayout: React.FC = () => {
 
   React.useEffect(() => {
     if (currentChat) {
-      loadChatMessages(currentChat.id);
+      // Clear previous messages and load new ones
+      loadChatMessages(currentChat.id, 20, 0);
     }
   }, [currentChat, loadChatMessages]);
 
@@ -120,7 +120,6 @@ export const MainLayout: React.FC = () => {
         {currentChat && user ? (
           <ChatContainer
             chat={currentChat}
-            messages={currentMessages}
             currentUserId={user.id}
             typingUsers={typingUsers[currentChat.id] || new Set()}
             onSendMessage={handleSendMessage}

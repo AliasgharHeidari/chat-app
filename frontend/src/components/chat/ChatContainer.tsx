@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // ✅ useEffect اضافه شد
 import type { Chat } from "@/types";
 import { MessageList } from "./MessageList";
 import { useChat } from "@/hooks/useChat";
 import { useChatStore } from "@/store/chatStore";
-import { useSocket } from "@/hooks/useSocket"; // ✅ اضافه شد
+import { useSocket } from "@/hooks/useSocket";
 import { MessageInput } from "./MessageInput";
 import { UserStatus } from "./UserStatus";
 import { TypingIndicator } from "./TypingIndicator";
@@ -15,29 +15,35 @@ interface ChatContainerProps {
   chat: Chat;
   currentUserId: number;
   typingUsers: Set<number>;
-  isLoadingMessages?: boolean;
   onSendMessage: (text: string) => void;
   onTyping: (isTyping: boolean) => void;
   onEditMessage?: (messageId: number, newText: string) => void;
-  onDeleteMessage?: (messageId: number, forEveryone?: boolean) => void;
 }
 
 export const ChatContainer: React.FC<ChatContainerProps> = ({
   chat,
   currentUserId,
   typingUsers,
-  isLoadingMessages = false,
   onSendMessage,
   onTyping,
   onEditMessage,
 }) => {
   const [isSending, setIsSending] = useState(false);
 
-  // ✅ messages رو مستقیم از store بگیر
+  // ✅ از store بگیر
   const messages = useChatStore((state) => state.messages[chat.id] || []);
+  const isLoadingMessages = useChatStore((state) => state.isLoadingMessages);
+  const loadChatMessages = useChatStore((state) => state.loadChatMessages);
 
   // ✅ markAsSeen رو از useSocket بگیر
   const { markAsSeen } = useSocket();
+
+  // ✅ وقتی چت عوض میشه، پیام‌ها رو لود کن
+  useEffect(() => {
+    if (chat?.id) {
+      loadChatMessages(chat.id, 20, 0);
+    }
+  }, [chat?.id, loadChatMessages]);
 
   const otherUser = chat.user1_id === currentUserId ? chat.user2 : chat.user1;
   const otherUserInitials = otherUser
@@ -121,7 +127,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
         isLoading={isLoadingMessages}
         onEdit={handleEditMessage}
         onDelete={handleDeleteMessage}
-        onSeen={markAsSeen} // ✅ پاس بده
+        onSeen={markAsSeen}
       />
       <MessageInput
         onSendMessage={handleSendMessage}

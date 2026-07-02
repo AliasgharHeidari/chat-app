@@ -19,17 +19,15 @@ export function useSocket() {
     setUserNotTyping,
     currentChat,
   } = useChat();
-
-  const updateChatLastMessage = useChatStore(
-    (state) => state.updateChatLastMessage,
-  );
+  const updateChatLastMessage = useChatStore((state) => state.updateChatLastMessage);
+  const loadChatMessages = useChatStore((state) => state.loadChatMessages);
+  // ✅ برای رفرش کل لیست چت‌ها (تا last_message/unread هم روی reconnect sync بشه)
+  const loadChats = useChatStore((state) => state.loadChats);
 
   useEffect(() => {
     if (!token) return;
-
     wsManager.setToken(token);
     setIsConnecting(true);
-
     wsManager
       .connect()
       .then(() => {
@@ -45,18 +43,16 @@ export function useSocket() {
       setIsConnected(true);
       setIsConnecting(false);
     });
-
     const unsubDisconnect = wsManager.on("disconnect", () => {
       setIsConnected(false);
     });
-
     const unsubNewMessage = wsManager.on("new_message", (data) => {
       console.debug("WS new_message:", data);
-
       const message: Message = {
         id: data.message_id,
         chat_id: data.chat_id,
         sender_id: data.sender_id,
+        sender_name: data.sender_name,
         message_text: data.message_text,
         status: data.status || "sent",
         is_edited: false,
@@ -64,11 +60,9 @@ export function useSocket() {
         created_at: data.created_at,
         updated_at: data.created_at,
       };
-
       addMessage(data.chat_id, message);
       updateChatLastMessage(data.chat_id, message);
     });
-
     const unsubMessageStatus = wsManager.on("message_status", (data) => {
       console.debug("WS message_status:", data);
       if (currentChat) {
@@ -77,7 +71,6 @@ export function useSocket() {
         });
       }
     });
-
     const unsubTyping = wsManager.on("typing", (data) => {
       console.debug("WS typing:", data);
       if (currentChat?.id === data.chat_id) {
@@ -88,7 +81,6 @@ export function useSocket() {
         }
       }
     });
-
     const unsubUserStatus = wsManager.on("user_status", (data) => {
       console.debug("WS user_status:", data);
       if (data.is_online) {
@@ -97,16 +89,11 @@ export function useSocket() {
         setUserOffline(data.user_id);
       }
     });
-
     const unsubMessageDeleted = wsManager.on("message_deleted", (data) => {
-      console.log("🗑️ WS message_deleted RECEIVED:", data);
-      console.log("🗑️ currentChat:", currentChat);
       if (currentChat?.id === data.chat_id) {
-        console.log("🗑️ Removing message from WS:", data.message_id);
         removeMessage(data.chat_id, data.message_id);
       }
     });
-
     const unsubMessageEdited = wsManager.on("message_edited", (data) => {
       console.debug("WS message_edited:", data);
       if (currentChat) {
@@ -140,8 +127,20 @@ export function useSocket() {
     updateChatLastMessage,
   ]);
 
+  // ✅ وقتی WebSocket وصل شد (اتصال اولیه یا reconnect بعد از آفلاین بودن)،
+  // هم لیست چت‌ها (برای last_message/unread) و هم پیام‌های چت جاری رو
+  // دوباره از دیتابیس می‌گیریم. این همون چیزیه که باعث میشه پیام‌هایی
+  // که وقتی کاربر آفلاین بوده ارسال شدن، بعد از آنلاین شدن نمایش داده بشن.
+  useEffect(() => {
+    if (isConnected) {
+      loadChats();
+      if (currentChat?.id) {
+        loadChatMessages(currentChat.id, 20, 0);
+      }
+    }
+  }, [isConnected, currentChat?.id, loadChatMessages, loadChats]);
+
   const sendMessage = useCallback((chatId: number, messageText: string) => {
-    console.log("📤 sendMessage called in useSocket:", { chatId, messageText });
     wsManager.send("new_message", {
       chat_id: chatId,
       message: messageText,
@@ -160,7 +159,6 @@ export function useSocket() {
   );
 
   const markAsSeen = useCallback((messageId: number) => {
-    console.log("👁️ markAsSeen called for message:", messageId);
     wsManager.send("message_status", {
       message_id: messageId,
       status: "seen",

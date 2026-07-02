@@ -58,8 +58,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   isLoadingMessages: false,
   error: null,
 
-  // ✅ حالا currentChat رو در localStorage هم نگه می‌داریم
-  // تا بعد از رفرش صفحه بشه دوباره بازیابیش کرد.
   setCurrentChat: (chat) => {
     set({ currentChat: chat });
     if (chat) {
@@ -75,8 +73,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       const chats = await api.getAllChats();
       set({ chats, isLoadingChats: false });
 
-      // ✅ بعد از لود شدن چت‌ها، اگه چت جاری هنوز ست نشده
-      // (مثلاً بعد از رفرش صفحه)، از localStorage بازیابی کن.
       const state = get();
       if (!state.currentChat) {
         const savedChatId = localStorage.getItem(CURRENT_CHAT_STORAGE_KEY);
@@ -87,7 +83,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
           if (restoredChat) {
             set({ currentChat: restoredChat });
           } else {
-            // چت دیگه معتبر نیست (مثلاً حذف شده)، پاکش کن
             localStorage.removeItem(CURRENT_CHAT_STORAGE_KEY);
           }
         }
@@ -117,49 +112,48 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
   },
 
-loadChatMessages: async (chatId, limit = 20, offset = 0) => {
-  set({ isLoadingMessages: true, error: null });
-  try {
-    const response = await api.getChatMessages(chatId, limit, offset);
-    const state = get();
-    const existingMessages = state.messages[chatId] || [];
+  loadChatMessages: async (chatId, limit = 20, offset = 0) => {
+    set({ isLoadingMessages: true, error: null });
+    try {
+      const response = await api.getChatMessages(chatId, limit, offset);
+      const state = get();
+      const existingMessages = state.messages[chatId] || [];
 
-    if (offset === 0) {
-      // ✅ جدیدترین‌ها اول هستن، پس معکوسشون کن تا قدیمی‌ترین اول بشه
-      const reversedMessages = [...response.messages].reverse();
+      if (offset === 0) {
+        // ✅ معکوس کردن برای نمایش درست (قدیمی‌ترین اول)
+        const reversedMessages = [...response.messages].reverse();
+        set({
+          messages: {
+            ...state.messages,
+            [chatId]: reversedMessages,
+          },
+          isLoadingMessages: false,
+        });
+      } else {
+        // ✅ پیام‌های جدید (قدیمی‌تر) رو به اول لیست اضافه کن
+        const allMessages = [...response.messages, ...existingMessages];
+        const deduped = Array.from(
+          new Map(allMessages.map((msg) => [msg.id, msg])).values()
+        );
+        set({
+          messages: {
+            ...state.messages,
+            [chatId]: deduped,
+          },
+          isLoadingMessages: false,
+        });
+      }
+    } catch (error) {
       set({
-        messages: {
-          ...state.messages,
-          [chatId]: reversedMessages,
-        },
-        isLoadingMessages: false,
-      });
-    } else {
-      // Pagination - append new messages and deduplicate
-      const allMessages = [...existingMessages, ...response.messages];
-      const deduped = Array.from(
-        new Map(allMessages.map((msg) => [msg.id, msg])).values(),
-      );
-      set({
-        messages: {
-          ...state.messages,
-          [chatId]: deduped,
-        },
+        error: api.getErrorMessage(error),
         isLoadingMessages: false,
       });
     }
-  } catch (error) {
-    set({
-      error: api.getErrorMessage(error),
-      isLoadingMessages: false,
-    });
-  }
-},
+  },
 
   addMessage: (chatId, message) => {
     const state = get();
     const chatMessages = state.messages[chatId] || [];
-    // Avoid duplicates
     if (chatMessages.some((m) => m.id === message.id)) {
       return;
     }

@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./Avatar.module.css";
 
 interface AvatarProps {
-  src?: string;
+  src?: string | null;
   alt?: string;
   size?: "small" | "medium" | "large";
   isOnline?: boolean;
@@ -14,7 +14,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   alt = "User avatar",
   size = "medium",
   isOnline = false,
-  initials,
+  initials = "?",
 }) => {
   const avatarClass = `${styles.avatar} ${styles[size]}`;
 
@@ -22,7 +22,15 @@ export const Avatar: React.FC<AvatarProps> = ({
     <div className={styles.container}>
       <div className={avatarClass}>
         {src ? (
-          <img src={src} alt={alt} className={styles.image} />
+          <img 
+            src={src} 
+            alt={alt} 
+            className={styles.image}
+            onError={(e) => {
+              // اگه عکس لود نشد، مخفی کن و initials رو نشون بده
+              e.currentTarget.style.display = "none";
+            }}
+          />
         ) : (
           <div className={styles.placeholder}>{initials}</div>
         )}

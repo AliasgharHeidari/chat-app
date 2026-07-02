@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; // ✅ useEffect اضافه شد
+import React, { useState, useEffect } from "react";
 import type { Chat } from "@/types";
 import { MessageList } from "./MessageList";
 import { useChat } from "@/hooks/useChat";
@@ -29,21 +29,27 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   onEditMessage,
 }) => {
   const [isSending, setIsSending] = useState(false);
+  const [offset, setOffset] = useState(20); // ✅ برای pagination
 
-  // ✅ از store بگیر
   const messages = useChatStore((state) => state.messages[chat.id] || []);
   const isLoadingMessages = useChatStore((state) => state.isLoadingMessages);
   const loadChatMessages = useChatStore((state) => state.loadChatMessages);
-
-  // ✅ markAsSeen رو از useSocket بگیر
   const { markAsSeen } = useSocket();
 
   // ✅ وقتی چت عوض میشه، پیام‌ها رو لود کن
   useEffect(() => {
     if (chat?.id) {
+      setOffset(20);
       loadChatMessages(chat.id, 20, 0);
     }
   }, [chat?.id, loadChatMessages]);
+
+  // ✅ تابع لود پیام‌های بیشتر (اسکرول به بالا)
+  const handleLoadMore = () => {
+    if (!chat?.id || isLoadingMessages) return;
+    loadChatMessages(chat.id, 20, offset);
+    setOffset(offset + 20);
+  };
 
   const otherUser = chat.user1_id === currentUserId ? chat.user2 : chat.user1;
   const otherUserInitials = otherUser
@@ -106,8 +112,10 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   }
 
   const { isUserOnline } = useChat();
-
   const otherIsOnline = otherUser ? isUserOnline(otherUser.id) : false;
+
+  // ✅ محاسبه hasMore
+  const hasMore = messages.length >= offset && messages.length > 0;
 
   return (
     <div className={styles.container}>
@@ -128,6 +136,8 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
         onEdit={handleEditMessage}
         onDelete={handleDeleteMessage}
         onSeen={markAsSeen}
+        onLoadMore={handleLoadMore} // ✅ پاس بده
+        hasMore={hasMore} // ✅ پاس بده
       />
       <MessageInput
         onSendMessage={handleSendMessage}

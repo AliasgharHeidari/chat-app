@@ -29,7 +29,6 @@ class ChatAPI {
       },
     });
 
-    // Add interceptor for auth token
     this.client.interceptors.request.use((config) => {
       if (this.token) {
         config.headers.Authorization = `Bearer ${this.token}`;
@@ -37,7 +36,6 @@ class ChatAPI {
       return config;
     });
 
-    // Restore token from localStorage
     const storedToken = localStorage.getItem("auth_token");
     if (storedToken) {
       this.token = storedToken;
@@ -61,13 +59,10 @@ class ChatAPI {
   async register(data: RegisterRequest): Promise<AuthResponse> {
     const response = await this.client.post("/auth/register", data);
     const token = response.data.token;
-
     if (token && response.data.user) {
       this.setToken(token);
       return { token, user: response.data.user };
     }
-
-    // Backend may not return auth data after registration, so log in automatically.
     const loginResponse = await this.login({
       username: data.username,
       password: data.password,
@@ -81,13 +76,10 @@ class ChatAPI {
     if (!token) {
       throw new Error("Login response did not include token");
     }
-
     this.setToken(token);
-
     if (response.data.user) {
       return { token, user: response.data.user };
     }
-
     const profileResponse = await this.client.get("/chat/me");
     const profileData = profileResponse.data.user ?? profileResponse.data;
     return { token, user: profileData };
@@ -101,8 +93,6 @@ class ChatAPI {
 
   async updateProfile(data: UpdateProfileRequest): Promise<User> {
     const response = await this.client.put("/chat/me", data);
-    // Backend currently returns only a message on success; fetch the profile
-    // to ensure callers receive the updated `User` object.
     if (response.data && response.data.user) {
       return response.data.user;
     }
@@ -150,21 +140,20 @@ class ChatAPI {
     return response.data;
   }
 
-async deleteMessage(
-  messageId: number,
-  data: DeleteMessageRequest,
-): Promise<void> {
-  await this.client({
-    method: 'delete',
-    url: `/chat/messages/${messageId}`,
-    data: data,
-  });
-}
+  async deleteMessage(
+    messageId: number,
+    data: DeleteMessageRequest,
+  ): Promise<void> {
+    await this.client({
+      method: 'delete',
+      url: `/chat/messages/${messageId}`,
+      data: data,
+    });
+  }
 
   // User endpoints
   async searchUsers(query: string): Promise<SearchUsersResponse[]> {
     const response = await this.client.get(`/chat/users/search?q=${query}`);
-    // Backend returns { users: [...], count: n }
     return response.data.users ?? [];
   }
 
@@ -173,7 +162,6 @@ async deleteMessage(
     return response.data.user ?? response.data;
   }
 
-  // Error handler
   getErrorMessage(error: unknown): string {
     if (axios.isAxiosError(error)) {
       return error.response?.data?.message || error.message;
@@ -183,5 +171,3 @@ async deleteMessage(
 }
 
 export const api = new ChatAPI();
-
-

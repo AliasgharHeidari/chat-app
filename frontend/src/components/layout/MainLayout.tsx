@@ -6,6 +6,7 @@ import { UserList } from "@/components/chat/UserList";
 import { ChatContainer } from "@/components/chat/ChatContainer";
 import { SearchUsers } from "@/components/chat/SearchUsers";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { ProfileEditor } from "@/components/profile/ProfileEditor"; // ✅ اضافه شد
 import styles from "./MainLayout.module.css";
 
 export const MainLayout: React.FC = () => {
@@ -23,6 +24,7 @@ export const MainLayout: React.FC = () => {
   } = useChat();
   const { isConnected, sendMessage, sendTyping } = useSocket();
   const [showSearchUsers, setShowSearchUsers] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false); // ✅ اضافه شد
 
   React.useEffect(() => {
     loadChats();
@@ -30,7 +32,6 @@ export const MainLayout: React.FC = () => {
 
   React.useEffect(() => {
     if (currentChat) {
-      // Clear previous messages and load new ones
       loadChatMessages(currentChat.id, 20, 0);
     }
   }, [currentChat, loadChatMessages]);
@@ -63,9 +64,14 @@ export const MainLayout: React.FC = () => {
 
   const handleDeleteMessage = (messageId: number) => {
     if (currentChat) {
-      // default: delete for me
       removeMessage(currentChat.id, messageId);
     }
+  };
+
+  // ✅ آپدیت پروفایل
+  const handleProfileUpdate = (updatedUser: any) => {
+    // user رو به‌روز میکنیم (useAuth handle میکنه)
+    console.log("Profile updated:", updatedUser);
   };
 
   if (isLoadingChats && chats.length === 0) {
@@ -82,14 +88,25 @@ export const MainLayout: React.FC = () => {
         <div className={styles.sidebarHeader}>
           <h1 className={styles.appTitle}>Chat</h1>
           <div className={styles.headerActions}>
-            {user && <span className={styles.username}>{user.username}</span>}
-            <button
-              onClick={logout}
-              className={styles.logoutButton}
-              title="Logout"
-            >
-              ↓
-            </button>
+            {user && (
+              <>
+                <span className={styles.username}>{user.username}</span>
+                <button
+                  onClick={() => setIsProfileOpen(true)} // ✅ دکمه ویرایش
+                  className={styles.editProfileButton}
+                  title="Edit Profile"
+                >
+                  ✏️
+                </button>
+                <button
+                  onClick={logout}
+                  className={styles.logoutButton}
+                  title="Logout"
+                >
+                  ↓
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -133,6 +150,13 @@ export const MainLayout: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* ✅ مودال ویرایش پروفایل */}
+      <ProfileEditor
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        onUpdate={handleProfileUpdate}
+      />
     </div>
   );
 };

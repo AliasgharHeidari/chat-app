@@ -104,12 +104,7 @@ if (message.deleted_for && message.deleted_for === currentUserId) {
                     Edit
                   </button>
                   <div className={styles.deleteGroup}>
-                    <button
-                      onClick={() => onDelete?.(message.id, false)}
-                      className={styles.menuItem}
-                    >
-                      Delete for me
-                    </button>
+                  
                     {isOwn && (
                       <button
                         onClick={() => onDelete?.(message.id, true)}

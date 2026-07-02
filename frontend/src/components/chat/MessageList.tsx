@@ -11,7 +11,9 @@ interface MessageListProps {
   isLoading?: boolean;
   onEdit?: (messageId: number, newText: string) => void;
   onDelete?: (messageId: number, forEveryone: boolean) => void;
-  onSeen?: (messageId: number) => void; // ✅ اضافه شد
+  onSeen?: (messageId: number) => void;
+  onLoadMore?: () => void; // ✅ اضافه شد
+  hasMore?: boolean; // ✅ اضافه شد
 }
 
 export const MessageList: React.FC<MessageListProps> = ({
@@ -20,10 +22,14 @@ export const MessageList: React.FC<MessageListProps> = ({
   isLoading = false,
   onEdit,
   onDelete,
-  onSeen, // ✅ اضافه شد
+  onSeen,
+  onLoadMore, // ✅ اضافه شد
+  hasMore = false, // ✅ اضافه شد
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const seenTimeoutRef = useRef<number | null>(null);
+  const isLoadingMoreRef = useRef(false);
+  const prevScrollHeightRef = useRef(0);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -33,34 +39,54 @@ export const MessageList: React.FC<MessageListProps> = ({
     }
   }, [messages]);
 
-  // ✅ وقتی پیام جدید میاد، تمام پیام‌های دیده نشده رو seen کن
+  // وقتی پیام جدید میاد، تمام پیام‌های دیده نشده رو seen کن
   useEffect(() => {
     if (messages.length > 0 && onSeen) {
-      // تمام پیام‌های دیده نشده از کاربر دیگر رو پیدا کن
       const unseenMessages = messages.filter(
         (msg) => msg.sender_id !== currentUserId && msg.status !== "seen",
       );
-
       if (unseenMessages.length > 0) {
-        // با تأخیر کوچک برای جلوگیری از ارسال همزمان
         if (seenTimeoutRef.current) {
           clearTimeout(seenTimeoutRef.current);
         }
         seenTimeoutRef.current = setTimeout(() => {
-          // تمام پیام‌های دیده نشده رو mark کن
           unseenMessages.forEach((msg) => {
             onSeen(msg.id);
           });
         }, 500);
       }
     }
-
     return () => {
       if (seenTimeoutRef.current) {
         clearTimeout(seenTimeoutRef.current);
       }
     };
   }, [messages, currentUserId, onSeen]);
+
+  // ✅ تشخیص اسکرول به بالا
+  const handleScroll = () => {
+    if (!containerRef.current || isLoading || !onLoadMore || !hasMore) return;
+    if (isLoadingMoreRef.current) return;
+
+    const { scrollTop } = containerRef.current;
+    if (scrollTop < 50) {
+      isLoadingMoreRef.current = true;
+      prevScrollHeightRef.current = containerRef.current.scrollHeight;
+      onLoadMore();
+      setTimeout(() => {
+        isLoadingMoreRef.current = false;
+      }, 1000);
+    }
+  };
+
+  // ✅ بعد از لود پیام‌های جدید، اسکرول رو در موقعیت قبلی نگه دار
+  useEffect(() => {
+    if (isLoadingMoreRef.current && containerRef.current) {
+      const newScrollHeight = containerRef.current.scrollHeight;
+      const diff = newScrollHeight - prevScrollHeightRef.current;
+      containerRef.current.scrollTop = diff > 0 ? diff : 0;
+    }
+  }, [messages]);
 
   const getDateLabel = (dateString: string): string => {
     if (isToday(dateString)) return "Today";
@@ -70,7 +96,6 @@ export const MessageList: React.FC<MessageListProps> = ({
 
   const groupMessagesByDate = (msgs: Message[]) => {
     const groups: { [key: string]: Message[] } = {};
-
     msgs.forEach((msg) => {
       const date = msg.created_at.split("T")[0];
       if (!groups[date]) {
@@ -78,7 +103,6 @@ export const MessageList: React.FC<MessageListProps> = ({
       }
       groups[date].push(msg);
     });
-
     return Object.entries(groups).map(([date, msgs]) => ({
       date,
       messages: msgs,
@@ -104,7 +128,16 @@ export const MessageList: React.FC<MessageListProps> = ({
   }
 
   return (
-    <div className={styles.container} ref={containerRef}>
+    <div 
+      className={styles.container} 
+      ref={containerRef}
+      onScroll={handleScroll} // ✅ اضافه شد
+    >
+      {isLoading && hasMore && (
+        <div className={styles.loadingMore}>
+          <LoadingSpinner size="small" />
+        </div>
+      )}
       {groupedMessages.map((group) => (
         <div key={group.date}>
           <div className={styles.dateLabel}>

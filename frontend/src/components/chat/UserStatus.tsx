@@ -8,6 +8,7 @@ interface UserStatusProps {
   lastSeen?: string;
   initials?: string;
   profilePicUrl?: string;
+  onClick?: () => void; 
 }
 
 export const UserStatus: React.FC<UserStatusProps> = ({
@@ -16,6 +17,7 @@ export const UserStatus: React.FC<UserStatusProps> = ({
   lastSeen,
   initials,
   profilePicUrl,
+  onClick, // ✅ اضافه شد
 }) => {
   const statusText = isOnline
     ? "Online"
@@ -24,7 +26,11 @@ export const UserStatus: React.FC<UserStatusProps> = ({
       : "Offline";
 
   return (
-    <div className={styles.container}>
+    <div
+      className={styles.container}
+      onClick={onClick}
+      style={{ cursor: onClick ? "pointer" : "default" }}
+    >
       <Avatar
         src={profilePicUrl}
         initials={initials}

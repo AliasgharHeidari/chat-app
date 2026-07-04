@@ -1,10 +1,9 @@
 .container {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 12px 20px;
-  font-size: 12px;
-  color: #999;
+  padding: 4px 16px;
+  font-size: 13px;
+  color: var(--text-secondary, #888);
+  background-color: var(--bg-primary, #fff);
+  min-height: 24px;
 }
 
 .dots {

@@ -1,16 +1,17 @@
 import { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Login } from "@/components/auth/Login";
 import { Register } from "@/components/auth/Register";
 import { MainLayout } from "@/components/layout/MainLayout";
+import { ChatRoom } from "@/components/chat/ChatRoom";
+import { ProtectedRoute } from "@/components/common/ProtectedRoute";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import styles from "./App.module.css";
 
-type AuthPage = "login" | "register";
-
-function App() {
+function AppContent() {
   const { isAuthenticated, isInitialized } = useAuth();
-  const [currentPage, setCurrentPage] = useState<AuthPage>("login");
+  const [currentPage, setCurrentPage] = useState<"login" | "register">("login");
 
   if (!isInitialized) {
     return (
@@ -32,7 +33,23 @@ function App() {
     );
   }
 
-  return <MainLayout />;
+  return (
+    <Routes>
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={<MainLayout />} />
+        <Route path="/chat/:chatId" element={<ChatRoom />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
 }
 
 export default App;

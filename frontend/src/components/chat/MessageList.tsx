@@ -27,7 +27,7 @@ export const MessageList: React.FC<MessageListProps> = ({
   hasMore = false, // ✅ اضافه شد
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const seenTimeoutRef = useRef<number | null>(null);
+  const seenTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLoadingMoreRef = useRef(false);
   const prevScrollHeightRef = useRef(0);
 
@@ -128,8 +128,8 @@ export const MessageList: React.FC<MessageListProps> = ({
   }
 
   return (
-    <div 
-      className={styles.container} 
+    <div
+      className={styles.container}
       ref={containerRef}
       onScroll={handleScroll} // ✅ اضافه شد
     >

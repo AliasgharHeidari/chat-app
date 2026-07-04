@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useChat } from "@/hooks/useChat";
 import { useSocket } from "@/hooks/useSocket";
@@ -6,72 +6,46 @@ import { UserList } from "@/components/chat/UserList";
 import { ChatContainer } from "@/components/chat/ChatContainer";
 import { SearchUsers } from "@/components/chat/SearchUsers";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { ProfileEditor } from "@/components/profile/ProfileEditor"; // ✅ اضافه شد
+import { SettingsPanel } from "@/components/profile/SettingsPanel";
+import { useNavigate } from "react-router-dom";
 import styles from "./MainLayout.module.css";
 
 export const MainLayout: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
   const {
     chats,
     currentChat,
     isLoadingChats,
     setCurrentChat,
     loadChats,
-    loadChatMessages,
     updateMessage,
-    removeMessage,
     typingUsers,
   } = useChat();
   const { isConnected, sendMessage, sendTyping } = useSocket();
   const [showSearchUsers, setShowSearchUsers] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false); // ✅ اضافه شد
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
     loadChats();
   }, [loadChats]);
-
-  React.useEffect(() => {
-    if (currentChat) {
-      loadChatMessages(currentChat.id, 20, 0);
-    }
-  }, [currentChat, loadChatMessages]);
 
   const handleChatSelect = async (chat: any) => {
     setCurrentChat(chat);
     setShowSearchUsers(false);
-  };
-
-  const handleSendMessage = (text: string) => {
-    if (currentChat) {
-      sendMessage(currentChat.id, text);
+    if (isMobile) {
+      navigate(`/chat/${chat.id}`);
     }
-  };
-
-  const handleTyping = (isTyping: boolean) => {
-    if (currentChat) {
-      sendTyping(currentChat.id, isTyping);
-    }
-  };
-
-  const handleEditMessage = (messageId: number, newText: string) => {
-    if (currentChat) {
-      updateMessage(currentChat.id, messageId, {
-        message_text: newText,
-        is_edited: true,
-      });
-    }
-  };
-
-  const handleDeleteMessage = (messageId: number) => {
-    if (currentChat) {
-      removeMessage(currentChat.id, messageId);
-    }
-  };
-
-  // ✅ آپدیت پروفایل
-  const handleProfileUpdate = (updatedUser: any) => {
-    // user رو به‌روز میکنیم (useAuth handle میکنه)
-    console.log("Profile updated:", updatedUser);
   };
 
   if (isLoadingChats && chats.length === 0) {
@@ -86,27 +60,15 @@ export const MainLayout: React.FC = () => {
     <div className={styles.container}>
       <div className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
-          <h1 className={styles.appTitle}>Chat</h1>
+          <h1 className={styles.appTitle}>💬 Chat</h1>
           <div className={styles.headerActions}>
-            {user && (
-              <>
-                <span className={styles.username}>{user.username}</span>
-                <button
-                  onClick={() => setIsProfileOpen(true)} // ✅ دکمه ویرایش
-                  className={styles.editProfileButton}
-                  title="Edit Profile"
-                >
-                  ✏️
-                </button>
-                <button
-                  onClick={logout}
-                  className={styles.logoutButton}
-                  title="Logout"
-                >
-                  ↓
-                </button>
-              </>
-            )}
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className={styles.settingsButton}
+              title="Settings"
+            >
+              ⚙️
+            </button>
           </div>
         </div>
 
@@ -134,15 +96,19 @@ export const MainLayout: React.FC = () => {
           </div>
         )}
 
-        {currentChat && user ? (
+        {!isMobile && currentChat && user ? (
           <ChatContainer
             chat={currentChat}
             currentUserId={user.id}
             typingUsers={typingUsers[currentChat.id] || new Set()}
-            onSendMessage={handleSendMessage}
-            onTyping={handleTyping}
-            onEditMessage={handleEditMessage}
-            onDeleteMessage={handleDeleteMessage}
+            onSendMessage={(text) => sendMessage(currentChat.id, text)}
+            onTyping={(isTyping) => sendTyping(currentChat.id, isTyping)}
+            onEditMessage={(messageId, newText) =>
+              updateMessage(currentChat.id, messageId, {
+                message_text: newText,
+                is_edited: true,
+              })
+            }
           />
         ) : (
           <div className={styles.placeholder}>
@@ -151,11 +117,9 @@ export const MainLayout: React.FC = () => {
         )}
       </div>
 
-      {/* ✅ مودال ویرایش پروفایل */}
-      <ProfileEditor
-        isOpen={isProfileOpen}
-        onClose={() => setIsProfileOpen(false)}
-        onUpdate={handleProfileUpdate}
+      <SettingsPanel
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
       />
     </div>
   );

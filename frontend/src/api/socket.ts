@@ -58,7 +58,7 @@ class WebSocketManager {
   private isIntentionallyClosed = false;
   private messageBuffer: WSMessage<unknown>[] = [];
   private maxBufferSize = 100;
-  private pingInterval: number | null = null;
+  private pingInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -168,7 +168,7 @@ class WebSocketManager {
 
   private handleMessage(message: WSMessage<unknown>) {
     const type = message.type as WSEventType;
-     console.log("🔍 RAW WS MESSAGE:", message); 
+    console.log("🔍 RAW WS MESSAGE:", message);
     if (type === "pong") {
       return; // Ignore pong responses
     }
@@ -184,36 +184,35 @@ class WebSocketManager {
     }
   }
 
-send<T extends keyof WSSendMap>(type: T, data: WSSendMap[T]): void {
-  const message: WSMessage = {
-    type,
-    data,
-    timestamp: Date.now(),
-  };
+  send<T extends keyof WSSendMap>(type: T, data: WSSendMap[T]): void {
+    const message: WSMessage = {
+      type,
+      data,
+      timestamp: Date.now(),
+    };
 
-  console.log("📤 wsManager.send called:", { type, data, message });
-  console.log("🔍 WebSocket readyState:", this.ws?.readyState);
-  console.log("🔍 isConnected:", this.isConnected());
+    console.log("📤 wsManager.send called:", { type, data, message });
+    console.log("🔍 WebSocket readyState:", this.ws?.readyState);
+    console.log("🔍 isConnected:", this.isConnected());
 
-  if (this.isConnected() && this.ws) {
-    try {
-      const json = JSON.stringify(message);
-      console.log("📤 ACTUALLY SENDING OVER WEBSOCKET:", json);
-      this.ws.send(json);
-      console.log("✅ Message sent successfully!");
-    } catch (error) {
-      console.error("❌ Error sending message:", error);
-    }
-  } else {
-    console.warn("⚠️ WebSocket not connected, buffering message");
-    if (this.messageBuffer.length < this.maxBufferSize) {
-      this.messageBuffer.push(message);
+    if (this.isConnected() && this.ws) {
+      try {
+        const json = JSON.stringify(message);
+        console.log("📤 ACTUALLY SENDING OVER WEBSOCKET:", json);
+        this.ws.send(json);
+        console.log("✅ Message sent successfully!");
+      } catch (error) {
+        console.error("❌ Error sending message:", error);
+      }
     } else {
-      console.warn("Message buffer full, dropping message");
+      console.warn("⚠️ WebSocket not connected, buffering message");
+      if (this.messageBuffer.length < this.maxBufferSize) {
+        this.messageBuffer.push(message);
+      } else {
+        console.warn("Message buffer full, dropping message");
+      }
     }
   }
-}
-
 
   on<T extends keyof WSEventMap>(
     type: T,

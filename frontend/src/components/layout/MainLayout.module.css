@@ -1,7 +1,8 @@
 .container {
   display: flex;
   height: 100vh;
-  background-color: #fff;
+  background-color: var(--bg-primary, #fff);
+  overflow: hidden;
 }
 
 .loadingContainer {
@@ -9,77 +10,89 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--bg-secondary, #f5f5f5);
 }
 
 .sidebar {
   width: 300px;
   display: flex;
   flex-direction: column;
-  background-color: white;
-  border-right: 1px solid #ddd;
+  background-color: var(--bg-primary, #fff);
+  border-right: 1px solid var(--border-color, #ddd);
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
 .sidebarHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  border-bottom: 1px solid #ddd;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color, #ddd);
+  flex-shrink: 0;
+  gap: 8px;
+  flex-wrap: nowrap;
+  background-color: var(--bg-primary, #fff);
 }
 
 .appTitle {
   margin: 0;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
-  color: #333;
+  color: var(--text-primary, #333);
+  white-space: nowrap;
 }
 
 .headerActions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .username {
   font-size: 12px;
-  color: #999;
-  max-width: 100px;
+  color: var(--text-secondary, #999);
+  max-width: 80px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.logoutButton {
-  width: 32px;
-  height: 32px;
+.settingsButton {
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background-color: #f0f0f0;
+  background: transparent;
   border: none;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--text-primary, #333);
 }
 
-.logoutButton:hover {
-  background-color: #e0e0e0;
+.settingsButton:hover {
+  background: var(--bg-secondary, #f0f0f0);
 }
 
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: #fff;
+  background-color: var(--bg-primary, #fff);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .connectionNotice {
-  padding: 10px;
+  padding: 8px 12px;
   background-color: #fff3cd;
   border-bottom: 1px solid #ffc107;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .connectionStatus {
@@ -92,8 +105,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #999;
-  background-color: #fafafa;
+  color: var(--text-secondary, #999);
+  background-color: var(--bg-secondary, #fafafa);
+  text-align: center;
+  padding: 20px;
 }
 
 .placeholder p {
@@ -101,19 +116,108 @@
   font-size: 16px;
 }
 
+/* ======================================== */
+/*          📱 موبایل (تا ۷۶۸px)            */
+/* ======================================== */
+
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
+    height: 100dvh;
   }
 
   .sidebar {
     width: 100%;
+    height: auto;
+    max-height: 45vh;
     border-right: none;
-    border-bottom: 1px solid #ddd;
-    height: 200px;
+    border-bottom: 1px solid var(--border-color, #ddd);
+    flex-shrink: 0;
+  }
+
+  .sidebarHeader {
+    padding: 10px 14px;
+  }
+
+  .appTitle {
+    font-size: 18px;
+  }
+
+  .username {
+    max-width: 60px;
+    font-size: 11px;
   }
 
   .main {
     flex: 1;
+    min-height: 0;
+    height: 55vh;
+  }
+
+  .placeholder {
+    font-size: 14px;
+    padding: 16px;
+  }
+
+  .placeholder p {
+    font-size: 14px;
+  }
+}
+
+/* ======================================== */
+/*          📱 موبایل خیلی کوچک (تا ۴۸۰px)   */
+/* ======================================== */
+
+@media (max-width: 480px) {
+  .sidebarHeader {
+    padding: 8px 12px;
+  }
+
+  .appTitle {
+    font-size: 16px;
+  }
+
+  .headerActions {
+    gap: 4px;
+  }
+
+  .username {
+    display: none;
+  }
+
+  .settingsButton {
+    width: 30px;
+    height: 30px;
+    font-size: 17px;
+  }
+
+  .sidebar {
+    max-height: 38vh;
+  }
+
+  .main {
+    height: 62vh;
+  }
+
+  .placeholder p {
+    font-size: 13px;
+  }
+}
+
+/* ======================================== */
+/*          💻 تبلت (۷۶۹px تا ۱۰۲۴px)        */
+/* ======================================== */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar {
+    width: 260px;
+  }
+
+  .appTitle {
+    font-size: 18px;
+  }
+
+  .username {
+    max-width: 70px;
   }
 }

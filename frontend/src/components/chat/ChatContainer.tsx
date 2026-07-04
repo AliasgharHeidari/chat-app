@@ -29,14 +29,13 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   onEditMessage,
 }) => {
   const [isSending, setIsSending] = useState(false);
-  const [offset, setOffset] = useState(20); // ✅ برای pagination
+  const [offset, setOffset] = useState(20);
 
   const messages = useChatStore((state) => state.messages[chat.id] || []);
   const isLoadingMessages = useChatStore((state) => state.isLoadingMessages);
   const loadChatMessages = useChatStore((state) => state.loadChatMessages);
   const { markAsSeen } = useSocket();
 
-  // ✅ وقتی چت عوض میشه، پیام‌ها رو لود کن
   useEffect(() => {
     if (chat?.id) {
       setOffset(20);
@@ -44,7 +43,6 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     }
   }, [chat?.id, loadChatMessages]);
 
-  // ✅ تابع لود پیام‌های بیشتر (اسکرول به بالا)
   const handleLoadMore = () => {
     if (!chat?.id || isLoadingMessages) return;
     loadChatMessages(chat.id, 20, offset);
@@ -67,7 +65,6 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   });
 
   const handleSendMessage = (text: string) => {
-    console.log("🔍 ChatContainer.handleSendMessage called with:", text);
     if (!text.trim()) return;
     setIsSending(true);
     try {
@@ -89,11 +86,10 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   };
 
   const handleDeleteMessage = async (messageId: number, forEveryone = false) => {
-    console.log("📤 ChatContainer - forEveryone:", forEveryone);
     const ok = confirm(
       forEveryone
         ? "Delete this message for everyone?"
-        : "Delete this message for me?",
+        : "Delete this message for me?"
     );
     if (!ok) return;
     try {
@@ -114,7 +110,6 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   const { isUserOnline } = useChat();
   const otherIsOnline = otherUser ? isUserOnline(otherUser.id) : false;
 
-  // ✅ محاسبه hasMore
   const hasMore = messages.length >= offset && messages.length > 0;
 
   return (
@@ -136,9 +131,11 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
         onEdit={handleEditMessage}
         onDelete={handleDeleteMessage}
         onSeen={markAsSeen}
-        onLoadMore={handleLoadMore} // ✅ پاس بده
-        hasMore={hasMore} // ✅ پاس بده
+        onLoadMore={handleLoadMore}
+        hasMore={hasMore}
       />
+      
+      {/* ✅ MessageInput همیشه نمایش داده میشه */}
       <MessageInput
         onSendMessage={handleSendMessage}
         onTyping={onTyping}

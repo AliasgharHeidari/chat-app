@@ -15,7 +15,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 }) => {
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const typingTimeoutRef = useRef<number | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTypingRef = useRef(false);
 
   useEffect(() => {

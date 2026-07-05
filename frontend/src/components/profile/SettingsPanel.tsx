@@ -82,7 +82,6 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 onClick={handleLogout}
               >
                 <span className={styles.logoutText}>Logout</span>
-                <span className={styles.arrow}>›</span>
               </div>
             </div>
 

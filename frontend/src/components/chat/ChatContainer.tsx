@@ -8,6 +8,7 @@ import { MessageInput } from "./MessageInput";
 import { UserStatus } from "./UserStatus";
 import { TypingIndicator } from "./TypingIndicator";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { UserProfileModal } from "./UserProfileModal";
 import { api } from "@/api/rest";
 import styles from "./ChatContainer.module.css";
 
@@ -30,11 +31,13 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
 }) => {
   const [isSending, setIsSending] = useState(false);
   const [offset, setOffset] = useState(20);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const messages = useChatStore((state) => state.messages[chat.id] || []);
   const isLoadingMessages = useChatStore((state) => state.isLoadingMessages);
   const loadChatMessages = useChatStore((state) => state.loadChatMessages);
   const { markAsSeen } = useSocket();
+  const { isUserOnline } = useChat(); // ✅ این رو داشته باش
 
   useEffect(() => {
     if (chat?.id) {
@@ -99,6 +102,12 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     }
   };
 
+  const handleUserClick = () => {
+    if (otherUser) {
+      setIsProfileModalOpen(true);
+    }
+  };
+
   if (!otherUser) {
     return (
       <div className={styles.loading}>
@@ -107,10 +116,15 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     );
   }
 
-  const { isUserOnline } = useChat();
-  const otherIsOnline = otherUser ? isUserOnline(otherUser.id) : false;
+  const otherIsOnline = isUserOnline(otherUser.id); // ✅ از isUserOnline استفاده کن
 
   const hasMore = messages.length >= offset && messages.length > 0;
+
+  // ✅ کاربر رو با وضعیت آنلاین واقعی به مودال پاس بده
+  const userForModal = {
+    ...otherUser,
+    is_online: otherIsOnline,
+  };
 
   return (
     <div className={styles.container}>
@@ -120,6 +134,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
         lastSeen={otherUser.last_seen}
         initials={otherUserInitials}
         profilePicUrl={otherUser.profile_pic_url}
+        onClick={handleUserClick}
       />
 
       <TypingIndicator userNames={typingUserNames} />
@@ -135,11 +150,16 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
         hasMore={hasMore}
       />
       
-      {/* ✅ MessageInput همیشه نمایش داده میشه */}
       <MessageInput
         onSendMessage={handleSendMessage}
         onTyping={onTyping}
         isLoading={isSending}
+      />
+
+      <UserProfileModal
+        user={userForModal}
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
       />
     </div>
   );

@@ -32,6 +32,71 @@
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.3);
   animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* ✅ حالت Night Mode */
+[data-theme="dark"] .modal {
+  background: rgba(25, 25, 40, 0.75);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .header h2 {
+  color: #e8e8e8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .closeBtn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ccc;
+}
+
+[data-theme="dark"] .closeBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+[data-theme="dark"] .field label {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .field input,
+[data-theme="dark"] .field textarea {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e8e8e8;
+}
+
+[data-theme="dark"] .field input:focus,
+[data-theme="dark"] .field textarea:focus {
+  border-color: rgba(102, 126, 234, 0.6);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .cancelBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #ccc;
+}
+
+[data-theme="dark"] .cancelBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .saveBtn {
+  background: rgba(0, 132, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .saveBtn:hover {
+  background: rgba(0, 132, 255, 0.9);
 }
 
 @keyframes slideUp {
@@ -52,6 +117,7 @@
   margin-bottom: 16px;
   padding-bottom: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  transition: border-color 0.3s ease;
 }
 
 .header h2 {
@@ -60,6 +126,7 @@
   font-weight: 700;
   color: #1a1a1a;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+  transition: color 0.3s ease;
 }
 
 .closeBtn {
@@ -93,10 +160,11 @@
   display: block;
   font-size: 11px;
   font-weight: 600;
-  color: rgba(0, 0, 0);
+  color: rgba(0, 0, 0, 0.6);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 3px;
+  transition: color 0.3s ease;
 }
 
 .field input,
@@ -110,7 +178,7 @@
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   color: #1a1a1a;
-  transition: border 0.2s;
+  transition: border 0.2s, background 0.3s ease, color 0.3s ease;
   outline: none;
 }
 
@@ -150,7 +218,7 @@
   font-weight: 600;
   cursor: pointer;
   color: #444;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
 }
 
 .cancelBtn:hover {

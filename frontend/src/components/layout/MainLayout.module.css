@@ -1,8 +1,14 @@
+/* ======================================== */
+/*          🎨 مدرن و شیشه‌ای با پالت Slate */
+/* ======================================== */
+
 .container {
   display: flex;
   height: 100vh;
-  background-color: var(--bg-primary, #fff);
+  background: radial-gradient(circle at 20% 20%, #f1f5f9, #e2e8f0);
   overflow: hidden;
+  padding: 12px;
+  gap: 12px;
 }
 
 .loadingContainer {
@@ -10,37 +16,79 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: var(--bg-secondary, #f5f5f5);
+  background: radial-gradient(circle at 20% 20%, #f1f5f9, #e2e8f0);
 }
 
+/* ======================================== */
+/*          📌 سایدبار مدرن                */
+/* ======================================== */
+
 .sidebar {
-  width: 300px;
+  width: 320px;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-primary, #fff);
-  border-right: 1px solid var(--border-color, #ddd);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
   flex-shrink: 0;
   overflow: hidden;
 }
+
+/* ======================================== */
+/*          🌙 حالت Night Mode (Slate)      */
+/* ======================================== */
+
+[data-theme="dark"] .container {
+  background: radial-gradient(circle at 20% 20%, #1e293b, #0f172a);
+}
+
+[data-theme="dark"] .sidebar {
+  background: rgba(30, 41, 59, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* ======================================== */
+/*          🧠 هدر سایدبار                  */
+/* ======================================== */
 
 .sidebarHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border-color, #ddd);
+  padding: 18px 20px 14px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
   flex-shrink: 0;
   gap: 8px;
   flex-wrap: nowrap;
-  background-color: var(--bg-primary, #fff);
+  background: transparent;
+}
+
+[data-theme="dark"] .sidebarHeader {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .appTitle {
   margin: 0;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
-  color: var(--text-primary, #333);
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   white-space: nowrap;
+}
+
+[data-theme="dark"] .appTitle {
+  background: linear-gradient(135deg, #94a3b8, #cbd5e1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .headerActions {
@@ -50,55 +98,92 @@
   flex-shrink: 0;
 }
 
-.username {
-  font-size: 12px;
-  color: var(--text-secondary, #999);
-  max-width: 80px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .settingsButton {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: transparent;
+  background: rgba(102, 126, 234, 0.08);
   border: none;
-  font-size: 20px;
+  font-size: 18px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-primary, #333);
+  color: #667eea;
 }
 
 .settingsButton:hover {
-  background: var(--bg-secondary, #f0f0f0);
+  background: rgba(102, 126, 234, 0.18);
+  transform: rotate(60deg) scale(1.05);
 }
+
+[data-theme="dark"] .settingsButton {
+  background: rgba(148, 163, 184, 0.1);
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .settingsButton:hover {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+/* ======================================== */
+/*          📋 بخش اصلی                     */
+/* ======================================== */
 
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-primary, #fff);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
   min-width: 0;
   overflow: hidden;
 }
 
+[data-theme="dark"] .main {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* ======================================== */
+/*          🔌 وضعیت اتصال                 */
+/* ======================================== */
+
 .connectionNotice {
-  padding: 8px 12px;
-  background-color: #fff3cd;
-  border-bottom: 1px solid #ffc107;
+  padding: 6px 14px;
+  background: rgba(255, 243, 205, 0.6);
+  backdrop-filter: blur(4px);
+  border-bottom: 1px solid rgba(255, 193, 7, 0.2);
   text-align: center;
   flex-shrink: 0;
+}
+
+[data-theme="dark"] .connectionNotice {
+  background: rgba(255, 243, 205, 0.06);
+  border-bottom: 1px solid rgba(255, 193, 7, 0.06);
 }
 
 .connectionStatus {
   font-size: 12px;
   color: #856404;
+  font-weight: 500;
 }
+
+[data-theme="dark"] .connectionStatus {
+  color: #fbbf24;
+}
+
+/* ======================================== */
+/*          📭 حالت بدون چت                 */
+/* ======================================== */
 
 .placeholder {
   flex: 1;
@@ -106,23 +191,27 @@
   align-items: center;
   justify-content: center;
   color: var(--text-secondary, #999);
-  background-color: var(--bg-secondary, #fafafa);
+  background: transparent;
   text-align: center;
   padding: 20px;
+  font-size: 16px;
+  font-weight: 400;
 }
 
 .placeholder p {
   margin: 0;
-  font-size: 16px;
+  opacity: 0.6;
 }
 
 /* ======================================== */
-/*          📱 موبایل (تا ۷۶۸px)            */
+/*          📱 ریسپانسیو موبایل            */
 /* ======================================== */
 
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
+    padding: 8px;
+    gap: 8px;
     height: 100dvh;
   }
 
@@ -130,28 +219,28 @@
     width: 100%;
     height: auto;
     max-height: 45vh;
-    border-right: none;
-    border-bottom: 1px solid var(--border-color, #ddd);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
     flex-shrink: 0;
   }
 
+  [data-theme="dark"] .sidebar {
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
   .sidebarHeader {
-    padding: 10px 14px;
+    padding: 12px 16px;
   }
 
   .appTitle {
     font-size: 18px;
   }
 
-  .username {
-    max-width: 60px;
-    font-size: 11px;
-  }
-
   .main {
     flex: 1;
     min-height: 0;
     height: 55vh;
+    border-radius: 20px;
   }
 
   .placeholder {
@@ -164,39 +253,34 @@
   }
 }
 
-/* ======================================== */
-/*          📱 موبایل خیلی کوچک (تا ۴۸۰px)   */
-/* ======================================== */
-
 @media (max-width: 480px) {
+  .container {
+    padding: 4px;
+    gap: 4px;
+  }
+
+  .sidebar {
+    max-height: 38vh;
+    border-radius: 16px;
+  }
+
   .sidebarHeader {
-    padding: 8px 12px;
+    padding: 10px 12px;
   }
 
   .appTitle {
     font-size: 16px;
   }
 
-  .headerActions {
-    gap: 4px;
-  }
-
-  .username {
-    display: none;
-  }
-
   .settingsButton {
-    width: 30px;
-    height: 30px;
-    font-size: 17px;
-  }
-
-  .sidebar {
-    max-height: 38vh;
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
   }
 
   .main {
     height: 62vh;
+    border-radius: 16px;
   }
 
   .placeholder p {
@@ -205,19 +289,15 @@
 }
 
 /* ======================================== */
-/*          💻 تبلت (۷۶۹px تا ۱۰۲۴px)        */
+/*          💻 تبلت                         */
 /* ======================================== */
 
 @media (min-width: 769px) and (max-width: 1024px) {
   .sidebar {
-    width: 260px;
+    width: 270px;
   }
 
   .appTitle {
-    font-size: 18px;
-  }
-
-  .username {
-    max-width: 70px;
+    font-size: 19px;
   }
 }

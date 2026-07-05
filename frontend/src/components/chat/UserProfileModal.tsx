@@ -47,7 +47,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           <div className={styles.statusSection}>
             <span className={styles.label}>Status</span>
             <p className={user.is_online ? styles.online : styles.offline}>
-              {user.is_online ? "🟢 Online" : "Offline"}
+              {user.is_online ? "Online" : "Offline"}
             </p>
           </div>
 

@@ -7,34 +7,35 @@ import styles from "./SettingsPanel.module.css";
 interface SettingsPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  onLogout: () => void; // ✅ اضافه شد
 }
 
 export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   isOpen,
   onClose,
+  onLogout, // ✅ از props بگیر
 }) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth(); // ❌ logout رو از اینجا حذف کن
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleEditProfile = () => {
     setIsProfileOpen(true);
-    // پنل رو باز نگه میداریم ولی با لایه جدا
   };
 
   const handleProfileClose = () => {
     setIsProfileOpen(false);
   };
 
-  const handleLogout = () => {
-    logout();
-    onClose();
-  };
+  // ❌ handleLogout رو حذف کن
+  // const handleLogout = () => {
+  //   logout();
+  //   onClose();
+  // };
 
   if (!isOpen) return null;
 
   return (
     <>
-      {/* پنل تنظیمات - وقتی ادیت پروفایل بازه، پنل رو مخفی کن */}
       {!isProfileOpen && (
         <div className={styles.overlay} onClick={onClose}>
           <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
@@ -60,10 +61,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             </div>
 
             <div className={styles.menuList}>
-              <div
-                className={styles.menuItem}
-                onClick={handleEditProfile}
-              >
+              <div className={styles.menuItem} onClick={handleEditProfile}>
                 <span className={styles.menuIcon}></span>
                 <span>Edit Profile</span>
                 <span className={styles.arrow}>›</span>
@@ -79,7 +77,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
               <div
                 className={`${styles.menuItem} ${styles.logoutItem}`}
-                onClick={handleLogout}
+                onClick={onLogout} // ✅ از prop استفاده کن
               >
                 <span className={styles.logoutText}>Logout</span>
               </div>
@@ -92,7 +90,6 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
         </div>
       )}
 
-      {/* ✅ مودال ویرایش پروفایل (جدا و روی همه چیز) */}
       <ProfileEditor
         isOpen={isProfileOpen}
         onClose={handleProfileClose}

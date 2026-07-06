@@ -1,24 +1,28 @@
 import React from "react";
 import { Avatar } from "@/components/common/Avatar";
+import { useChat } from "@/hooks/useChat";
 import styles from "./UserStatus.module.css";
 
 interface UserStatusProps {
+  userId: number; // ✅ userId رو اضافه کن
   name: string;
-  isOnline: boolean;
   lastSeen?: string;
   initials?: string;
   profilePicUrl?: string;
-  onClick?: () => void; 
+  onClick?: () => void;
 }
 
 export const UserStatus: React.FC<UserStatusProps> = ({
+  userId,
   name,
-  isOnline,
   lastSeen,
   initials,
   profilePicUrl,
-  onClick, // ✅ اضافه شد
+  onClick,
 }) => {
+  const { isUserOnline } = useChat();
+  const isOnline = isUserOnline(userId); // ✅ از هوک بگیر
+
   const statusText = isOnline
     ? "Online"
     : lastSeen

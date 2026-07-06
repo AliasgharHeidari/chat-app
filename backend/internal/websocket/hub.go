@@ -36,8 +36,13 @@ func (h *Hub) Unregister(client *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	delete(h.Clients, client.ID)
-	log.Printf("❌ User %d is OFFLINE", client.ID)
+	// Only remove if this is still the currently-registered client for this
+	// user ID. Prevents a stale/old connection's cleanup (e.g. after being
+	// force-closed by a new Register call) from deleting a fresh reconnect.
+	if existing, ok := h.Clients[client.ID]; ok && existing == client {
+		delete(h.Clients, client.ID)
+		log.Printf("❌ User %d is OFFLINE", client.ID)
+	}
 }
 
 func (h *Hub) SendToUser(userID uint, message []byte) bool {
@@ -70,7 +75,6 @@ func (h *Hub) Broadcast(message []byte, excludeUserID uint) {
 		select {
 		case client.Send <- message:
 		default:
-
 		}
 	}
 }

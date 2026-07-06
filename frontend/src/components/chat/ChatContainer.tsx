@@ -37,7 +37,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   const isLoadingMessages = useChatStore((state) => state.isLoadingMessages);
   const loadChatMessages = useChatStore((state) => state.loadChatMessages);
   const { markAsSeen } = useSocket();
-  const { isUserOnline } = useChat(); // ✅ این رو داشته باش
+  const { isUserOnline } = useChat();
 
   useEffect(() => {
     if (chat?.id) {
@@ -116,11 +116,10 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     );
   }
 
-  const otherIsOnline = isUserOnline(otherUser.id); // ✅ از isUserOnline استفاده کن
+  const otherIsOnline = isUserOnline(otherUser.id);
 
   const hasMore = messages.length >= offset && messages.length > 0;
 
-  // ✅ کاربر رو با وضعیت آنلاین واقعی به مودال پاس بده
   const userForModal = {
     ...otherUser,
     is_online: otherIsOnline,
@@ -129,8 +128,8 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   return (
     <div className={styles.container}>
       <UserStatus
+        userId={otherUser.id}          // ✅ userId رو پاس بده
         name={otherUserName}
-        isOnline={otherIsOnline}
         lastSeen={otherUser.last_seen}
         initials={otherUserInitials}
         profilePicUrl={otherUser.profile_pic_url}

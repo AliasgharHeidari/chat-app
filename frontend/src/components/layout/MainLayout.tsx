@@ -54,7 +54,7 @@ const EmptyState: React.FC = () => (
 // ========================================
 
 export const MainLayout: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
   const [showSearchUsers, setShowSearchUsers] = useState(false);
@@ -70,7 +70,7 @@ export const MainLayout: React.FC = () => {
     typingUsers,
   } = useChat();
 
-  const { isConnected, sendMessage, sendTyping } = useSocket();
+  const { isConnected, sendMessage, sendTyping, disconnect } = useSocket();
 
   // ========================================
   // 🎯 هندلرهای رویداد
@@ -88,7 +88,7 @@ export const MainLayout: React.FC = () => {
         navigate(`/chat/${chat.id}`);
       }
     },
-    [isMobile, setCurrentChat, navigate]
+    [isMobile, setCurrentChat, navigate],
   );
 
   const handleSettingsToggle = useCallback(() => {
@@ -103,13 +103,20 @@ export const MainLayout: React.FC = () => {
     setShowSearchUsers(false);
   }, []);
 
+  // ✅ خروج با قطع WebSocket
+  const handleLogout = useCallback(() => {
+    disconnect(); // WebSocket رو قطع کن
+    logout(); // خروج از حساب
+    navigate("/login");
+  }, [disconnect, logout, navigate]);
+
   // ========================================
-  // ♻️ محاسبات memoized با نوع‌دهی درست
+  // ♻️ محاسبات memoized
   // ========================================
 
   const showChat = useMemo(
     () => !isMobile && currentChat !== null && user !== null,
-    [isMobile, currentChat, user]
+    [isMobile, currentChat, user],
   );
 
   const typingSet = useMemo((): Set<number> => {
@@ -197,6 +204,7 @@ export const MainLayout: React.FC = () => {
       <SettingsPanel
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+        onLogout={handleLogout}
       />
     </div>
   );

@@ -41,7 +41,6 @@ func WebSocketHandler(c *fiber.Ctx) error {
 		// Notify existing clients about this user's online status (exclude self)
 		// and send current online users to newly connected client
 		online := hub.GetOnlineUsers()
-		// Send existing online users to the new client
 		for _, uid := range online {
 			if uid == client.ID {
 				continue
@@ -68,6 +67,11 @@ func WebSocketHandler(c *fiber.Ctx) error {
 		onlineBytes, _ := json.Marshal(onlineMsg)
 		hub.Broadcast(onlineBytes, client.ID)
 
+		// done is closed the moment the read loop dies (connection closed/error).
+		// This lets the write loop below stop waiting on client.Send and return,
+		// which in turn runs the deferred cleanup/offline-broadcast.
+		done := make(chan struct{})
+
 		defer func() {
 			// On disconnect, unregister and broadcast offline status
 			hub.Unregister(client)
@@ -82,9 +86,11 @@ func WebSocketHandler(c *fiber.Ctx) error {
 			}
 			offlineBytes, _ := json.Marshal(offlineMsg)
 			hub.Broadcast(offlineBytes, client.ID)
+			conn.Close()
 		}()
 
 		go func() {
+			defer close(done)
 			for {
 				var msg model.WSMessage
 				err := conn.ReadJSON(&msg)
@@ -95,9 +101,18 @@ func WebSocketHandler(c *fiber.Ctx) error {
 			}
 		}()
 
-		for msg := range client.Send {
-			// msg is already a JSON []byte
-			conn.WriteMessage(websocket.TextMessage, msg)
+		for {
+			select {
+			case msg, ok := <-client.Send:
+				if !ok {
+					return
+				}
+				if err := conn.WriteMessage(websocket.TextMessage, msg); err != nil {
+					return
+				}
+			case <-done:
+				return
+			}
 		}
 	})(c)
 }
@@ -160,7 +175,6 @@ func handleMessage(client *websocketPkg.Client, msg model.WSMessage) {
 		chatID := uint(data["chat_id"].(float64))
 		isTyping := data["is_typing"].(bool)
 
-		// Find other user in the chat
 		chat, err := messageService.GetChatByChatID(client.ID, chatID)
 		if err != nil {
 			log.Printf("❌ Chat not found for typing: %v", err)
@@ -177,7 +191,6 @@ func handleMessage(client *websocketPkg.Client, msg model.WSMessage) {
 			},
 		}
 		tb, _ := json.Marshal(typingMsg)
-		// Send to other participant
 		if ok := hub.SendToUser(receiverID, tb); !ok {
 			log.Printf("❌ Failed to deliver typing event to user %d", receiverID)
 		}
@@ -195,21 +208,18 @@ func handleMessage(client *websocketPkg.Client, msg model.WSMessage) {
 		messageID := uint(data["message_id"].(float64))
 		status := data["status"].(string)
 
-		// Get the message to find which chat it belongs to
 		dbMsg, err := indatabase.GetMessageByID(messageID)
 		if err != nil {
 			log.Printf("❌ Message not found: %v", err)
 			return
 		}
 
-		// Update the message status in database
 		err = messageService.MarkMessageAsSeen(messageID)
 		if err != nil {
 			log.Printf("❌ Failed to update message status: %v", err)
 			return
 		}
 
-		// Broadcast status update to the sender
 		statusMsg := model.WSMessage{
 			Type: "message_status",
 			Data: model.WSMessageStatusData{

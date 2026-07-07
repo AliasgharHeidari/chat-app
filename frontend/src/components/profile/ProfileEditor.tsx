@@ -67,7 +67,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
     <div className={styles.overlay}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h2>✏️ Edit Profile</h2>
+          <h2>Edit Profile</h2>
           <button onClick={onClose} className={styles.closeBtn}>
             ×
           </button>

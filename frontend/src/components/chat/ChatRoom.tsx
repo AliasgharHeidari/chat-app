@@ -4,6 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useChat } from "@/hooks/useChat";
 import { useSocket } from "@/hooks/useSocket";
 import { ChatContainer } from "./ChatContainer";
+import { UserProfileModal } from "./UserProfileModal";
+import { Avatar } from "@/components/common/Avatar";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import styles from "./ChatRoom.module.css";
 
@@ -22,6 +24,8 @@ export const ChatRoom: React.FC = () => {
   } = useChat();
   const { sendMessage, sendTyping } = useSocket();
   const [loading, setLoading] = useState(true);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const { isUserOnline } = useChat();
 
   useEffect(() => {
     const loadChat = async () => {
@@ -46,6 +50,10 @@ export const ChatRoom: React.FC = () => {
     navigate("/");
   };
 
+  const handleUserClick = () => {
+    setIsProfileModalOpen(true);
+  };
+
   if (loading || !currentChat || !user) {
     return (
       <div className={styles.loadingContainer}>
@@ -54,33 +62,62 @@ export const ChatRoom: React.FC = () => {
     );
   }
 
+  const otherUser = currentChat.user1_id === user.id ? currentChat.user2 : currentChat.user1;
+  const otherName = otherUser
+    ? `${otherUser.first_name} ${otherUser.last_name}`
+    : "Unknown";
+  const otherInitials = otherUser
+    ? `${otherUser.first_name[0]}${otherUser.last_name[0]}`.toUpperCase()
+    : "U";
+  const isOnline = otherUser ? isUserOnline(otherUser.id) : false;
+
+  const userForModal = otherUser
+    ? { ...otherUser, is_online: isOnline }
+    : null;
+
   return (
     <div className={styles.container}>
+      {/* ✅ هدر کامل موبایل با کلیک‌پذیری */}
       <div className={styles.header}>
         <button onClick={handleBack} className={styles.backBtn}>
           ←
         </button>
-        <span className={styles.title}>
-          {currentChat.user1?.id === user.id
-            ? `${currentChat.user2?.first_name} ${currentChat.user2?.last_name}`
-            : `${currentChat.user1?.first_name} ${currentChat.user1?.last_name}`}
-        </span>
+        <div className={styles.userInfo} onClick={handleUserClick}>
+          <Avatar
+            src={otherUser?.profile_pic_url}
+            initials={otherInitials}
+            size="medium"
+            isOnline={isOnline}
+          />
+          <div className={styles.userText}>
+            <span className={styles.userName}>{otherName}</span>
+            <span className={styles.userStatus}>
+              {isOnline ? "Online" : "Offline"}
+            </span>
+          </div>
+        </div>
       </div>
-      <div className={styles.chatWrapper}>
-        <ChatContainer
-          chat={currentChat}
-          currentUserId={user.id}
-          typingUsers={typingUsers[currentChat.id] || new Set()}
-          onSendMessage={(text) => sendMessage(Number(chatId), text)}
-          onTyping={(isTyping) => sendTyping(Number(chatId), isTyping)}
-          onEditMessage={(messageId, newText) =>
-            updateMessage(Number(currentChat.id), messageId, {
-              message_text: newText,
-              is_edited: true,
-            })
-          }
-        />
-      </div>
+
+      <ChatContainer
+        chat={currentChat}
+        currentUserId={user.id}
+        typingUsers={typingUsers[currentChat.id] || new Set()}
+        onSendMessage={(text) => sendMessage(Number(chatId), text)}
+        onTyping={(isTyping) => sendTyping(Number(chatId), isTyping)}
+        onEditMessage={(messageId, newText) =>
+          updateMessage(Number(currentChat.id), messageId, {
+            message_text: newText,
+            is_edited: true,
+          })
+        }
+        hideUserStatus={true}
+      />
+
+      <UserProfileModal
+        user={userForModal}
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+      />
     </div>
   );
 };

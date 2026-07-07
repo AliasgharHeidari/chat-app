@@ -37,7 +37,7 @@
 
 /* ✅ حالت Night Mode */
 [data-theme="dark"] .modal {
-  background: rgba(25, 25, 40, 0.75);
+  background: rgb(44, 61, 81, 0.1);
   backdrop-filter: blur(32px) saturate(180%);
   -webkit-backdrop-filter: blur(32px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.06);

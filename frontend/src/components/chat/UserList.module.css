@@ -16,31 +16,46 @@
 }
 
 .title {
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--text-primary, #1a1a1a);
   margin: 0;
 }
 
 .newChatButton {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: none;
-  background-color: #667eea;
-  color: white;
-  font-size: 20px;
+  background-color: #cee7da;
+  color: var(--text-primary, #1a1a1a);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
 }
 
 .newChatButton:hover {
-  background-color: #5568d3;
+  background-color: #b5e0ca;
+  border-color: #667eea;
+  color: #fdfdfd;
+  transform: scale(1.05);
 }
 
+[data-theme="dark"] .newChatButton {
+  border-color: var(--border-color, #334155);
+  background-color: var(--bg-primary, #0f172a);
+  color: var(--text-primary, #e2e8f0);
+}
+
+[data-theme="dark"] .newChatButton:hover {
+  background-color: var(--bg-secondary, #1e293b);
+  border-color: #818cf8;
+  color: #818cf8;
+}
 .searchBox {
   padding: 8px 16px;
   background-color: var(--bg-primary, #fff);

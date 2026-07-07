@@ -2,34 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ======================================== */
+/* 🎨 فونت رسمی تلگرام: Vazirmatn (وزیرمتن) */
+/* ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ======================================== */
+/* 🎨 فونت اموجی iOS (سیستم)              */
+/* ======================================== */
+
 :root {
+  --font-fa: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
+  --font-en: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-emoji: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Symbola', sans-serif;
+
   --bg-primary: #ffffff;
-  --bg-secondary: #f7f9fc;
+  --bg-secondary: #f8fafc;
+  --bg-message-other: #e8ecf1;
+  --bg-message-other-dark: #2d3748;
   --text-primary: #1a1a1a;
   --text-secondary: #4a4a4a;
-  --border-color: #e2e8f0;
+  --border-color: #c5ccd4;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 [data-theme="dark"] {
-  --bg-primary: #1a1a2e;
-  --bg-secondary: #16213e;
+  --bg-primary: #121212;
+  --bg-secondary: #1c1c1c;
   --text-primary: #e2e8f0;
   --text-secondary: #a0aec0;
   --border-color: #2d3748;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-* {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+/* ======================================== */
+/* 🌍 تنظیمات گلوبال فونت اموجی iOS        */
+/* ======================================== */
+
+/* ✅ اعمال فونت اموجی به کل صفحه */
+html, body, * {
+  font-family: var(--font-fa), 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* ✅ کلاس برای متون انگلیسی */
+.en,
+[lang="en"] {
+  font-family: var(--font-en), 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+}
+
+/* ✅ اموجی‌ها در پیام‌ها و ورودی */
+.message-text,
+.message-bubble p,
+.chat-message,
+textarea,
+input,
+.MessageInput,
+.emoji-picker,
+.EmojiPickerReact {
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif !important;
+}
+
+/* ======================================== */
+/* 🎨 استایل اسکرول بار                    */
+/* ======================================== */
 
 ::-webkit-scrollbar {
   width: 6px;
@@ -46,4 +91,20 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
+}
+
+/* ✅ حذف هایلایت آبی موبایل */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ✅ بهبود خوانایی */
+p, span, div {
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* ✅ تنظیم برای اعداد فارسی */
+.fa-num {
+  font-feature-settings: "ss02";
 }

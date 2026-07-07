@@ -62,7 +62,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
             <div className={styles.menuList}>
               <div className={styles.menuItem} onClick={handleEditProfile}>
-                <span className={styles.menuIcon}></span>
+
                 <span>Edit Profile</span>
                 <span className={styles.arrow}>›</span>
               </div>

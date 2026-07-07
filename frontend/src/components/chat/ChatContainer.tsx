@@ -19,6 +19,7 @@ interface ChatContainerProps {
   onSendMessage: (text: string) => void;
   onTyping: (isTyping: boolean) => void;
   onEditMessage?: (messageId: number, newText: string) => void;
+  hideUserStatus?: boolean; // ✅ اضافه شد
 }
 
 export const ChatContainer: React.FC<ChatContainerProps> = ({
@@ -28,6 +29,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   onSendMessage,
   onTyping,
   onEditMessage,
+  hideUserStatus = false, // ✅ مقدار پیش‌فرض
 }) => {
   const [isSending, setIsSending] = useState(false);
   const [offset, setOffset] = useState(20);
@@ -127,14 +129,17 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
 
   return (
     <div className={styles.container}>
-      <UserStatus
-        userId={otherUser.id}          // ✅ userId رو پاس بده
-        name={otherUserName}
-        lastSeen={otherUser.last_seen}
-        initials={otherUserInitials}
-        profilePicUrl={otherUser.profile_pic_url}
-        onClick={handleUserClick}
-      />
+      {/* ✅ فقط اگه hideUserStatus false باشه، UserStatus نمایش داده بشه */}
+      {!hideUserStatus && (
+        <UserStatus
+          userId={otherUser.id}
+          name={otherUserName}
+          lastSeen={otherUser.last_seen}
+          initials={otherUserInitials}
+          profilePicUrl={otherUser.profile_pic_url}
+          onClick={handleUserClick}
+        />
+      )}
 
       <TypingIndicator userNames={typingUserNames} />
 

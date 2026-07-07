@@ -8,6 +8,7 @@ import (
 )
 
 type Config struct {
+	Host     string
 	Port     string
 	DBHost   string
 	DBPort   string
@@ -23,6 +24,7 @@ func LoadConfig() {
 	godotenv.Load()
 	
 	AppConfig = &Config{
+		Host:      getEnv("HOST", "127.0.0.1"),
 		Port:      getEnv("PORT", "3000"),
 		DBHost:    getEnv("DB_HOST", "localhost"),
 		DBPort:    getEnv("DB_PORT", "5432"),

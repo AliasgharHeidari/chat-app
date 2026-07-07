@@ -1,23 +1,46 @@
+/* ======================================== */
+/*          🔍 جستجوی کاربران               */
+/* ======================================== */
+
 .container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: white;
+  background-color: var(--bg-primary, rgb(253, 253, 253));
+  transition: background-color 0.3s ease;
 }
+
+[data-theme="dark"] .container {
+  background-color: var(--bg-primary, #0f172a);
+}
+
+/* ======================================== */
+/*          🧠 هدر                          */
+/* ======================================== */
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border-color, #ddd);
+  transition: border-color 0.3s ease;
+}
+
+[data-theme="dark"] .header {
+  border-bottom: 1px solid var(--border-color, #334155);
 }
 
 .title {
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #333);
+  transition: color 0.3s ease;
+}
+
+[data-theme="dark"] .title {
+  color: var(--text-primary, #e2e8f0);
 }
 
 .closeButton {
@@ -25,36 +48,76 @@
   border: none;
   font-size: 20px;
   cursor: pointer;
-  color: #999;
+  color: var(--text-secondary, #999);
   padding: 5px;
+  transition: color 0.3s ease;
 }
 
 .closeButton:hover {
-  color: #333;
+  color: var(--text-primary, #333);
 }
+
+[data-theme="dark"] .closeButton {
+  color: var(--text-secondary, #94a3b8);
+}
+
+[data-theme="dark"] .closeButton:hover {
+  color: var(--text-primary, #e2e8f0);
+}
+
+/* ======================================== */
+/*          🔎 جعبه جستجو                   */
+/* ======================================== */
 
 .searchBox {
   padding: 10px 15px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color, #eee);
+  transition: border-color 0.3s ease;
+}
+
+[data-theme="dark"] .searchBox {
+  border-bottom: 1px solid var(--border-color, #334155);
 }
 
 .searchInput {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color, #ddd);
   border-radius: 20px;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.3s ease, color 0.3s ease;
+  background-color: var(--bg-secondary, #f1f5f9);
+  color: var(--text-primary, #1a1a1a);
+}
+
+[data-theme="dark"] .searchInput {
+  background-color: var(--bg-secondary, #1e293b);
+  border-color: var(--border-color, #334155);
+  color: var(--text-primary, #e2e8f0);
 }
 
 .searchInput:focus {
   border-color: #667eea;
 }
 
+[data-theme="dark"] .searchInput:focus {
+  border-color: #818cf8;
+}
+
+/* ======================================== */
+/*          📋 نتایج جستجو                  */
+/* ======================================== */
+
 .resultsContainer {
   flex: 1;
   overflow-y: auto;
+  background-color: var(--bg-primary, #ffffff);
+  transition: background-color 0.3s ease;
+}
+
+[data-theme="dark"] .resultsContainer {
+  background-color: var(--bg-primary, #0f172a);
 }
 
 .resultsContainer::-webkit-scrollbar {
@@ -62,13 +125,25 @@
 }
 
 .resultsContainer::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--bg-secondary, #f1f1f1);
+}
+
+[data-theme="dark"] .resultsContainer::-webkit-scrollbar-track {
+  background: var(--bg-secondary, #1e293b);
 }
 
 .resultsContainer::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: var(--border-color, #ccc);
   border-radius: 3px;
 }
+
+[data-theme="dark"] .resultsContainer::-webkit-scrollbar-thumb {
+  background: var(--border-color, #475569);
+}
+
+/* ======================================== */
+/*          📭 حالت خالی/بارگذاری           */
+/* ======================================== */
 
 .center,
 .empty {
@@ -76,22 +151,45 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #999;
+  color: var(--text-secondary, #999);
   text-align: center;
+  padding: 20px;
+  transition: color 0.3s ease;
 }
+
+[data-theme="dark"] .center,
+[data-theme="dark"] .empty {
+  color: var(--text-secondary, #94a3b8);
+}
+
+/* ======================================== */
+/*          👤 آیتم کاربر                   */
+/* ======================================== */
 
 .resultItem {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px 15px;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.2s;
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
+  transition: background-color 0.2s, border-color 0.3s ease;
+}
+
+[data-theme="dark"] .resultItem {
+  border-bottom: 1px solid var(--border-color, #1e293b);
 }
 
 .resultItem:hover {
-  background-color: #f9f9f9;
+  background-color: var(--bg-secondary, #f9f9f9);
 }
+
+[data-theme="dark"] .resultItem:hover {
+  background-color: var(--bg-secondary, #1e293b);
+}
+
+/* ======================================== */
+/*          ℹ️ اطلاعات کاربر                */
+/* ======================================== */
 
 .userInfo {
   flex: 1;
@@ -102,26 +200,45 @@
   margin: 0 0 2px;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #333);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: color 0.3s ease;
+}
+
+[data-theme="dark"] .userName {
+  color: var(--text-primary, #e2e8f0);
 }
 
 .username {
   margin: 0 0 4px;
   font-size: 12px;
-  color: #999;
+  color: var(--text-secondary, #999);
+  transition: color 0.3s ease;
+}
+
+[data-theme="dark"] .username {
+  color: var(--text-secondary, #94a3b8);
 }
 
 .bio {
   margin: 0;
   font-size: 12px;
-  color: #666;
+  color: var(--text-secondary, #666);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: color 0.3s ease;
 }
+
+[data-theme="dark"] .bio {
+  color: var(--text-secondary, #94a3b8);
+}
+
+/* ======================================== */
+/*          🔘 دکمه شروع چت                */
+/* ======================================== */
 
 .startButton {
   padding: 6px 12px;
@@ -131,15 +248,66 @@
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, opacity 0.2s;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .startButton:hover:not(:disabled) {
   background-color: #5568d3;
 }
 
+[data-theme="dark"] .startButton {
+  background-color: #818cf8;
+}
+
+[data-theme="dark"] .startButton:hover:not(:disabled) {
+  background-color: #6366f1;
+}
+
 .startButton:disabled {
-  background-color: #ccc;
+  background-color: var(--border-color, #ccc);
   cursor: not-allowed;
+  opacity: 0.5;
+}
+
+[data-theme="dark"] .startButton:disabled {
+  background-color: var(--border-color, #475569);
+}
+
+/* ======================================== */
+/*          📱 ریسپانسیو                    */
+/* ======================================== */
+
+@media (max-width: 480px) {
+  .header {
+    padding: 10px 12px;
+  }
+
+  .title {
+    font-size: 17px;
+  }
+
+  .searchBox {
+    padding: 8px 12px;
+  }
+
+  .searchInput {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .resultItem {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .userName {
+    font-size: 13px;
+  }
+
+  .startButton {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
 }

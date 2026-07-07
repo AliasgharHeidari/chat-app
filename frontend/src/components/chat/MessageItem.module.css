@@ -1,7 +1,6 @@
 /* ======================================== */
 /*          💬 پیام‌ها - پالت Slate         */
 /* ======================================== */
-
 .container {
   display: flex;
   align-items: flex-end;
@@ -9,22 +8,18 @@
   margin-bottom: 12px;
   animation: slideIn 0.3s ease-out;
 }
-
 .own {
   justify-content: flex-end;
 }
-
 .other {
   justify-content: flex-start;
 }
-
 .messageContent {
   display: flex;
   flex-direction: column;
   gap: 4px;
   max-width: 60%;
 }
-
 .messageBubble {
   position: relative;
   padding: 8px 12px;
@@ -32,50 +27,50 @@
   word-wrap: break-word;
 }
 
+
 /* ======================================== */
 /*          🎨 لایت مود                     */
 /* ======================================== */
-
 .ownBubble {
-  background-color: #667eea;
+  background: #97a583;
   color: #ffffff;
 }
-
 .otherBubble {
-  background-color: var(--bg-message-other, #f1f5f9);
+  background-image: linear-gradient(135deg, #b6b8b8 10%, #bec2c1 100%);
   color: var(--text-primary, #1a1a1a);
 }
-
 /* ======================================== */
 /*          🌙 دارک مود (Slate)            */
 /* ======================================== */
-
 [data-theme="dark"] .ownBubble {
-  background-color: #475569; /* slate-600 */
-  color: #f1f5f9;
+  background: linear-gradient(90deg, rgba(69, 77, 105, 0.97) 26%, rgba(61, 72, 92, 1) 56%);
+  color: #ffffff;
 }
-
 [data-theme="dark"] .otherBubble {
-  background-color: var(--bg-message-other-dark, #1e293b); /* slate-800 */
+  background-image: linear-gradient(135deg, #272727 10%, #252525 100%);
   color: #e2e8f0;
 }
-
 /* ======================================== */
 /*          📝 متن و ویرایش                 */
 /* ======================================== */
-
 .messageText {
   margin: 0;
   font-size: 14px;
   line-height: 1.4;
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif !important;
 }
-
+/* ✅ تصاویر اموجی Twemoji — یکسان روی همه سیستم‌عامل‌ها (ویندوز، اندروید، iOS) */
+.messageText img.emoji {
+  height: 1.2em;
+  width: 1.2em;
+  vertical-align: -0.2em;
+  margin: 0 1px;
+}
 .edited {
   font-size: 12px;
   opacity: 0.7;
   margin-left: 4px;
 }
-
 .meta {
   display: flex;
   align-items: center;
@@ -84,13 +79,11 @@
   color: var(--text-secondary, #94a3b8);
   padding: 0 8px;
 }
-
 .deleteGroup {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-
 .menuItemDanger {
   background: transparent;
   border: none;
@@ -98,20 +91,16 @@
   cursor: pointer;
   font-size: 12px;
 }
-
 .time {
   display: block;
 }
-
 .status {
   display: block;
   font-weight: bold;
 }
-
 /* ======================================== */
 /*          📌 منو و اکشن‌ها                 */
 /* ======================================== */
-
 .menu {
   position: absolute;
   top: -30px;
@@ -122,12 +111,10 @@
   box-shadow: var(--shadow, 0 2px 8px rgba(0, 0, 0, 0.1));
   z-index: 10;
 }
-
 [data-theme="dark"] .menu {
   background: var(--bg-primary, #1e293b);
   border-color: var(--border-color, #334155);
 }
-
 .menuItem {
   display: block;
   width: 100%;
@@ -140,61 +127,51 @@
   color: var(--text-primary, #1a1a1a);
   transition: background-color 0.2s;
 }
-
 [data-theme="dark"] .menuItem {
   color: var(--text-primary, #e2e8f0);
 }
-
 .menuItem:hover {
   background-color: var(--bg-secondary, #f1f5f9);
 }
-
 [data-theme="dark"] .menuItem:hover {
   background-color: var(--bg-secondary, #334155);
 }
-
 .menuItem:first-child {
   border-radius: 4px 4px 0 0;
 }
-
 .menuItem:last-child {
   border-radius: 0 0 4px 4px;
 }
-
 /* ======================================== */
 /*          ✏️ ویرایش                       */
 /* ======================================== */
-
 .editContainer {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-
 .editInput {
   padding: 8px;
   border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 4px;
-  font-family: inherit;
+  /* ✅ فونت اموجی اول، سپس فونت فارسی */
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', var(--font-fa), sans-serif;
   font-size: 14px;
   resize: none;
   min-height: 60px;
   background-color: var(--bg-primary, #ffffff);
   color: var(--text-primary, #1a1a1a);
 }
-
 [data-theme="dark"] .editInput {
   background-color: var(--bg-primary, #1e293b);
   border-color: var(--border-color, #334155);
   color: var(--text-primary, #e2e8f0);
 }
-
 .editButtons {
   display: flex;
   gap: 6px;
   justify-content: flex-end;
 }
-
 .saveBtn,
 .cancelBtn {
   padding: 4px 10px;
@@ -204,47 +181,37 @@
   cursor: pointer;
   transition: background-color 0.2s;
 }
-
 .saveBtn {
   background-color: #667eea;
   color: white;
 }
-
 .saveBtn:hover {
   background-color: #5568d3;
 }
-
 [data-theme="dark"] .saveBtn {
   background-color: #475569;
   color: #f1f5f9;
 }
-
 [data-theme="dark"] .saveBtn:hover {
   background-color: #334155;
 }
-
 .cancelBtn {
   background-color: var(--bg-secondary, #f1f5f9);
   color: var(--text-primary, #1a1a1a);
 }
-
 .cancelBtn:hover {
   background-color: var(--border-color, #e2e8f0);
 }
-
 [data-theme="dark"] .cancelBtn {
   background-color: var(--bg-secondary, #334155);
   color: var(--text-primary, #e2e8f0);
 }
-
 [data-theme="dark"] .cancelBtn:hover {
   background-color: var(--border-color, #475569);
 }
-
 /* ======================================== */
 /*          📱 ریسپانسیو موبایل            */
 /* ======================================== */
-
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -255,103 +222,84 @@
     transform: translateY(0);
   }
 }
-
 /* ✅ تبلت و موبایل (تا ۷۶۸px) */
 @media (max-width: 768px) {
   .messageContent {
     max-width: 80%;
   }
-
   .messageBubble {
     padding: 8px 10px;
     border-radius: 14px;
   }
-
   .messageText {
     font-size: 14px;
   }
-
   .meta {
     font-size: 10px;
     gap: 4px;
     padding: 0 6px;
   }
-
   .menu {
     top: -26px;
     right: 4px;
   }
-
   .menuItem {
     padding: 4px 10px;
     font-size: 11px;
   }
-
   .editInput {
     font-size: 13px;
     padding: 6px 10px;
     min-height: 50px;
   }
-
   .saveBtn,
   .cancelBtn {
     font-size: 11px;
     padding: 3px 8px;
   }
 }
-
 /* ✅ موبایل خیلی کوچک (تا ۴۸۰px) */
 @media (max-width: 480px) {
   .messageContent {
     max-width: 90%;
   }
-
   .messageBubble {
     padding: 6px 8px;
     border-radius: 12px;
   }
-
   .messageText {
     font-size: 13px;
     line-height: 1.3;
   }
-
   .meta {
     font-size: 9px;
     gap: 3px;
   }
-
   .menu {
     top: -22px;
     right: 2px;
   }
-
   .menuItem {
     padding: 3px 8px;
     font-size: 10px;
   }
-
   .editInput {
     font-size: 12px;
     padding: 4px 8px;
     min-height: 40px;
   }
-
   .saveBtn,
   .cancelBtn {
     font-size: 10px;
     padding: 2px 6px;
   }
-
   .container {
     gap: 4px;
     margin-bottom: 8px;
   }
-
   .messageContent {
     gap: 2px;
   }
-
   .status {
     font-size: 8px;
   }

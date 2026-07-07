@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(221, 221, 221, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -40,6 +40,22 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
+[data-theme="dark"] .overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.281);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.25s ease;
+}
+
 [data-theme="dark"] .closeBtn {
   background: rgba(255, 255, 255, 0.1);
   color: #ccc;
@@ -67,7 +83,7 @@
 }
 
 [data-theme="dark"] .offline {
-  color: #999;
+  color: #fc4db36c;
 }
 
 [data-theme="dark"] .lastSeen {
@@ -193,7 +209,7 @@
 }
 
 .offline {
-  color: #888;
+  color: #b64f97bb;
   font-weight: 500;
   transition: color 0.3s ease;
 }

@@ -47,5 +47,5 @@ func Start() {
 	protected.Post("/messages", handler.SendMessage)
 	protected.Put("/messages/:message_id", handler.ModifyMessage)
 	protected.Delete("/messages/:message_id", handler.DeleteMessage)
-	app.Listen(cfg.Port)
+	app.Listen(cfg.Host + cfg.Port)
 }

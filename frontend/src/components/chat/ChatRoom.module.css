@@ -1,9 +1,13 @@
+/* ======================================== */
+/*          📱 ChatRoom - پالت Slate        */
+/* ======================================== */
+
 .container {
   display: flex;
   flex-direction: column;
   height: 100vh;
   height: 100dvh;
-  background: var(--bg-primary, #fff);
+  background: var(--bg-primary, #ffffff);
   overflow: hidden;
 }
 
@@ -12,47 +16,145 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: var(--bg-secondary, #f5f5f5);
+  background: var(--bg-secondary, #f1f5f9);
 }
+
+/* ======================================== */
+/*          🧠 هدر کامل موبایل              */
+/* ======================================== */
 
 .header {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  background: var(--bg-primary, #fff);
-  border-bottom: 1px solid var(--border-color, #ddd);
+  padding: 8px 12px;
+  background: var(--bg-primary, #ffffff);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
   flex-shrink: 0;
-  gap: 12px;
-  min-height: 56px;
+  gap: 10px;
+  min-height: 60px;
+}
+
+[data-theme="dark"] .header {
+  background: var(--bg-primary, #0f172a);
+  border-bottom: 1px solid var(--border-color, #334155);
 }
 
 .backBtn {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 22px;
   cursor: pointer;
-  color: var(--text-primary, #333);
-  padding: 4px 8px;
+  color: var(--text-primary, #1a1a1a);
+  padding: 4px 6px;
   border-radius: 8px;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .backBtn:hover {
-  background: var(--bg-secondary, #f0f0f0);
+  background: var(--bg-secondary, #f1f5f9);
 }
 
-.title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary, #333);
+[data-theme="dark"] .backBtn {
+  color: var(--text-primary, #e2e8f0);
+}
+
+[data-theme="dark"] .backBtn:hover {
+  background: var(--bg-secondary, #1e293b);
+}
+
+/* ✅ هدر کلیک‌پذیر برای پروفایل */
+.userInfo {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  min-width: 0;
 }
 
-/* ✅ برای اطمینان از نمایش MessageInput */
+.userInfo:hover {
+  background: var(--bg-secondary, #f1f5f9);
+}
+
+[data-theme="dark"] .userInfo:hover {
+  background: var(--bg-secondary, #1e293b);
+}
+
+.userText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.userName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  transition: color 0.3s ease;
+}
+
+[data-theme="dark"] .userName {
+  color: var(--text-primary, #e2e8f0);
+}
+
+.userStatus {
+  font-size: 12px;
+  color: var(--text-secondary, #64748b);
+  transition: color 0.3s ease;
+}
+
+[data-theme="dark"] .userStatus {
+  color: var(--text-secondary, #94a3b8);
+}
+
+/* ======================================== */
+/*          📦 محتوای چت                    */
+/* ======================================== */
+
 .chatWrapper {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+  background: var(--bg-secondary, #f8fafc);
+}
+
+[data-theme="dark"] .chatWrapper {
+  background: var(--bg-secondary, #0f172a);
+}
+
+/* ======================================== */
+/*          📱 ریسپانسیو                    */
+/* ======================================== */
+
+@media (max-width: 480px) {
+  .header {
+    padding: 6px 10px;
+    min-height: 52px;
+  }
+
+  .backBtn {
+    font-size: 20px;
+    padding: 2px 4px;
+  }
+
+  .userName {
+    font-size: 15px;
+  }
+
+  .userStatus {
+    font-size: 11px;
+  }
+
+  .userInfo {
+    padding: 2px 4px;
+    gap: 6px;
+  }
 }

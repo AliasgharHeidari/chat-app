@@ -1,10 +1,14 @@
 .container {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 16px 16px 70px 16px;
   background-color: var(--bg-secondary, #fafafa);
   display: flex;
   flex-direction: column;
+}
+
+[data-theme="dark"] .container {
+  background-color: var(--bg-secondary, #0f172a);
 }
 
 .dateLabel {
@@ -13,6 +17,10 @@
   color: var(--text-secondary, #888);
   padding: 8px 0 12px 0;
   font-weight: 500;
+}
+
+[data-theme="dark"] .dateLabel {
+  color: var(--text-secondary, #94a3b8);
 }
 
 .center {
@@ -32,6 +40,10 @@
   padding: 20px;
 }
 
+[data-theme="dark"] .empty {
+  color: var(--text-secondary, #94a3b8);
+}
+
 .empty p {
   margin: 0;
 }
@@ -39,4 +51,35 @@
 .loadingMore {
   text-align: center;
   padding: 8px 0;
+}
+
+/* ======================================== */
+/*          🎨 اسکرول‌بار                   */
+/* ======================================== */
+
+.container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: var(--border-color, #cbd5e1);
+  border-radius: 999px;
+}
+
+[data-theme="dark"] .container::-webkit-scrollbar-thumb {
+  background: var(--border-color, #475569);
+}
+
+/* ======================================== */
+/*          📱 ریسپانسیو                    */
+/* ======================================== */
+
+@media (max-width: 480px) {
+  .container {
+    padding: 12px 12px 12px 12px;
+  }
 }

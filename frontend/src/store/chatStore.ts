@@ -2,8 +2,6 @@ import { create } from "zustand";
 import type { Chat, Message, SearchUsersResponse } from "@/types";
 import { api } from "@/api/rest";
 
-const CURRENT_CHAT_STORAGE_KEY = "current_chat_id";
-
 interface ChatStore {
   chats: Chat[];
   messages: Record<number, Message[]>;
@@ -14,34 +12,20 @@ interface ChatStore {
   isLoadingChats: boolean;
   isLoadingMessages: boolean;
   error: string | null;
-  // Chat actions
   setCurrentChat: (chat: Chat | null) => void;
   loadChats: () => Promise<void>;
   initChat: (targetUsername: string) => Promise<Chat>;
-  loadChatMessages: (
-    chatId: number,
-    limit?: number,
-    offset?: number,
-  ) => Promise<void>;
-  // Message actions
+  loadChatMessages: (chatId: number) => Promise<void>;
   addMessage: (chatId: number, message: Message) => void;
-  updateMessage: (
-    chatId: number,
-    messageId: number,
-    updates: Partial<Message>,
-  ) => void;
+  updateMessage: (chatId: number, messageId: number, updates: Partial<Message>) => void;
   removeMessage: (chatId: number, messageId: number) => void;
   clearMessages: (chatId: number) => void;
-  // آپدیت آخرین پیام در لیست چت‌ها
   updateChatLastMessage: (chatId: number, message: Message) => void;
-  // Search actions
   searchUsers: (query: string) => Promise<void>;
   clearSearchResults: () => void;
-  // Online status
   setUserOnline: (userId: number) => void;
   setUserOffline: (userId: number) => void;
   setOnlineUsers: (userIds: number[]) => void;
-  // Typing status
   setUserTyping: (chatId: number, userId: number) => void;
   setUserNotTyping: (chatId: number, userId: number) => void;
   setError: (error: string | null) => void;
@@ -61,9 +45,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   setCurrentChat: (chat) => {
     set({ currentChat: chat });
     if (chat) {
-      localStorage.setItem(CURRENT_CHAT_STORAGE_KEY, String(chat.id));
+      localStorage.setItem("current_chat_id", String(chat.id));
     } else {
-      localStorage.removeItem(CURRENT_CHAT_STORAGE_KEY);
+      localStorage.removeItem("current_chat_id");
     }
   },
 
@@ -72,26 +56,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     try {
       const chats = await api.getAllChats();
       set({ chats, isLoadingChats: false });
-
-      const state = get();
-      if (!state.currentChat) {
-        const savedChatId = localStorage.getItem(CURRENT_CHAT_STORAGE_KEY);
-        if (savedChatId) {
-          const restoredChat = chats.find(
-            (c) => c.id === Number(savedChatId),
-          );
-          if (restoredChat) {
-            set({ currentChat: restoredChat });
-          } else {
-            localStorage.removeItem(CURRENT_CHAT_STORAGE_KEY);
-          }
-        }
-      }
     } catch (error) {
-      set({
-        error: api.getErrorMessage(error),
-        isLoadingChats: false,
-      });
+      set({ error: api.getErrorMessage(error), isLoadingChats: false });
     }
   },
 
@@ -99,12 +65,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     set({ error: null });
     try {
       const chat = await api.initChat({ target_username: targetUsername });
-      const state = get();
-      const existingChat = state.chats.find((c) => c.id === chat.id);
-      if (!existingChat) {
-        set({ chats: [...state.chats, chat] });
-      }
-      get().setCurrentChat(chat);
+      set((state) => ({
+        chats: state.chats.some((c) => c.id === chat.id) ? state.chats : [...state.chats, chat],
+        currentChat: chat,
+      }));
+      localStorage.setItem("current_chat_id", String(chat.id));
       return chat;
     } catch (error) {
       set({ error: api.getErrorMessage(error) });
@@ -112,101 +77,92 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
   },
 
-  loadChatMessages: async (chatId, limit = 20, offset = 0) => {
-    set({ isLoadingMessages: true, error: null });
-    try {
-      const response = await api.getChatMessages(chatId, limit, offset);
-      const state = get();
+  // ✅ ساده‌ترین شکل ممکن
+loadChatMessages: async (chatId, limit = 20, offset = 0) => {
+  set({ isLoadingMessages: true, error: null });
+  try {
+    const response = await api.getChatMessages(chatId, limit, offset);
+    
+    // پیام‌ها رو به ترتیب صعودی مرتب کن (قدیمی‌ترین اول)
+    const sortedMessages = [...response.messages].sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
+
+    set((state) => {
       const existingMessages = state.messages[chatId] || [];
-
+      
+      // اگر offset=0 باشه، جایگزین کن
       if (offset === 0) {
-        // ✅ معکوس کردن برای نمایش درست (قدیمی‌ترین اول)
-        const reversedMessages = [...response.messages].reverse();
-        set({
+        return {
           messages: {
             ...state.messages,
-            [chatId]: reversedMessages,
+            [chatId]: sortedMessages,
           },
           isLoadingMessages: false,
-        });
-      } else {
-        // ✅ پیام‌های جدید (قدیمی‌تر) رو به اول لیست اضافه کن
-        const allMessages = [...response.messages, ...existingMessages];
-        const deduped = Array.from(
-          new Map(allMessages.map((msg) => [msg.id, msg])).values()
-        );
-        set({
-          messages: {
-            ...state.messages,
-            [chatId]: deduped,
-          },
-          isLoadingMessages: false,
-        });
+        };
       }
-    } catch (error) {
-      set({
-        error: api.getErrorMessage(error),
+      
+      // اگر offset>0 باشه، به ابتدا اضافه کن (قدیمی‌ترها)
+      const allMessages = [...sortedMessages, ...existingMessages];
+      const uniqueMessages = Array.from(
+        new Map(allMessages.map((msg) => [msg.id, msg])).values()
+      );
+      
+      return {
+        messages: {
+          ...state.messages,
+          [chatId]: uniqueMessages,
+        },
         isLoadingMessages: false,
-      });
-    }
-  },
-
+      };
+    });
+  } catch (error) {
+    set({ error: api.getErrorMessage(error), isLoadingMessages: false });
+  }
+},
+  // ✅ اضافه کردن به انتها
   addMessage: (chatId, message) => {
-    const state = get();
-    const chatMessages = state.messages[chatId] || [];
-    if (chatMessages.some((m) => m.id === message.id)) {
-      return;
-    }
+    const currentMessages = get().messages[chatId] || [];
+    if (currentMessages.some((m) => m.id === message.id)) return;
     set({
       messages: {
-        ...state.messages,
-        [chatId]: [...chatMessages, message],
+        ...get().messages,
+        [chatId]: [...currentMessages, message],
       },
     });
   },
 
   updateMessage: (chatId, messageId, updates) => {
-    const state = get();
-    const chatMessages = state.messages[chatId] || [];
+    const messages = get().messages[chatId] || [];
     set({
       messages: {
-        ...state.messages,
-        [chatId]: chatMessages.map((msg) =>
-          msg.id === messageId ? { ...msg, ...updates } : msg,
-        ),
+        ...get().messages,
+        [chatId]: messages.map((m) => (m.id === messageId ? { ...m, ...updates } : m)),
       },
     });
   },
 
   removeMessage: (chatId, messageId) => {
-    const state = get();
-    const chatMessages = state.messages[chatId] || [];
-    const filtered = chatMessages.filter((msg) => msg.id !== messageId);
+    const messages = get().messages[chatId] || [];
     set({
       messages: {
-        ...state.messages,
-        [chatId]: filtered,
+        ...get().messages,
+        [chatId]: messages.filter((m) => m.id !== messageId),
       },
     });
   },
 
   clearMessages: (chatId) => {
-    const state = get();
-    const messages = { ...state.messages };
-    delete messages[chatId];
-    set({ messages });
+    const { [chatId]: _, ...rest } = get().messages;
+    set({ messages: rest });
   },
 
   updateChatLastMessage: (chatId, message) => {
     set((state) => ({
       chats: state.chats.map((chat) =>
         chat.id === chatId
-          ? {
-              ...chat,
-              last_message: message,
-              updated_at: message.created_at,
-            }
-          : chat,
+          ? { ...chat, last_message: message, updated_at: message.created_at }
+          : chat
       ),
     }));
   },
@@ -228,17 +184,17 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   clearSearchResults: () => set({ searchResults: [] }),
 
   setUserOnline: (userId) => {
-    const state = get();
-    const newOnlineUsers = new Set(state.onlineUsers);
-    newOnlineUsers.add(userId);
-    set({ onlineUsers: newOnlineUsers });
+    set((state) => ({
+      onlineUsers: new Set(state.onlineUsers).add(userId),
+    }));
   },
 
   setUserOffline: (userId) => {
-    const state = get();
-    const newOnlineUsers = new Set(state.onlineUsers);
-    newOnlineUsers.delete(userId);
-    set({ onlineUsers: newOnlineUsers });
+    set((state) => {
+      const newSet = new Set(state.onlineUsers);
+      newSet.delete(userId);
+      return { onlineUsers: newSet };
+    });
   },
 
   setOnlineUsers: (userIds) => {
@@ -246,26 +202,24 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   },
 
   setUserTyping: (chatId, userId) => {
-    const state = get();
-    const typingSet = state.typingUsers[chatId] || new Set();
-    typingSet.add(userId);
-    set({
+    set((state) => ({
       typingUsers: {
         ...state.typingUsers,
-        [chatId]: new Set(typingSet),
+        [chatId]: new Set(state.typingUsers[chatId] || []).add(userId),
       },
-    });
+    }));
   },
 
   setUserNotTyping: (chatId, userId) => {
-    const state = get();
-    const typingSet = state.typingUsers[chatId] || new Set();
-    typingSet.delete(userId);
-    set({
-      typingUsers: {
-        ...state.typingUsers,
-        [chatId]: new Set(typingSet),
-      },
+    set((state) => {
+      const set = new Set(state.typingUsers[chatId] || []);
+      set.delete(userId);
+      return {
+        typingUsers: {
+          ...state.typingUsers,
+          [chatId]: set,
+        },
+      };
     });
   },
 

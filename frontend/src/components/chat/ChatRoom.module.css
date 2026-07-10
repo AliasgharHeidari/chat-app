@@ -48,7 +48,7 @@
   min-height: 66px;
 }
 
-/* ✅ دکمه برگشت — دایره‌ای و شیشه‌ای، مجزا از باکس پروفایل */
+
 .backBtn {
   position: absolute;
   left: 14px;
@@ -90,7 +90,6 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* ✅ باکس پروفایل — پیل شیشه‌ای مجزا، با border-radius و شفافیت */
 .userInfo {
   display: flex;
   align-items: center;
@@ -101,7 +100,7 @@
   width: fit-content;
   max-width: calc(100% - 60px);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.45);
+  background: rgba(168, 168, 168, 0.45);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.5);
@@ -110,7 +109,7 @@
 }
 
 .userInfo:hover {
-  background: rgba(255, 255, 255, 0.62);
+  background: rgba(221, 221, 221, 0.62);
 }
 
 .userInfo:active {

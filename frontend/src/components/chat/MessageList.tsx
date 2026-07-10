@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { Message } from "@/types";
 import { MessageItem } from "./MessageItem";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
@@ -9,29 +9,36 @@ interface MessageListProps {
   messages: Message[];
   currentUserId: number;
   isLoading?: boolean;
+  isSelectMode?: boolean;
+  selectedMessages?: Set<number>;
+  onToggleSelect?: (messageId: number) => void;
   onEdit?: (messageId: number, newText: string) => void;
   onDelete?: (messageId: number, forEveryone: boolean) => void;
   onSeen?: (messageId: number) => void;
-  onLoadMore?: () => void; // ✅ اضافه شد
-  hasMore?: boolean; // ✅ اضافه شد
+  onLoadMore?: () => void;
+  hasMore?: boolean;
+  onCopyMessage?: (text: string) => void;
 }
 
 export const MessageList: React.FC<MessageListProps> = ({
   messages,
   currentUserId,
   isLoading = false,
+  isSelectMode = false,
+  selectedMessages = new Set(),
+  onToggleSelect,
   onEdit,
   onDelete,
   onSeen,
-  onLoadMore, // ✅ اضافه شد
-  hasMore = false, // ✅ اضافه شد
+  onLoadMore,
+  hasMore = false,
+  onCopyMessage,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const seenTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLoadingMoreRef = useRef(false);
   const prevScrollHeightRef = useRef(0);
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (containerRef.current) {
       const scrollHeight = containerRef.current.scrollHeight;
@@ -39,7 +46,6 @@ export const MessageList: React.FC<MessageListProps> = ({
     }
   }, [messages]);
 
-  // وقتی پیام جدید میاد، تمام پیام‌های دیده نشده رو seen کن
   useEffect(() => {
     if (messages.length > 0 && onSeen) {
       const unseenMessages = messages.filter(
@@ -63,7 +69,6 @@ export const MessageList: React.FC<MessageListProps> = ({
     };
   }, [messages, currentUserId, onSeen]);
 
-  // ✅ تشخیص اسکرول به بالا
   const handleScroll = () => {
     if (!containerRef.current || isLoading || !onLoadMore || !hasMore) return;
     if (isLoadingMoreRef.current) return;
@@ -79,7 +84,6 @@ export const MessageList: React.FC<MessageListProps> = ({
     }
   };
 
-  // ✅ بعد از لود پیام‌های جدید، اسکرول رو در موقعیت قبلی نگه دار
   useEffect(() => {
     if (isLoadingMoreRef.current && containerRef.current) {
       const newScrollHeight = containerRef.current.scrollHeight;
@@ -128,11 +132,7 @@ export const MessageList: React.FC<MessageListProps> = ({
   }
 
   return (
-    <div
-      className={styles.container}
-      ref={containerRef}
-      onScroll={handleScroll} // ✅ اضافه شد
-    >
+    <div className={styles.container} ref={containerRef} onScroll={handleScroll}>
       {isLoading && hasMore && (
         <div className={styles.loadingMore}>
           <LoadingSpinner size="small" />
@@ -153,8 +153,12 @@ export const MessageList: React.FC<MessageListProps> = ({
                 index === 0 ||
                 group.messages[index - 1].sender_id !== message.sender_id
               }
+              isSelectMode={isSelectMode}
+              isSelected={selectedMessages.has(message.id)}
+              onToggleSelect={onToggleSelect}
               onEdit={onEdit}
               onDelete={onDelete}
+              onCopy={onCopyMessage}
             />
           ))}
         </div>

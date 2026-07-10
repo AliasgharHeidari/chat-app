@@ -1,94 +1,91 @@
 /* ======================================== */
-/*          🔍 جستجوی کاربران               */
+/*          📋 لیست چت‌ها                   */
 /* ======================================== */
 
 .container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--bg-primary, rgb(253, 253, 253));
-  transition: background-color 0.3s ease;
+  background-color: var(--bg-primary, #ffffff);
+  overflow: hidden;
 }
-
-[data-theme="dark"] .container {
-  background-color: var(--bg-primary, #0f172a);
-}
-
-/* ======================================== */
-/*          🧠 هدر                          */
-/* ======================================== */
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  border-bottom: 1px solid var(--border-color, #ddd);
-  transition: border-color 0.3s ease;
-}
-
-[data-theme="dark"] .header {
-  border-bottom: 1px solid var(--border-color, #334155);
+  padding: 14px 16px 10px 16px;
+  background-color: var(--bg-primary, #ffffff);
 }
 
 .title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
   margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-primary, #333);
-  transition: color 0.3s ease;
-}
-
-[data-theme="dark"] .title {
-  color: var(--text-primary, #e2e8f0);
-}
-
-.closeButton {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: var(--text-secondary, #999);
-  padding: 5px;
-  transition: color 0.3s ease;
-}
-
-.closeButton:hover {
-  color: var(--text-primary, #333);
-}
-
-[data-theme="dark"] .closeButton {
-  color: var(--text-secondary, #94a3b8);
-}
-
-[data-theme="dark"] .closeButton:hover {
-  color: var(--text-primary, #e2e8f0);
+  letter-spacing: -0.01em;
 }
 
 /* ======================================== */
-/*          🔎 جعبه جستجو                   */
+/*          ➕ دکمه چت جدید                 */
+/* ======================================== */
+
+.newChatButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background-color: #cee7da;
+  color: var(--text-primary, #1a1a1a);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.newChatButton:hover {
+  background-color: #b5e0ca;
+  transform: scale(1.08) rotate(90deg);
+}
+
+[data-theme="dark"] .newChatButton {
+  background-color: var(--bg-primary, #0f172a);
+  color: var(--text-primary, #e2e8f0);
+}
+
+[data-theme="dark"] .newChatButton:hover {
+  background-color: var(--bg-secondary, #1e293b);
+}
+
+/* ======================================== */
+/*          🔍 جستجو                        */
 /* ======================================== */
 
 .searchBox {
-  padding: 10px 15px;
-  border-bottom: 1px solid var(--border-color, #eee);
-  transition: border-color 0.3s ease;
-}
-
-[data-theme="dark"] .searchBox {
-  border-bottom: 1px solid var(--border-color, #334155);
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 4px 16px 10px 16px;
+  background-color: var(--bg-primary, #ffffff);
 }
 
 .searchInput {
   width: 100%;
-  padding: 10px 12px;
+  padding: 9px 14px 9px 36px;
   border: 1px solid var(--border-color, #ddd);
-  border-radius: 20px;
+  border-radius: 999px;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s, background-color 0.3s ease, color 0.3s ease;
-  background-color: var(--bg-secondary, #f1f5f9);
+  transition: border-color 0.2s, background-color 0.2s;
+  background-color: var(--bg-secondary, #f5f5f5);
   color: var(--text-primary, #1a1a1a);
+}
+
+.searchInput:focus {
+  border-color: #667eea;
 }
 
 [data-theme="dark"] .searchInput {
@@ -97,217 +94,158 @@
   color: var(--text-primary, #e2e8f0);
 }
 
-.searchInput:focus {
-  border-color: #667eea;
-}
-
-[data-theme="dark"] .searchInput:focus {
-  border-color: #818cf8;
-}
-
 /* ======================================== */
-/*          📋 نتایج جستجو                  */
+/*          📋 لیست چت‌ها                   */
 /* ======================================== */
 
-.resultsContainer {
+.listContainer {
   flex: 1;
   overflow-y: auto;
   background-color: var(--bg-primary, #ffffff);
-  transition: background-color 0.3s ease;
+  padding: 2px 8px 8px 8px;
 }
 
-[data-theme="dark"] .resultsContainer {
-  background-color: var(--bg-primary, #0f172a);
-}
-
-.resultsContainer::-webkit-scrollbar {
-  width: 6px;
-}
-
-.resultsContainer::-webkit-scrollbar-track {
-  background: var(--bg-secondary, #f1f1f1);
-}
-
-[data-theme="dark"] .resultsContainer::-webkit-scrollbar-track {
-  background: var(--bg-secondary, #1e293b);
-}
-
-.resultsContainer::-webkit-scrollbar-thumb {
-  background: var(--border-color, #ccc);
-  border-radius: 3px;
-}
-
-[data-theme="dark"] .resultsContainer::-webkit-scrollbar-thumb {
-  background: var(--border-color, #475569);
-}
-
-/* ======================================== */
-/*          📭 حالت خالی/بارگذاری           */
-/* ======================================== */
-
-.center,
-.empty {
+.list {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--text-secondary, #999);
-  text-align: center;
-  padding: 20px;
-  transition: color 0.3s ease;
-}
-
-[data-theme="dark"] .center,
-[data-theme="dark"] .empty {
-  color: var(--text-secondary, #94a3b8);
+  flex-direction: column;
+  gap: 2px;
 }
 
 /* ======================================== */
-/*          👤 آیتم کاربر                   */
+/*          📱 آیتم چت                      */
 /* ======================================== */
 
-.resultItem {
+.chatItem {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 15px;
-  border-bottom: 1px solid var(--border-color, #f0f0f0);
-  transition: background-color 0.2s, border-color 0.3s ease;
+  padding: 10px 10px;
+  cursor: pointer;
+  border-radius: 14px;
+  background-color: #f8fafc;
+  transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
-[data-theme="dark"] .resultItem {
-  border-bottom: 1px solid var(--border-color, #1e293b);
+[data-theme="dark"] .chatItem {
+  background-color: transparent;
 }
 
-.resultItem:hover {
-  background-color: var(--bg-secondary, #f9f9f9);
+.chatItem:hover {
+  background-color: var(--bg-secondary, #e8ecf1);
 }
 
-[data-theme="dark"] .resultItem:hover {
+[data-theme="dark"] .chatItem:hover {
+  background-color: var(--bg-secondary, #1e293b);
+}
+
+.chatItem:active {
+  transform: scale(0.98);
+}
+
+.chatItem.active {
+  background-color: var(--bg-secondary, #dce4ea);
+}
+
+[data-theme="dark"] .chatItem.active {
   background-color: var(--bg-secondary, #1e293b);
 }
 
 /* ======================================== */
-/*          ℹ️ اطلاعات کاربر                */
+/*          ℹ️ اطلاعات چت                   */
 /* ======================================== */
 
-.userInfo {
+.chatInfo {
   flex: 1;
-  overflow: hidden;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.userName {
-  margin: 0 0 2px;
-  font-size: 14px;
+.chatTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chatName {
+  font-size: 15.5px;
   font-weight: 600;
-  color: var(--text-primary, #333);
+  color: var(--text-primary, #1a1a1a);
+  margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: color 0.3s ease;
 }
 
-[data-theme="dark"] .userName {
+[data-theme="dark"] .chatName {
   color: var(--text-primary, #e2e8f0);
 }
 
-.username {
-  margin: 0 0 4px;
-  font-size: 12px;
-  color: var(--text-secondary, #999);
-  transition: color 0.3s ease;
-}
-
-[data-theme="dark"] .username {
-  color: var(--text-secondary, #94a3b8);
-}
-
-.bio {
-  margin: 0;
-  font-size: 12px;
+.chatPreview {
+  font-size: 13px;
   color: var(--text-secondary, #666);
+  margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: color 0.3s ease;
 }
 
-[data-theme="dark"] .bio {
+[data-theme="dark"] .chatPreview {
   color: var(--text-secondary, #94a3b8);
 }
 
 /* ======================================== */
-/*          🔘 دکمه شروع چت                */
+/*          📭 حالت‌های خالی/بارگذاری      */
 /* ======================================== */
 
-.startButton {
-  padding: 6px 12px;
-  background-color: #667eea;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background-color 0.2s, opacity 0.2s;
-  white-space: nowrap;
-  flex-shrink: 0;
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
 }
 
-.startButton:hover:not(:disabled) {
-  background-color: #5568d3;
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+  color: var(--text-secondary, #999);
+  text-align: center;
 }
 
-[data-theme="dark"] .startButton {
-  background-color: #818cf8;
+/* ======================================== */
+/*          🎨 اسکرول‌بار                   */
+/* ======================================== */
+
+.listContainer::-webkit-scrollbar {
+  width: 6px;
 }
 
-[data-theme="dark"] .startButton:hover:not(:disabled) {
-  background-color: #6366f1;
+.listContainer::-webkit-scrollbar-thumb {
+  background: var(--border-color, #ddd);
+  border-radius: 999px;
 }
 
-.startButton:disabled {
-  background-color: var(--border-color, #ccc);
-  cursor: not-allowed;
-  opacity: 0.5;
+.listContainer::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-[data-theme="dark"] .startButton:disabled {
-  background-color: var(--border-color, #475569);
+[data-theme="dark"] .listContainer::-webkit-scrollbar-thumb {
+  background: var(--border-color, #334155);
 }
 
 /* ======================================== */
 /*          📱 ریسپانسیو                    */
 /* ======================================== */
 
-@media (max-width: 480px) {
-  .header {
-    padding: 10px 12px;
-  }
-
-  .title {
-    font-size: 17px;
-  }
-
-  .searchBox {
-    padding: 8px 12px;
-  }
-
-  .searchInput {
-    padding: 8px 10px;
-    font-size: 13px;
-  }
-
-  .resultItem {
-    padding: 10px 12px;
-    gap: 10px;
-  }
-
-  .userName {
-    font-size: 13px;
-  }
-
-  .startButton {
-    padding: 4px 10px;
-    font-size: 11px;
+@media (max-width: 768px) {
+  .container {
+    border-right: none;
   }
 }

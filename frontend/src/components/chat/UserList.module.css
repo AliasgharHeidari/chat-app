@@ -1,26 +1,38 @@
+/* ======================================== */
+/*          📋 لیست چت‌ها                   */
+/* ======================================== */
+
 .container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--bg-primary, #fff);
+  background-color: var(--bg-primary, #ffffff);
   overflow: hidden;
 }
+
+/* ======================================== */
+/*          🧠 هدر لیست چت‌ها               */
+/* ======================================== */
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border-color, #ddd);
-  background-color: var(--bg-primary, #fff);
+  padding: 14px 16px 10px 16px;
+  background-color: var(--bg-primary, #ffffff);
 }
 
 .title {
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--text-primary, #1a1a1a);
   margin: 0;
+  letter-spacing: -0.01em;
 }
+
+/* ======================================== */
+/*          ➕ دکمه چت جدید                 */
+/* ======================================== */
 
 .newChatButton {
   width: 36px;
@@ -30,7 +42,7 @@
   background-color: #cee7da;
   color: var(--text-primary, #1a1a1a);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -40,78 +52,149 @@
 
 .newChatButton:hover {
   background-color: #b5e0ca;
-  border-color: #667eea;
-  color: #fdfdfd;
-  transform: scale(1.05);
+  transform: scale(1.08) rotate(90deg);
 }
 
 [data-theme="dark"] .newChatButton {
-  border-color: var(--border-color, #334155);
   background-color: var(--bg-primary, #0f172a);
   color: var(--text-primary, #e2e8f0);
 }
 
 [data-theme="dark"] .newChatButton:hover {
   background-color: var(--bg-secondary, #1e293b);
-  border-color: #818cf8;
-  color: #818cf8;
 }
+
+/* ======================================== */
+/*          🔍 جستجو                        */
+/* ======================================== */
+
 .searchBox {
-  padding: 8px 16px;
-  background-color: var(--bg-primary, #fff);
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 4px 16px 10px 16px;
+  background-color: var(--bg-primary, #ffffff);
+}
+
+.searchIcon {
+  position: absolute;
+  left: 28px; /* ✅ تنظیم به داخل باکس */
+  color: var(--text-secondary, #666);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .searchInput {
   width: 100%;
-  padding: 8px 12px;
+  padding: 9px 14px 9px 42px; /* ✅ فضای کافی برای آیکون */
   border: 1px solid var(--border-color, #ddd);
-  border-radius: 20px;
+  border-radius: 999px;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.2s;
   background-color: var(--bg-secondary, #f5f5f5);
   color: var(--text-primary, #1a1a1a);
 }
 
 .searchInput:focus {
-  border-color: #667eea;
+  border-color: #90B07D;
 }
+
+[data-theme="dark"] .searchInput {
+  background-color: var(--bg-secondary, #1e293b);
+  border-color: var(--border-color, #334155);
+  color: var(--text-primary, #e2e8f0);
+}
+/* ======================================== */
+/*          📋 لیست چت‌ها                   */
+/* ======================================== */
 
 .listContainer {
   flex: 1;
   overflow-y: auto;
-  background-color: var(--bg-primary, #fff);
+  background-color: var(--bg-primary, #ffffff);
+  padding: 2px 8px 8px 8px;
 }
 
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ======================================== */
+/*          📱 آیتم چت                      */
+/* ======================================== */
+
+/* ✅ لایت مود: پس‌زمینه کمی تیره‌تر از سفید */
 .chatItem {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 10px 10px;
   cursor: pointer;
-  transition: background-color 0.2s;
-  border-bottom: 1px solid var(--border-color, #eee);
-  background-color: var(--bg-primary, #fff);
+  border-radius: 14px;
+  background-color: #e7e7e7;
+  transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
 .chatItem:hover {
-  background-color: var(--bg-secondary, #f5f5f5);
+  background-color: #a3a3a3; /* ✅ تیره‌تر در هاور */
+}
+
+.chatItem:active {
+  transform: scale(0.98);
 }
 
 .chatItem.active {
-  background-color: var(--bg-secondary, #e8edf2);
+  background-color: #c0c0c0;
 }
+
+/* ✅ دارک مود */
+[data-theme="dark"] .chatItem {
+  background-color: transparent;
+}
+
+[data-theme="dark"] .chatItem:hover {
+  background-color: var(--bg-secondary, #1e293b);
+}
+
+[data-theme="dark"] .chatItem.active {
+  background-color: var(--bg-secondary, #1e293b);
+}
+
+/* ======================================== */
+/*          ℹ️ اطلاعات چت                   */
+/* ======================================== */
 
 .chatInfo {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chatTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .chatName {
-  font-size: 16px;
+  font-size: 15.5px;
   font-weight: 600;
   color: var(--text-primary, #1a1a1a);
-  margin: 0 0 2px 0;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="dark"] .chatName {
+  color: var(--text-primary, #e2e8f0);
 }
 
 .chatPreview {
@@ -122,6 +205,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+[data-theme="dark"] .chatPreview {
+  color: var(--text-secondary, #94a3b8);
+}
+
+/* ======================================== */
+/*          📭 حالت‌های خالی/بارگذاری      */
+/* ======================================== */
 
 .center {
   display: flex;
@@ -142,9 +233,30 @@
   text-align: center;
 }
 
-.empty p {
-  margin: 0 0 12px 0;
+/* ======================================== */
+/*          🎨 اسکرول‌بار                   */
+/* ======================================== */
+
+.listContainer::-webkit-scrollbar {
+  width: 6px;
 }
+
+.listContainer::-webkit-scrollbar-thumb {
+  background: var(--border-color, #ddd);
+  border-radius: 999px;
+}
+
+.listContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-theme="dark"] .listContainer::-webkit-scrollbar-thumb {
+  background: var(--border-color, #334155);
+}
+
+/* ======================================== */
+/*          📱 ریسپانسیو                    */
+/* ======================================== */
 
 @media (max-width: 768px) {
   .container {

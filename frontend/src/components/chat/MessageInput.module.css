@@ -1,11 +1,10 @@
 /* ======================================== */
 /*          📝 ورودی پیام                   */
 /* ======================================== */
-
 .container {
   display: flex;
   flex-direction: column;
-  padding: 8px 12px;
+  padding: 10px 14px 14px 14px;
   background-color: var(--bg-primary, #ffffff);
   border-top: 1px solid var(--border-color, #e2e8f0);
   flex-shrink: 0;
@@ -21,7 +20,6 @@
 /* ======================================== */
 /*          ❌ خطا                          */
 /* ======================================== */
-
 .error {
   color: #ef4444;
   font-size: 12px;
@@ -30,41 +28,54 @@
 }
 
 /* ======================================== */
-/*          📦 محفظه ورودی                  */
+/*   📦 محفظه ورودی — یک پیل شیشه‌ای واحد   */
 /* ======================================== */
-
 .inputWrapper {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   align-items: flex-end;
+  background: var(--bg-secondary, #f1f5f9);
+  border-radius: 24px;
+  padding: 4px 4px 4px 6px;
+  transition: box-shadow 0.2s ease;
+}
+
+.inputWrapper:focus-within {
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
+}
+
+[data-theme="dark"] .inputWrapper {
+  background: var(--bg-secondary, #1e293b);
+}
+
+[data-theme="dark"] .inputWrapper:focus-within {
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.3);
 }
 
 /* ======================================== */
 /*          😊 دکمه ایموجی                  */
 /* ======================================== */
-
 .emojiButton {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 22px;
   cursor: pointer;
-  padding: 8px 4px;
   transition: transform 0.2s, color 0.2s;
   color: var(--text-secondary, #64748b);
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 40px;
-  width: 40px;
+  height: 38px;
+  width: 38px;
   flex-shrink: 0;
   border-radius: 50%;
 }
 
 .emojiButton:hover {
-  transform: scale(1.15);
+  transform: scale(1.1);
   color: var(--text-primary, #1a1a1a);
-  background: var(--bg-secondary, #f1f5f9);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 [data-theme="dark"] .emojiButton {
@@ -73,42 +84,30 @@
 
 [data-theme="dark"] .emojiButton:hover {
   color: var(--text-primary, #e2e8f0);
-  background: var(--bg-secondary, #1e293b);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* ======================================== */
 /*          📝 ورودی متن                    */
 /* ======================================== */
-
 .input {
   flex: 1;
-  padding: 8px 14px;
-  border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 20px;
+  padding: 9px 6px;
+  border: none;
   font-size: 14px;
   font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif !important;
   resize: none;
   outline: none;
-  transition: border-color 0.2s, background-color 0.3s ease, color 0.3s ease;
-  background-color: var(--bg-secondary, #f1f5f9);
+  transition: color 0.3s ease;
+  background-color: transparent;
   color: var(--text-primary, #1a1a1a);
-  min-height: 40px;
+  min-height: 38px;
   max-height: 120px;
   line-height: 1.4;
 }
 
 [data-theme="dark"] .input {
-  background-color: var(--bg-secondary, #1e293b);
-  border-color: var(--border-color, #334155);
   color: var(--text-primary, #e2e8f0);
-}
-
-.input:focus {
-  border-color: #667eea;
-}
-
-[data-theme="dark"] .input:focus {
-  border-color: #818cf8;
 }
 
 .input:disabled {
@@ -121,21 +120,17 @@
 }
 
 /* ======================================== */
-/*          📤 دکمه ارسال                   */
+/*          📤 دکمه ارسال (دایره‌ای)        */
 /* ======================================== */
-
 .sendButton {
-  padding: 8px 18px;
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border: none;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
+  border-radius: 50%;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.2s;
-  height: 40px;
-  min-width: 60px;
+  transition: opacity 0.2s, transform 0.15s;
+  height: 38px;
+  width: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -143,8 +138,11 @@
 }
 
 .sendButton:hover:not(:disabled) {
-  opacity: 0.85;
-  transform: scale(1.02);
+  transform: scale(1.06);
+}
+
+.sendButton:active:not(:disabled) {
+  transform: scale(0.94);
 }
 
 .sendButton:disabled {
@@ -160,14 +158,13 @@
 /* ======================================== */
 /*          📦 پنل ایموجی (لایت مود)       */
 /* ======================================== */
-
 .emojiPickerContainer {
   position: absolute;
-  bottom: 70px;
+  bottom: 78px;
   left: 10px;
   z-index: 1000;
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 18px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
   border: 1px solid #e2e8f0;
   overflow: hidden;
@@ -176,7 +173,7 @@
 }
 
 .emojiPickerContainer .EmojiPickerReact {
-  --epr-picker-border-radius: 16px;
+  --epr-picker-border-radius: 18px;
   --epr-category-label-bg-color: #f8fafc;
   --epr-bg-color: #ffffff;
   --epr-text-color: #1a1a1a;
@@ -190,7 +187,6 @@
 /* ======================================== */
 /*          🌙 پنل ایموجی (دارک مود)       */
 /* ======================================== */
-
 [data-theme="dark"] .emojiPickerContainer {
   background: #1e293b;
   border-color: #334155;
@@ -219,69 +215,55 @@
 /* ======================================== */
 /*          📱 ریسپانسیو موبایل            */
 /* ======================================== */
-
 @media (max-width: 480px) {
   .container {
-    padding: 6px 10px;
+    padding: 8px 10px 10px 10px;
   }
-
   .inputWrapper {
-    gap: 6px;
+    gap: 2px;
+    padding: 3px 3px 3px 4px;
   }
-
   .emojiPickerContainer {
     left: 0;
     right: 0;
-    bottom: 60px;
+    bottom: 64px;
     border-radius: 16px 16px 0 0;
     max-height: 300px;
     border-bottom: none;
   }
-
   .emojiPickerContainer .EmojiPickerReact {
     width: 100% !important;
     height: 300px !important;
     border-radius: 16px 16px 0 0;
   }
-
   .emojiButton {
-    font-size: 20px;
-    width: 34px;
-    height: 34px;
-    padding: 4px;
+    font-size: 19px;
+    width: 32px;
+    height: 32px;
   }
-
   .input {
     font-size: 13px;
-    padding: 6px 10px;
-    min-height: 34px;
+    padding: 7px 4px;
+    min-height: 32px;
   }
-
   .sendButton {
-    font-size: 13px;
-    padding: 6px 12px;
-    min-width: 50px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
   }
 }
 
 @media (max-width: 380px) {
   .emojiButton {
-    font-size: 18px;
+    font-size: 17px;
     width: 28px;
     height: 28px;
   }
-
   .input {
     font-size: 12px;
-    padding: 4px 8px;
-    min-height: 30px;
+    min-height: 28px;
   }
-
   .sendButton {
-    font-size: 12px;
-    padding: 4px 10px;
-    min-width: 40px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
   }
 }

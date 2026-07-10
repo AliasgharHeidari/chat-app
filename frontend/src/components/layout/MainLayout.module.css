@@ -1,14 +1,13 @@
 /* ======================================== */
 /*          🎨 مدرن و شیشه‌ای با پالت Slate */
 /* ======================================== */
-
 .container {
   display: flex;
   height: 100vh;
- background: linear-gradient(90deg,rgba(126, 138, 109, 1) 0%, rgba(92, 118, 80, 1) 28%, rgba(58, 90, 64, 1) 67%, rgba(52, 78, 65, 1) 100%);
+  background: linear-gradient(90deg,rgba(126, 138, 109, 1) 0%, rgba(92, 118, 80, 1) 28%, rgba(58, 90, 64, 1) 67%, rgba(52, 78, 65, 1) 100%);
   overflow: hidden;
-  padding: 12px;
-  gap: 12px;
+  padding: 14px;
+  gap: 14px;
 }
 
 .loadingContainer {
@@ -22,27 +21,32 @@
 /* ======================================== */
 /*          📌 سایدبار مدرن                */
 /* ======================================== */
-
 .sidebar {
-  width: 320px;
+  width: 340px;
   display: flex;
   flex-direction: column;
-background: #90B07D;
+  background: #90B07D;
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 24px;
+  border-radius: 20px;
   border: 1px solid rgba(143, 182, 143, 0.6);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
   flex-shrink: 0;
   overflow: hidden;
 }
 
+.sidebarBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 /* ======================================== */
 /*          🌙 حالت Night Mode (Slate)      */
 /* ======================================== */
-
 [data-theme="dark"] .container {
-background: linear-gradient(166deg,rgba(94, 109, 136, 1) 0%, rgba(65, 81, 105, 1) 42%, rgba(45, 61, 82, 1) 66%, rgba(28, 40, 57, 1) 100%);
+  background: linear-gradient(166deg,rgba(94, 109, 136, 1) 0%, rgba(65, 81, 105, 1) 42%, rgba(45, 61, 82, 1) 66%, rgba(28, 40, 57, 1) 100%);
 }
 
 [data-theme="dark"] .sidebar {
@@ -56,16 +60,17 @@ background: linear-gradient(166deg,rgba(94, 109, 136, 1) 0%, rgba(65, 81, 105, 1
 /* ======================================== */
 /*          🧠 هدر سایدبار                  */
 /* ======================================== */
-
 .sidebarHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 20px 14px 20px;
+  padding: 16px 18px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
   flex-shrink: 0;
   gap: 8px;
-  flex-wrap: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 2;
   background: transparent;
 }
 
@@ -73,10 +78,17 @@ background: linear-gradient(166deg,rgba(94, 109, 136, 1) 0%, rgba(65, 81, 105, 1
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
 .appTitle {
   margin: 0;
-  font-size: 22px;
+  font-size: 21px;
   font-weight: 700;
+  letter-spacing: -0.01em;
   background: linear-gradient(135deg, #f0f0f1, #fdfcff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -99,24 +111,24 @@ background: linear-gradient(166deg,rgba(94, 109, 136, 1) 0%, rgba(65, 81, 105, 1
 }
 
 .settingsButton {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: rgba(108, 119, 170, 0.08);
   border: none;
-  font-size: 18px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
   display: flex;
   align-items: center;
-  opacity: 70%;
   justify-content: center;
   color: #667eea;
+  opacity: 0.85;
 }
 
 .settingsButton:hover {
   background: rgba(102, 126, 234, 0.18);
-  transform: scale(1.05);
+  transform: scale(1.06) rotate(20deg);
+  opacity: 1;
 }
 
 [data-theme="dark"] .settingsButton {
@@ -131,7 +143,6 @@ background: linear-gradient(166deg,rgba(94, 109, 136, 1) 0%, rgba(65, 81, 105, 1
 /* ======================================== */
 /*          📋 بخش اصلی                     */
 /* ======================================== */
-
 .main {
   flex: 1;
   display: flex;
@@ -139,11 +150,12 @@ background: linear-gradient(166deg,rgba(94, 109, 136, 1) 0%, rgba(65, 81, 105, 1
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border-radius: 24px;
+  border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
   min-width: 0;
   overflow: hidden;
+  position: relative;
 }
 
 [data-theme="dark"] .main {
@@ -157,19 +169,38 @@ background: linear-gradient(166deg,rgba(94, 109, 136, 1) 0%, rgba(65, 81, 105, 1
 /* ======================================== */
 /*          🔌 وضعیت اتصال                 */
 /* ======================================== */
-
 .connectionNotice {
-  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 7px 14px;
   background: rgba(255, 243, 205, 0.6);
   backdrop-filter: blur(4px);
   border-bottom: 1px solid rgba(255, 193, 7, 0.2);
-  text-align: center;
   flex-shrink: 0;
 }
 
 [data-theme="dark"] .connectionNotice {
   background: rgba(255, 243, 205, 0.06);
   border-bottom: 1px solid rgba(255, 193, 7, 0.06);
+}
+
+.connectionDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #856404;
+  animation: pulseDot 1.4s ease-in-out infinite;
+}
+
+[data-theme="dark"] .connectionDot {
+  background: #fbbf24;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.1); }
 }
 
 .connectionStatus {
@@ -183,42 +214,63 @@ background: linear-gradient(166deg,rgba(94, 109, 136, 1) 0%, rgba(65, 81, 105, 1
 }
 
 /* ======================================== */
-/*          📭 حالت بدون چت (اصلاح شده)    */
+/*          📭 حالت بدون چت                */
 /* ======================================== */
-
 .placeholder {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-secondary, #3c5c88);
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   text-align: center;
   padding: 24px;
-  font-size: 16px;
-  font-weight: 500;
-  border-radius: 0 0 24px 24px;
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-.placeholder p {
+.placeholderInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-width: 280px;
+}
+
+.placeholderIcon {
+  color: var(--text-secondary, #3c5c88);
+  opacity: 0.35;
+  margin-bottom: 6px;
+}
+
+.placeholderTitle {
   margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary, #3c5c88);
+}
+
+.placeholderSubtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary, #3c5c88);
   opacity: 0.7;
+  line-height: 1.5;
 }
 
 [data-theme="dark"] .placeholder {
   background: #1c1c1c;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+}
+
+[data-theme="dark"] .placeholderIcon,
+[data-theme="dark"] .placeholderTitle,
+[data-theme="dark"] .placeholderSubtitle {
   color: var(--text-secondary, #94a3b8);
 }
 
 /* ======================================== */
 /*          📱 ریسپانسیو موبایل            */
 /* ======================================== */
-
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
@@ -226,43 +278,34 @@ background: linear-gradient(166deg,rgba(94, 109, 136, 1) 0%, rgba(65, 81, 105, 1
     gap: 8px;
     height: 100dvh;
   }
-
   .sidebar {
     width: 100%;
     height: auto;
-    max-height: 45vh;
-    border-radius: 20px;
+    max-height: 72vh;
+    min-height: 120px;
+    border-radius: 18px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     flex-shrink: 0;
   }
-
   [data-theme="dark"] .sidebar {
     border: 1px solid rgba(255, 255, 255, 0.04);
   }
-
   .sidebarHeader {
     padding: 12px 16px;
   }
-
   .appTitle {
     font-size: 18px;
   }
-
   .main {
     flex: 1;
-    min-height: 0;
-    height: 55vh;
-    border-radius: 20px;
+    min-height: 140px;
+    border-radius: 18px;
   }
-
-  .placeholder {
+  .placeholderTitle {
     font-size: 14px;
-    padding: 16px;
-    border-radius: 0 0 20px 20px;
   }
-
-  .placeholder p {
-    font-size: 14px;
+  .placeholderSubtitle {
+    font-size: 12.5px;
   }
 }
 
@@ -271,51 +314,39 @@ background: linear-gradient(166deg,rgba(94, 109, 136, 1) 0%, rgba(65, 81, 105, 1
     padding: 4px;
     gap: 4px;
   }
-
   .sidebar {
-    max-height: 38vh;
-    border-radius: 16px;
+    max-height: 76vh;
+    min-height: 100px;
+    border-radius: 14px;
   }
-
   .sidebarHeader {
     padding: 10px 12px;
   }
-
   .appTitle {
     font-size: 16px;
   }
-
   .settingsButton {
     width: 32px;
     height: 32px;
-    font-size: 15px;
   }
-
   .main {
-    height: 62vh;
-    border-radius: 16px;
+    flex: 1;
+    min-height: 120px;
+    border-radius: 14px;
   }
-
-  .placeholder {
-    font-size: 13px;
-    padding: 12px;
-    border-radius: 0 0 16px 16px;
-  }
-
-  .placeholder p {
-    font-size: 13px;
+  .placeholderIcon {
+    width: 44px;
+    height: 44px;
   }
 }
 
 /* ======================================== */
 /*          💻 تبلت                         */
 /* ======================================== */
-
 @media (min-width: 769px) and (max-width: 1024px) {
   .sidebar {
-    width: 270px;
+    width: 280px;
   }
-
   .appTitle {
     font-size: 19px;
   }

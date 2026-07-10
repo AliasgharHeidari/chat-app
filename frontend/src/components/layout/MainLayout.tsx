@@ -13,12 +13,13 @@ import styles from "./MainLayout.module.css";
 // ========================================
 // 🧩 کامپوننت‌های داخلی
 // ========================================
-
 const Header: React.FC<{ onSettingsClick: () => void }> = ({
   onSettingsClick,
 }) => (
   <div className={styles.sidebarHeader}>
-    <h1 className={styles.appTitle}>Atrin</h1>
+    <div className={styles.brand}>
+      <h1 className={styles.appTitle}>Atrin</h1>
+    </div>
     <div className={styles.headerActions}>
       <button
         onClick={onSettingsClick}
@@ -28,52 +29,39 @@ const Header: React.FC<{ onSettingsClick: () => void }> = ({
       >
         <svg
           viewBox="0 0 32 32"
-          enable-background="new 0 0 32 32"
-          id="Stock_cut"
-          version="1.1"
+          width="18"
+          height="18"
           xmlns="http://www.w3.org/2000/svg"
-          fill="#000000"
         >
-          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-          <g
-            id="SVGRepo_tracerCarrier"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          ></g>
-          <g id="SVGRepo_iconCarrier">
-            {" "}
-            <desc></desc>{" "}
-            <g>
-              {" "}
-              <circle
-                cx="16"
-                cy="16"
-                fill="none"
-                r="15"
-                stroke="#000000"
-                stroke-linejoin="round"
-                stroke-miterlimit="10"
-                stroke-width="2"
-              ></circle>{" "}
-              <path
-                d="M26,27L26,27 c0-5.523-4.477-10-10-10h0c-5.523,0-10,4.477-10,10v0"
-                fill="none"
-                stroke="#000000"
-                stroke-linejoin="round"
-                stroke-miterlimit="10"
-                stroke-width="2"
-              ></path>{" "}
-              <circle
-                cx="16"
-                cy="11"
-                fill="none"
-                r="6"
-                stroke="#000000"
-                stroke-linejoin="round"
-                stroke-miterlimit="10"
-                stroke-width="2"
-              ></circle>{" "}
-            </g>{" "}
+          <g>
+            <circle
+              cx="16"
+              cy="16"
+              fill="none"
+              r="15"
+              stroke="currentColor"
+              strokeLinejoin="round"
+              strokeMiterlimit={10}
+              strokeWidth={2}
+            />
+            <path
+              d="M26,27L26,27 c0-5.523-4.477-10-10-10h0c-5.523,0-10,4.477-10,10v0"
+              fill="none"
+              stroke="currentColor"
+              strokeLinejoin="round"
+              strokeMiterlimit={10}
+              strokeWidth={2}
+            />
+            <circle
+              cx="16"
+              cy="11"
+              fill="none"
+              r="6"
+              stroke="currentColor"
+              strokeLinejoin="round"
+              strokeMiterlimit={10}
+              strokeWidth={2}
+            />
           </g>
         </svg>
       </button>
@@ -87,6 +75,7 @@ const ConnectionStatus: React.FC<{ isConnected: boolean }> = ({
   if (isConnected) return null;
   return (
     <div className={styles.connectionNotice}>
+      <span className={styles.connectionDot} aria-hidden="true" />
       <span className={styles.connectionStatus}>Connecting...</span>
     </div>
   );
@@ -94,21 +83,40 @@ const ConnectionStatus: React.FC<{ isConnected: boolean }> = ({
 
 const EmptyState: React.FC = () => (
   <div className={styles.placeholder}>
-    <p>Select a chat to start messaging</p>
+    <div className={styles.placeholderInner}>
+      <svg
+        className={styles.placeholderIcon}
+        width="56"
+        height="56"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M4 5.5C4 4.67 4.67 4 5.5 4h13c.83 0 1.5.67 1.5 1.5v10c0 .83-.67 1.5-1.5 1.5H9l-4 4v-4H5.5C4.67 16 4 15.33 4 14.5v-9Z"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinejoin="round"
+        />
+        <path d="M8 9h8M8 12.5h5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      </svg>
+      <p className={styles.placeholderTitle}>Select a chat</p>
+      <p className={styles.placeholderSubtitle}>
+        Choose a conversation from the list to start messaging
+      </p>
+    </div>
   </div>
 );
 
 // ========================================
 // 🏠 لایه‌بندی اصلی
 // ========================================
-
 export const MainLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
   const [showSearchUsers, setShowSearchUsers] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
   const {
     chats,
     currentChat,
@@ -118,13 +126,11 @@ export const MainLayout: React.FC = () => {
     updateMessage,
     typingUsers,
   } = useChat();
-
   const { isConnected, sendMessage, sendTyping, disconnect } = useSocket();
 
   // ========================================
   // 🎯 هندلرهای رویداد
   // ========================================
-
   const handleResize = useCallback(() => {
     setIsMobile(window.innerWidth < 768);
   }, []);
@@ -162,7 +168,6 @@ export const MainLayout: React.FC = () => {
   // ========================================
   // ♻️ محاسبات memoized
   // ========================================
-
   const showChat = useMemo(
     () => !isMobile && currentChat !== null && user !== null,
     [isMobile, currentChat, user],
@@ -177,7 +182,6 @@ export const MainLayout: React.FC = () => {
   // ========================================
   // 🔄 اثرات جانبی
   // ========================================
-
   useEffect(() => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -190,7 +194,6 @@ export const MainLayout: React.FC = () => {
   // ========================================
   // 🚦 وضعیت بارگذاری
   // ========================================
-
   if (isLoadingChats && chats.length === 0) {
     return (
       <div className={styles.loadingContainer}>
@@ -202,34 +205,33 @@ export const MainLayout: React.FC = () => {
   // ========================================
   // 🎨 رندر اصلی
   // ========================================
-
   return (
     <div className={styles.container}>
       {/* 📌 سایدبار */}
       <aside className={styles.sidebar}>
         <Header onSettingsClick={handleSettingsToggle} />
-
-        {showSearchUsers ? (
-          <SearchUsers
-            onChatCreated={handleSearchClose}
-            onClose={handleSearchClose}
-          />
-        ) : (
-          <UserList
-            chats={chats}
-            currentChat={currentChat}
-            currentUserId={user?.id || 0}
-            isLoading={isLoadingChats}
-            onChatSelect={handleChatSelect}
-            onNewChat={handleNewChat}
-          />
-        )}
+        <div className={styles.sidebarBody}>
+          {showSearchUsers ? (
+            <SearchUsers
+              onChatCreated={handleSearchClose}
+              onClose={handleSearchClose}
+            />
+          ) : (
+            <UserList
+              chats={chats}
+              currentChat={currentChat}
+              currentUserId={user?.id || 0}
+              isLoading={isLoadingChats}
+              onChatSelect={handleChatSelect}
+              onNewChat={handleNewChat}
+            />
+          )}
+        </div>
       </aside>
 
       {/* 📋 بخش اصلی */}
       <main className={styles.main}>
         <ConnectionStatus isConnected={isConnected} />
-
         {showChat && currentChat && user ? (
           <ChatContainer
             chat={currentChat}

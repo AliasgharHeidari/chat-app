@@ -7,7 +7,7 @@ import styles from "./MessageItem.module.css";
 interface MessageItemProps {
   message: Message;
   isOwn: boolean;
-  currentUserId: number; // ✅ اضافه شد
+  currentUserId: number;
   showAvatar?: boolean;
   onEdit?: (messageId: number, newText: string) => void;
   onDelete?: (messageId: number, forEveryone: boolean) => void;
@@ -16,27 +16,20 @@ interface MessageItemProps {
 export const MessageItem: React.FC<MessageItemProps> = ({
   message,
   isOwn,
-  currentUserId, // ✅ اضافه شد
+  currentUserId,
   showAvatar = false,
   onEdit,
   onDelete,
 }) => {
-
-  console.log("🔍 MessageItem:", {
-  id: message.id,
-  deleted_for: message.deleted_for,
-  currentUserId: currentUserId,
-  shouldHide: message.deleted_for && message.deleted_for === currentUserId,
-});
-
   const [isEditing, setIsEditing] = React.useState(false);
   const [editText, setEditText] = React.useState(message.message_text);
   const [showMenu, setShowMenu] = React.useState(false);
 
   // ✅ اگر پیام برای کاربر فعلی حذف شده، نشون نده
-if (message.deleted_for && message.deleted_for === currentUserId) {
-  return null;
-}
+  if (message.deleted_for && message.deleted_for === currentUserId) {
+    return null;
+  }
+
   const handleEditSubmit = () => {
     if (editText.trim() && editText !== message.message_text) {
       onEdit?.(message.id, editText);
@@ -58,7 +51,6 @@ if (message.deleted_for && message.deleted_for === currentUserId) {
       {showAvatar && !isOwn && (
         <Avatar size="small" initials={message.sender_name?.charAt(0) || "U"} />
       )}
-
       <div className={styles.messageContent}>
         {isEditing ? (
           <div className={styles.editContainer}>
@@ -78,47 +70,23 @@ if (message.deleted_for && message.deleted_for === currentUserId) {
             </div>
           </div>
         ) : (
-          <>
-            <div
-              className={`${styles.messageBubble} ${isOwn ? styles.ownBubble : styles.otherBubble}`}
-              onMouseEnter={() => setShowMenu(true)}
-              onMouseLeave={() => setShowMenu(false)}
-            >
-              <p className={styles.messageText}>
-                {message.is_deleted ? (
-                  <em>This message was deleted</em>
-                ) : (
-                  message.message_text
-                )}
-              </p>
+          <div
+            className={`${styles.messageBubble} ${isOwn ? styles.ownBubble : styles.otherBubble}`}
+            onMouseEnter={() => setShowMenu(true)}
+            onMouseLeave={() => setShowMenu(false)}
+          >
+            <p className={styles.messageText}>
+              {message.is_deleted ? (
+                <em>This message was deleted</em>
+              ) : (
+                message.message_text
+              )}
+            </p>
+
+            <div className={styles.metaRow}>
               {message.is_edited && !message.is_deleted && (
-                <span className={styles.edited}>(edited)</span>
+                <span className={styles.edited}>edited</span>
               )}
-
-              {showMenu && isOwn && !message.is_deleted && (
-                <div className={styles.menu}>
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className={styles.menuItem}
-                  >
-                    Edit
-                  </button>
-                  <div className={styles.deleteGroup}>
-                  
-                    {isOwn && (
-                      <button
-                        onClick={() => onDelete?.(message.id, true)}
-                        className={styles.menuItemDanger}
-                      >
-                        Delete for everyone
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className={styles.meta}>
               <span className={styles.time}>
                 {formatTime(message.created_at)}
               </span>
@@ -132,7 +100,26 @@ if (message.deleted_for && message.deleted_for === currentUserId) {
                 </span>
               )}
             </div>
-          </>
+
+            {showMenu && isOwn && !message.is_deleted && (
+              <div className={styles.menu}>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className={styles.menuItem}
+                >
+                  Edit
+                </button>
+                <div className={styles.deleteGroup}>
+                  <button
+                    onClick={() => onDelete?.(message.id, true)}
+                    className={styles.menuItemDanger}
+                  >
+                    Delete for everyone
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

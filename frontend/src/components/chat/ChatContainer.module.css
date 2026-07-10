@@ -1,8 +1,12 @@
 .container {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
   background-color: var(--bg-primary, #f8fafc);
+  background-image:
+    radial-gradient(rgba(0, 0, 0, 0.05) 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
   flex: 1;
   overflow: hidden;
 }
@@ -17,7 +21,10 @@
 
 /* ✅ حالت Night Mode با پالت Slate */
 [data-theme="dark"] .container {
-  background-color: var(--bg-primary, #0f172a);
+  background-color: #1a2233;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
 }
 
 [data-theme="dark"] .loading {
@@ -28,7 +35,6 @@
   .container {
     border-top: 1px solid var(--border-color, #e2e8f0);
   }
-
   [data-theme="dark"] .container {
     border-top: 1px solid var(--border-color, #334155);
   }

@@ -58,11 +58,11 @@ export const UserList: React.FC<UserListProps> = ({
           onClick={onNewChat}
           className={styles.newChatButton}
           title="Start new chat"
+          aria-label="Start new chat"
         >
-          {/* ✅ SVG به جای + */}
           <svg
-            width="20"
-            height="20"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -77,6 +77,17 @@ export const UserList: React.FC<UserListProps> = ({
       </div>
 
       <div className={styles.searchBox}>
+        <svg
+          className={styles.searchIcon}
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M20 20l-3.2-3.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
         <input
           type="text"
           placeholder="Search chats..."
@@ -96,29 +107,33 @@ export const UserList: React.FC<UserListProps> = ({
             <p>No chats yet</p>
           </div>
         ) : (
-          filteredChats.map((chat) => {
-            const otherUser = getOtherUser(chat);
-            return (
-              <div
-                key={chat.id}
-                className={`${styles.chatItem} ${
-                  currentChat?.id === chat.id ? styles.active : ""
-                }`}
-                onClick={() => onChatSelect(chat)}
-              >
-                <Avatar
-                  size="medium"
-                  src={otherUser?.profile_pic_url}
-                  initials={getChatInitials(chat)}
-                  isOnline={isUserOnline(otherUser?.id || 0)}
-                />
-                <div className={styles.chatInfo}>
-                  <h3 className={styles.chatName}>{getChatName(chat)}</h3>
-                  <p className={styles.chatPreview}>Tap to open</p>
+          <div className={styles.list}>
+            {filteredChats.map((chat) => {
+              const otherUser = getOtherUser(chat);
+              return (
+                <div
+                  key={chat.id}
+                  className={`${styles.chatItem} ${
+                    currentChat?.id === chat.id ? styles.active : ""
+                  }`}
+                  onClick={() => onChatSelect(chat)}
+                >
+                  <Avatar
+                    size="medium"
+                    src={otherUser?.profile_pic_url}
+                    initials={getChatInitials(chat)}
+                    isOnline={isUserOnline(otherUser?.id || 0)}
+                  />
+                  <div className={styles.chatInfo}>
+                    <div className={styles.chatTopRow}>
+                      <h3 className={styles.chatName}>{getChatName(chat)}</h3>
+                    </div>
+                    <p className={styles.chatPreview}>Tap to open</p>
+                  </div>
                 </div>
-              </div>
-            );
-          })
+              );
+            })}
+          </div>
         )}
       </div>
     </div>

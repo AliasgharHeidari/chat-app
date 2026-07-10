@@ -4,7 +4,7 @@ import { useChat } from "@/hooks/useChat";
 import styles from "./UserStatus.module.css";
 
 interface UserStatusProps {
-  userId: number; // ✅ userId رو اضافه کن
+  userId: number;
   name: string;
   lastSeen?: string;
   initials?: string;
@@ -21,8 +21,7 @@ export const UserStatus: React.FC<UserStatusProps> = ({
   onClick,
 }) => {
   const { isUserOnline } = useChat();
-  const isOnline = isUserOnline(userId); // ✅ از هوک بگیر
-
+  const isOnline = isUserOnline(userId);
   const statusText = isOnline
     ? "Online"
     : lastSeen
@@ -46,6 +45,7 @@ export const UserStatus: React.FC<UserStatusProps> = ({
         <p
           className={`${styles.status} ${isOnline ? styles.online : styles.offline}`}
         >
+          {isOnline && <span className={styles.dot} aria-hidden="true" />}
           {statusText}
         </p>
       </div>

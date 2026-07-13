@@ -14,9 +14,13 @@ interface AuthStore {
     username: string,
     firstName: string,
     lastName: string,
+    email: string, // 🔥 جدید
     password: string,
   ) => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>; // 🔥 جدید
+  verifyEmail: (email: string, code: string) => Promise<void>; // 🔥 جدید
+  resendVerification: (email: string) => Promise<void>; // 🔥 جدید
   logout: () => void;
   getCurrentUser: () => Promise<void>;
   updateProfile: (updates: Partial<User>) => Promise<void>;
@@ -40,21 +44,18 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
   setError: (error) => set({ error }),
 
-  register: async (username, firstName, lastName, password) => {
+  // 🔥 ثبت‌نام با ایمیل
+  register: async (username, firstName, lastName, email, password) => {
     set({ isLoading: true, error: null });
     try {
-      const result = await api.register({
+      await api.register({
         username,
         first_name: firstName,
         last_name: lastName,
+        email,
         password,
       });
-      set({
-        user: result.user,
-        token: result.token,
-        isLoading: false,
-      });
-      api.setToken(result.token);
+      set({ isLoading: false });
     } catch (error) {
       set({
         error: api.getErrorMessage(error),
@@ -74,6 +75,56 @@ export const useAuthStore = create<AuthStore>((set) => ({
         isLoading: false,
       });
       api.setToken(result.token);
+    } catch (error) {
+      set({
+        error: api.getErrorMessage(error),
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  // 🔥 جدید - لاگین با گوگل
+  loginWithGoogle: async (idToken) => {
+    set({ isLoading: true, error: null });
+    try {
+      const result = await api.loginWithGoogle(idToken);
+      set({
+        user: result.user,
+        token: result.token,
+        isLoading: false,
+      });
+      api.setToken(result.token);
+    } catch (error) {
+      set({
+        error: api.getErrorMessage(error),
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  // 🔥 جدید - تایید ایمیل
+  verifyEmail: async (email, code) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.verifyEmail({ email, code });
+      set({ isLoading: false });
+    } catch (error) {
+      set({
+        error: api.getErrorMessage(error),
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  // 🔥 جدید - ارسال مجدد کد تایید
+  resendVerification: async (email) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.resendVerification({ email });
+      set({ isLoading: false });
     } catch (error) {
       set({
         error: api.getErrorMessage(error),

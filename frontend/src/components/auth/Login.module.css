@@ -237,6 +237,63 @@
   font-size: 13.5px;
 }
 
+/* ---------- Google Button ---------- */
+.googleButtonWrapper {
+  width: 100%;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.googleButtonWrapper > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 48px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.googleButtonWrapper > div:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+}
+
+.googleButtonWrapper > div:active {
+  transform: translateY(0);
+}
+
+.googleButtonWrapper iframe {
+  width: 100% !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  min-height: 48px !important;
+}
+
+/* ---------- Divider ---------- */
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 14px 0 22px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* ---------- Form ---------- */
+
 .form {
   display: flex;
   flex-direction: column;
@@ -388,6 +445,7 @@
   cursor: pointer;
   font-weight: 600;
   padding: 0;
+  transition: color 0.2s;
 }
 
 .switchButton:hover {
@@ -400,6 +458,7 @@
 @media (max-width: 860px) {
   .shell {
     grid-template-columns: 1fr;
+    max-width: 440px;
   }
   .brandPanel {
     display: none;
@@ -410,11 +469,49 @@
   .formPanel {
     padding: 40px 28px;
   }
+  .formWrap {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 16px 12px;
+  }
+  .shell {
+    border-radius: 20px;
+  }
+  .formPanel {
+    padding: 28px 18px;
+  }
+  .title {
+    font-size: 22px;
+  }
+  .googleButtonWrapper > div {
+    min-height: 44px !important;
+  }
+  .googleButtonWrapper iframe {
+    height: 44px !important;
+    min-height: 44px !important;
+  }
+  .divider {
+    margin: 12px 0 18px;
+    font-size: 12px;
+  }
+  .submitButton {
+    font-size: 14px;
+    padding: 12px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .bubble,
-  .typingDot {
+  .typingDot,
+  .googleButtonWrapper > div {
     animation: none !important;
+    transition: none !important;
+  }
+  .googleButtonWrapper > div:hover {
+    transform: none !important;
   }
 }

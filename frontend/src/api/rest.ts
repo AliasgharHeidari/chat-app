@@ -13,6 +13,8 @@ import type {
   AuthResponse,
   SearchUsersResponse,
   GetMessagesResponse,
+  VerifyEmailRequest,
+  ResendVerificationRequest,
 } from "@/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -55,19 +57,11 @@ class ChatAPI {
     return this.token;
   }
 
-  // Auth endpoints
+  // 🔥 Auth endpoints
   async register(data: RegisterRequest): Promise<AuthResponse> {
     const response = await this.client.post("/auth/register", data);
-    const token = response.data.token;
-    if (token && response.data.user) {
-      this.setToken(token);
-      return { token, user: response.data.user };
-    }
-    const loginResponse = await this.login({
-      username: data.username,
-      password: data.password,
-    });
-    return loginResponse;
+    // بعد از ثبت‌نام، توکنی برنمی‌گرده (فقط پیام موفقیت)
+    return response.data;
   }
 
   async login(data: LoginRequest): Promise<AuthResponse> {
@@ -83,6 +77,30 @@ class ChatAPI {
     const profileResponse = await this.client.get("/chat/me");
     const profileData = profileResponse.data.user ?? profileResponse.data;
     return { token, user: profileData };
+  }
+
+  // 🔥 جدید - لاگین با گوگل
+  async loginWithGoogle(idToken: string): Promise<AuthResponse> {
+    const response = await this.client.post("/auth/google", {
+      id_token: idToken,
+    });
+    const { token, user } = response.data;
+    if (token) {
+      this.setToken(token);
+    }
+    return { token, user };
+  }
+
+  // 🔥 جدید - تایید ایمیل
+  async verifyEmail(data: VerifyEmailRequest): Promise<{ message: string }> {
+    const response = await this.client.post("/auth/verify-email", data);
+    return response.data;
+  }
+
+  // 🔥 جدید - ارسال مجدد کد تایید
+  async resendVerification(data: ResendVerificationRequest): Promise<{ message: string }> {
+    const response = await this.client.post("/auth/resend-verification", data);
+    return response.data;
   }
 
   // Profile endpoints
@@ -164,7 +182,7 @@ class ChatAPI {
 
   getErrorMessage(error: unknown): string {
     if (axios.isAxiosError(error)) {
-      return error.response?.data?.message || error.message;
+      return error.response?.data?.error || error.response?.data?.message || error.message;
     }
     return String(error);
   }

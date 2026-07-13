@@ -149,10 +149,7 @@ export const MessageList: React.FC<MessageListProps> = ({
               message={message}
               isOwn={message.sender_id === currentUserId}
               currentUserId={currentUserId}
-              showAvatar={
-                index === 0 ||
-                group.messages[index - 1].sender_id !== message.sender_id
-              }
+              showAvatar={false}
               isSelectMode={isSelectMode}
               isSelected={selectedMessages.has(message.id)}
               onToggleSelect={onToggleSelect}

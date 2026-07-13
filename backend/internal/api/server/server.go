@@ -1,3 +1,4 @@
+// backend/internal/api/server/server.go
 package server
 
 import (
@@ -16,7 +17,7 @@ func Start() {
 	cfg := config.AppConfig
 	app := fiber.New()
 
-	// Enable CORS for local development (Vite default port 5173)
+	// Enable CORS
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     "http://localhost:5173,https://localhost:5173",
 		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
@@ -27,12 +28,21 @@ func Start() {
 	app.Use(logger.New(logger.Config{
 		Format: "[${time}] ${status} - ${method} ${path}\n",
 	}))
+
+
 	api := app.Group("/auth")
 	api.Post("/register", authHandler.Register)
 	api.Post("/login", authHandler.Login)
+	api.Post("/google", authHandler.GoogleLogin)
+	
 
+	api.Post("/verify-email", authHandler.VerifyEmail)
+	api.Post("/resend-verification", authHandler.ResendVerification)
+
+	
 	app.Get("/ws/chat", Websocket.WebSocketHandler)
 
+	
 	protected := app.Group("/chat", middleware.Protected)
 	protected.Get("/me", profileHandler.GetProfile)
 	protected.Put("/me", profileHandler.ModifyProfile)
@@ -47,5 +57,6 @@ func Start() {
 	protected.Post("/messages", handler.SendMessage)
 	protected.Put("/messages/:message_id", handler.ModifyMessage)
 	protected.Delete("/messages/:message_id", handler.DeleteMessage)
+
 	app.Listen(cfg.Host + cfg.Port)
 }

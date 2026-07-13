@@ -4,8 +4,10 @@ export interface User {
   username: string;
   first_name: string;
   last_name: string;
+  email?: string; // 🔥 جدید
   bio?: string;
   profile_pic_url?: string;
+  email_verified?: boolean; // 🔥 جدید
   is_online: boolean;
   last_seen?: string;
   created_at: string;
@@ -16,6 +18,7 @@ export interface RegisterRequest {
   username: string;
   first_name: string;
   last_name: string;
+  email: string; // 🔥 جدید - الزامی
   password: string;
   bio?: string;
   profile_pic_url?: string;
@@ -32,6 +35,16 @@ export interface UpdateProfileRequest {
   last_name?: string;
   bio?: string;
   profile_pic_url?: string;
+}
+
+// 🔥 جدید - درخواست‌های تایید ایمیل
+export interface VerifyEmailRequest {
+  email: string;
+  code: string;
+}
+
+export interface ResendVerificationRequest {
+  email: string;
 }
 
 // Chat Types
@@ -127,12 +140,6 @@ export interface WSTyping {
 }
 
 export interface WSTypingRequest {
-  chat_id: number;
-  user_id: number;
-  is_typing: boolean;
-}
-
-export interface WSTyping {
   chat_id: number;
   user_id: number;
   is_typing: boolean;

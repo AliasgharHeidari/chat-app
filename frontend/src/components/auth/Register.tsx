@@ -5,10 +5,11 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import styles from "./Register.module.css";
 
 interface RegisterProps {
-  onSuccess?: () => void;
+  onSuccess?: (email: string) => void; // 🔥 تغییر - email رو به عنوان پارامتر قبول کن
   onSwitchToLogin?: () => void;
 }
 
+// ===== آیکون‌ها =====
 const IconChat = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -22,6 +23,24 @@ const IconUser = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.6" />
     <path d="M4.5 19.5c1.4-3.2 4.2-5 7.5-5s6.1 1.8 7.5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+  </svg>
+);
+
+const IconMail = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M22 6L12 13L2 6"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
@@ -52,6 +71,48 @@ const IconEyeOff = () => (
   </svg>
 );
 
+// ===== آیکون‌های جدید =====
+const IconCheck = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 6L9 17L4 12" stroke="#2ecc71" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const IconCross = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18 6L6 18" stroke="#ff6b6b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M6 6L18 18" stroke="#ff6b6b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const IconStrengthWeak = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="10" stroke="#ff6b6b" strokeWidth="2" />
+    <path d="M12 8v5M12 16h.01" stroke="#ff6b6b" strokeWidth="2.5" strokeLinecap="round" />
+  </svg>
+);
+
+const IconStrengthMedium = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="10" stroke="#ff8c42" strokeWidth="2" />
+    <path d="M12 8v5M12 16h.01" stroke="#ff8c42" strokeWidth="2.5" strokeLinecap="round" />
+  </svg>
+);
+
+const IconStrengthGood = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="10" stroke="#f1c40f" strokeWidth="2" />
+    <path d="M12 8v5M12 16h.01" stroke="#f1c40f" strokeWidth="2.5" strokeLinecap="round" />
+  </svg>
+);
+
+const IconStrengthStrong = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="10" stroke="#2ecc71" strokeWidth="2" />
+    <path d="M9 12l2 2 4-4" stroke="#2ecc71" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 export const Register: React.FC<RegisterProps> = ({
   onSuccess,
   onSwitchToLogin,
@@ -61,6 +122,7 @@ export const Register: React.FC<RegisterProps> = ({
     username: "",
     firstName: "",
     lastName: "",
+    email: "",
     password: "",
     confirmPassword: "",
     bio: "",
@@ -69,12 +131,43 @@ export const Register: React.FC<RegisterProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // State برای قدرت پسورد
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+  // تابع بررسی قدرت پسورد (امتیاز ۰ تا ۴)
+  const checkPasswordStrength = (password: string): number => {
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+    if (/\d/.test(password)) score++;
+    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score++;
+    return score;
+  };
+
+  // گرفتن متن و آیکون قدرت پسورد
+  const getStrengthInfo = (score: number) => {
+    switch (score) {
+      case 0:
+        return { label: "Very Weak", icon: <IconStrengthWeak />, color: "#ff6b6b" };
+      case 1:
+        return { label: "Weak", icon: <IconStrengthWeak />, color: "#ff6b6b" };
+      case 2:
+        return { label: "Medium", icon: <IconStrengthMedium />, color: "#ff8c42" };
+      case 3:
+        return { label: "Good", icon: <IconStrengthGood />, color: "#f1c40f" };
+      case 4:
+        return { label: "Strong", icon: <IconStrengthStrong />, color: "#2ecc71" };
+      default:
+        return { label: "", icon: null, color: "" };
+    }
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -84,13 +177,30 @@ export const Register: React.FC<RegisterProps> = ({
     }
   };
 
+  // هندلر اختصاصی برای پسورد
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setFormData((prev) => ({ ...prev, password: value }));
+    const strength = checkPasswordStrength(value);
+    setPasswordStrength(strength);
+    if (errors.password) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.password;
+        return newErrors;
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Validate form
+    
+    // اعتبارسنجی فرم
     const fieldErrors = validateForm(formData, {
       username: validators.username,
       firstName: validators.firstName,
       lastName: validators.lastName,
+      email: validators.email,
       password: validators.password,
       confirmPassword: (value) => {
         if (!value) return "Please confirm your password";
@@ -99,22 +209,37 @@ export const Register: React.FC<RegisterProps> = ({
       },
       bio: validators.bio,
     });
+    
     if (Object.keys(fieldErrors).length > 0) {
       setErrors(fieldErrors);
       return;
     }
+    
+    // جلوگیری از ثبت‌نام با پسورد ضعیف (امتیاز کمتر از ۳)
+    if (passwordStrength < 3) {
+      setErrors((prev) => ({
+        ...prev,
+        password: "Password must be at least Good (3/4) or Strong (4/4)",
+      }));
+      return;
+    }
+    
     try {
       await register(
         formData.username,
         formData.firstName,
         formData.lastName,
+        formData.email,
         formData.password,
       );
-      onSuccess?.();
+      // 🔥 ثبت‌نام موفق - ایمیل رو به App برگردون
+      onSuccess?.(formData.email);
     } catch {
       // Error is handled by the store
     }
   };
+
+  const strengthInfo = getStrengthInfo(passwordStrength);
 
   return (
     <div className={styles.page}>
@@ -228,6 +353,29 @@ export const Register: React.FC<RegisterProps> = ({
                 </div>
               </div>
 
+              {/* فیلد جدید ایمیل */}
+              <div className={styles.formGroup}>
+                <label htmlFor="email">Email Address</label>
+                <div className={styles.inputWrap}>
+                  <span className={styles.inputIcon}>
+                    <IconMail />
+                  </span>
+                  <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email address"
+                    disabled={isLoading}
+                    className={errors.email ? styles.inputError : undefined}
+                  />
+                </div>
+                {errors.email && (
+                  <span className={styles.fieldError}>{errors.email}</span>
+                )}
+              </div>
+
               <div className={styles.formGroup}>
                 <label htmlFor="password">Password</label>
                 <div className={styles.inputWrap}>
@@ -239,7 +387,9 @@ export const Register: React.FC<RegisterProps> = ({
                     type={showPassword ? "text" : "password"}
                     name="password"
                     value={formData.password}
-                    onChange={handleChange}
+                    onChange={handlePasswordChange}
+                    onFocus={() => setIsPasswordFocused(true)}
+                    onBlur={() => setIsPasswordFocused(false)}
                     placeholder="At least 8 characters"
                     disabled={isLoading}
                     className={errors.password ? styles.inputError : undefined}
@@ -254,8 +404,72 @@ export const Register: React.FC<RegisterProps> = ({
                     {showPassword ? <IconEyeOff /> : <IconEye />}
                   </button>
                 </div>
+
+                {/* Password Strength Meter */}
+                {formData.password && (
+                  <div className={styles.strengthContainer}>
+                    <div className={styles.strengthBars}>
+                      {[...Array(4)].map((_, i) => (
+                        <div
+                          key={i}
+                          className={`${styles.strengthBar} ${
+                            i < passwordStrength ? styles.active : ""
+                          }`}
+                          style={{
+                            backgroundColor:
+                              i < passwordStrength ? strengthInfo.color : undefined,
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <div className={styles.strengthLabel}>
+                      <span className={styles.strengthIconWrapper}>
+                        {strengthInfo.icon}
+                      </span>
+                      <span style={{ color: strengthInfo.color }}>
+                        {strengthInfo.label}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* لیست معیارها */}
+                {isPasswordFocused && formData.password && (
+                  <ul className={styles.criteriaList}>
+                    <li className={formData.password.length >= 8 ? styles.met : styles.unmet}>
+                      <span className={styles.criteriaIcon}>
+                        {formData.password.length >= 8 ? <IconCheck /> : <IconCross />}
+                      </span>
+                      At least 8 characters
+                    </li>
+                    <li className={/[a-z]/.test(formData.password) && /[A-Z]/.test(formData.password) ? styles.met : styles.unmet}>
+                      <span className={styles.criteriaIcon}>
+                        {/[a-z]/.test(formData.password) && /[A-Z]/.test(formData.password) ? <IconCheck /> : <IconCross />}
+                      </span>
+                      Uppercase & lowercase
+                    </li>
+                    <li className={/\d/.test(formData.password) ? styles.met : styles.unmet}>
+                      <span className={styles.criteriaIcon}>
+                        {/\d/.test(formData.password) ? <IconCheck /> : <IconCross />}
+                      </span>
+                      At least one number
+                    </li>
+                    <li className={/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password) ? styles.met : styles.unmet}>
+                      <span className={styles.criteriaIcon}>
+                        {/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password) ? <IconCheck /> : <IconCross />}
+                      </span>
+                      Special character
+                    </li>
+                  </ul>
+                )}
+
                 {errors.password && (
                   <span className={styles.fieldError}>{errors.password}</span>
+                )}
+                {formData.password && passwordStrength < 3 && (
+                  <span className={styles.fieldError}>
+                    ⚠️ Password must be at least <strong>Good</strong> (3/4) or <strong>Strong</strong> (4/4)
+                  </span>
                 )}
               </div>
 

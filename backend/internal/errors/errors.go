@@ -16,4 +16,14 @@ var (
 	MessageDeletedErr         = errors.New("message deleted error")
 	MessageNotFoundErr        = errors.New("message not found error")
 	MessageAlreadyDeletedErr  = errors.New("message already deleted error")
+	
+	EmailAlreadyExistErr      = errors.New("email already exist error")
+	EmailRequiredErr          = errors.New("email required error")
+	InvalidEmailErr           = errors.New("invalid email format")
+
+	InvalidVerificationCodeErr = errors.New("invalid verification code")
+	VerificationCodeExpiredErr = errors.New("verification code expired")
+	EmailAlreadyVerifiedErr    = errors.New("email already verified")
+	UserNotFoundErr            = errors.New("user not found")
+	EmailSendErr               = errors.New("failed to send verification email")
 )

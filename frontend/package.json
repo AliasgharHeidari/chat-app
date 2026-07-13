@@ -12,6 +12,7 @@
     "postinstall": "node scripts/copy-emoji-assets.js"
   },
   "dependencies": {
+    "@react-oauth/google": "^0.13.5",
     "axios": "^1.6.2",
     "emoji-datasource": "^16.0.0",
     "emoji-datasource-apple": "^16.0.0",

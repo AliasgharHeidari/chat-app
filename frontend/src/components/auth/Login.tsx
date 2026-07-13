@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "@/hooks/useAuth";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import styles from "./Login.module.css";
@@ -55,7 +56,7 @@ export const Login: React.FC<LoginProps> = ({
   onSuccess,
   onSwitchToRegister,
 }) => {
-  const { login, isLoading, error } = useAuth();
+  const { login, loginWithGoogle, isLoading, error } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -73,6 +74,20 @@ export const Login: React.FC<LoginProps> = ({
         return newErrors;
       });
     }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    const idToken = credentialResponse.credential;
+    try {
+      await loginWithGoogle(idToken);
+      onSuccess?.();
+    } catch (err) {
+      // Error is handled by the store
+    }
+  };
+
+  const handleGoogleError = () => {
+    console.error("Google login failed");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -145,6 +160,23 @@ export const Login: React.FC<LoginProps> = ({
                 {error}
               </div>
             )}
+
+            <div className={styles.googleButtonWrapper}>
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                useOneTap
+                theme="filled_blue"
+                size="large"
+                text="continue_with"
+                shape="pill"
+                width="100%"
+              />
+            </div>
+
+            <div className={styles.divider}>
+              <span>or</span>
+            </div>
 
             <form onSubmit={handleSubmit} className={styles.form} noValidate>
               <div className={styles.formGroup}>

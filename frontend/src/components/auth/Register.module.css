@@ -12,6 +12,9 @@
   --accent-2: #5e6d88;
   --danger: #ff6b6b;
   --danger-bg: rgba(255, 107, 107, 0.12);
+  --success: #2ecc71;
+  --warning: #f1c40f;
+  --orange: #ff8c42;
 
   min-height: 100vh;
   display: flex;
@@ -35,7 +38,9 @@
   box-shadow: 0 40px 90px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--line);
 }
 
-/* ---------- Brand panel ---------- */
+/* ======================================== */
+/* Brand Panel                              */
+/* ======================================== */
 
 .brandPanel {
   position: relative;
@@ -190,7 +195,9 @@
   }
 }
 
-/* ---------- Form panel ---------- */
+/* ======================================== */
+/* Form Panel                               */
+/* ======================================== */
 
 .formPanel {
   display: flex;
@@ -287,7 +294,6 @@
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
-/* inputs that sit inside an icon wrapper need left padding for the icon */
 .inputWrap input {
   padding-left: 42px;
 }
@@ -322,6 +328,10 @@
   cursor: not-allowed;
 }
 
+.plainInput {
+  padding: 11px 14px !important;
+}
+
 .inputError {
   border-color: var(--danger) !important;
 }
@@ -350,7 +360,123 @@
 .fieldError {
   color: #ff8a8a;
   font-size: 12px;
+  margin-top: 4px;
 }
+
+/* ======================================== */
+/* 🔐 Password Strength Meter              */
+/* ======================================== */
+
+.strengthContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 4px 0;
+}
+
+.strengthBars {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.strengthBar {
+  height: 4px;
+  flex: 1;
+  border-radius: 4px;
+  background: var(--line);
+  transition: background 0.4s ease, transform 0.2s ease;
+}
+
+.strengthBar.active {
+  background: var(--accent-2);
+  transform: scaleY(1.2);
+}
+
+.strengthLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 90px;
+  text-align: right;
+  transition: color 0.3s ease;
+  justify-content: flex-end;
+}
+
+.strengthIconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ======================================== */
+/* 📋 Criteria List                        */
+/* ======================================== */
+
+.criteriaList {
+  list-style: none;
+  padding: 8px 0 0 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  animation: slideDown 0.25s ease;
+}
+
+.criteriaList li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 12.5px;
+  transition: color 0.2s ease;
+}
+
+.criteriaIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.met {
+  color: var(--success);
+}
+
+.met .criteriaIcon {
+  color: var(--success);
+}
+
+.unmet {
+  color: var(--danger);
+}
+
+.unmet .criteriaIcon {
+  color: var(--danger);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ======================================== */
+/* 🎯 Submit Button                        */
+/* ======================================== */
 
 .submitButton {
   margin-top: 6px;
@@ -398,6 +524,7 @@
   cursor: pointer;
   font-weight: 600;
   padding: 0;
+  transition: color 0.2s;
 }
 
 .switchButton:hover {
@@ -405,32 +532,242 @@
   text-decoration: underline;
 }
 
-/* ---------- Responsive ---------- */
+/* ======================================== */
+/* 📱 Responsive                           */
+/* ======================================== */
 
 @media (max-width: 900px) {
   .shell {
     grid-template-columns: 1fr;
+    max-width: 480px;
+    min-height: auto;
+    border-radius: 24px;
   }
+  
   .brandPanel {
     display: none;
   }
+  
   .mobileLogo {
     display: flex;
   }
+  
   .formPanel {
-    padding: 40px 24px;
+    padding: 32px 24px;
+  }
+  
+  .formWrap {
+    max-width: 100%;
+  }
+  
+  .strengthContainer {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .strengthLabel {
+    min-width: 80px;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 16px 12px;
+  }
+  
+  .shell {
+    border-radius: 20px;
+  }
+  
+  .formPanel {
+    padding: 24px 16px;
+  }
+  
+  .title {
+    font-size: 20px;
+  }
+  
+  .brandHeading {
+    font-size: 24px;
   }
 }
 
 @media (max-width: 480px) {
   .row {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .strengthContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  
+  .strengthLabel {
+    justify-content: flex-start;
+    min-width: auto;
+    font-size: 11px;
+  }
+  
+  .criteriaList {
+    gap: 3px;
+  }
+  
+  .criteriaList li {
+    font-size: 11.5px;
+    padding: 3px 0;
+  }
+  
+  .criteriaIcon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .formGroup input,
+  .formGroup textarea {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+  
+  .inputWrap input {
+    padding-left: 36px;
+  }
+  
+  .submitButton {
+    font-size: 14px;
+    padding: 12px;
+  }
+  
+  .bubbleStack {
+    max-width: 100%;
   }
 }
 
+@media (max-width: 380px) {
+  .formPanel {
+    padding: 16px 12px;
+  }
+  
+  .form {
+    gap: 12px;
+  }
+  
+  .formGroup {
+    gap: 4px;
+  }
+  
+  .strengthBars {
+    gap: 3px;
+  }
+  
+  .strengthBar {
+    height: 3px;
+  }
+}
+
+/* ======================================== */
+/* ♿ Accessibility & Reduced Motion       */
+/* ======================================== */
+
 @media (prefers-reduced-motion: reduce) {
   .bubble,
-  .typingDot {
+  .typingDot,
+  .criteriaList,
+  .strengthBar {
     animation: none !important;
+    transition: none !important;
   }
+  
+  .strengthBar.active {
+    transform: none !important;
+  }
+}
+
+/* ======================================== */
+/* 🔥 Focus States for Keyboard Navigation */
+/* ======================================== */
+
+.switchButton:focus-visible,
+.toggleVisibility:focus-visible,
+.submitButton:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 2px;
+}
+
+/* ======================================== */
+/* 🎨 Scrollbar Styling                    */
+/* ======================================== */
+
+.formWrap::-webkit-scrollbar {
+  width: 4px;
+}
+
+.formWrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.formWrap::-webkit-scrollbar-thumb {
+  background: var(--accent-soft);
+  border-radius: 4px;
+}
+
+.formWrap::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-2);
+}
+
+/* ======================================== */
+/* 📝 Textarea Specific                    */
+/* ======================================== */
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 60px;
+  max-height: 120px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.formGroup textarea:focus {
+  min-height: 70px;
+}
+
+/* ======================================== */
+/* 🏷️ Label Animation                     */
+/* ======================================== */
+
+.formGroup label {
+  transition: color 0.2s ease;
+}
+
+.formGroup:focus-within label {
+  color: var(--text-primary);
+}
+
+/* ======================================== */
+/* 💫 Error State Animation                */
+/* ======================================== */
+
+.fieldError {
+  animation: shakeError 0.3s ease;
+}
+
+@keyframes shakeError {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+/* ======================================== */
+/* 🎨 Dark Mode Enhancement               */
+/* ======================================== */
+
+@media (prefers-color-scheme: light) {
+  /* این استایل برای حالت دارک هست، نیازی به تغییر نیست */
 }

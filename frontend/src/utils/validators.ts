@@ -9,6 +9,16 @@ export const validators = {
     return null;
   },
 
+  // 🔥 جدید - اعتبارسنجی ایمیل
+  email: (value: string): string | null => {
+    if (!value) return "Email is required";
+    const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(value)) {
+      return "Please enter a valid email address";
+    }
+    return null;
+  },
+
   password: (value: string): string | null => {
     if (!value) return "Password is required";
     if (value.length < 8) return "Password must be at least 8 characters";

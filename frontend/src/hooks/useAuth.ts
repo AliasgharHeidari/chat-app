@@ -10,6 +10,9 @@ export function useAuth() {
     login,
     logout,
     register,
+    loginWithGoogle, // 🔥 جدید
+    verifyEmail, // 🔥 جدید
+    resendVerification, // 🔥 جدید
     getCurrentUser,
     updateProfile,
   } = useAuthStore();
@@ -35,6 +38,9 @@ export function useAuth() {
     login,
     logout,
     register,
+    loginWithGoogle, // 🔥 جدید
+    verifyEmail, // 🔥 جدید
+    resendVerification, // 🔥 جدید
     updateProfile,
   };
 }

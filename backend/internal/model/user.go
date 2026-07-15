@@ -12,7 +12,7 @@ type User struct {
 	ProfilePicURL string     `gorm:"size:500" json:"profile_pic_url"`
 	PasswordHash  string     `gorm:"size:255" json:"-"`
 	Email         string     `gorm:"uniqueIndex;size:100;not null" json:"email"`
-	GoogleID      string     `gorm:"uniqueIndex;size:100" json:"-"`
+	GoogleID      *string     `gorm:"uniqueIndex;size:100" json:"-"`
 	
 	EmailVerified bool      `gorm:"default:false" json:"email_verified"`
 	VerifyToken   string    `gorm:"size:100;index" json:"-"`

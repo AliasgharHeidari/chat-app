@@ -168,7 +168,7 @@ func (s *GoogleAuthService) HandleGoogleLogin(idToken string) (*model.User, stri
 		FirstName:     googleUser.GivenName,
 		LastName:      googleUser.FamilyName,
 		Email:         googleUser.Email,
-		GoogleID:      googleUser.ID,
+		GoogleID:      &googleUser.ID,
 		ProfilePicURL: "", // 🔥 خالی، کاربر خودش لینک رو اضافه میکنه
 		Bio:           "",
 		PasswordHash:  "",

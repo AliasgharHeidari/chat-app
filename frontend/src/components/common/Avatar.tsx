@@ -22,9 +22,9 @@ export const Avatar: React.FC<AvatarProps> = ({
     <div className={styles.container}>
       <div className={avatarClass}>
         {src ? (
-          <img 
-            src={src} 
-            alt={alt} 
+          <img
+            src={src}
+            alt={alt}
             className={styles.image}
             onError={(e) => {
               // اگه عکس لود نشد، مخفی کن و initials رو نشون بده

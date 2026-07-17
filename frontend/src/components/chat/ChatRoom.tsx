@@ -1,3 +1,4 @@
+// frontend/src/components/chat/ChatRoom.tsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,6 +24,7 @@ export const ChatRoom: React.FC = () => {
     updateMessage,
   } = useChat();
   const { sendMessage, sendTyping } = useSocket();
+
   const [loading, setLoading] = useState(true);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const { isUserOnline } = useChat();
@@ -32,7 +34,6 @@ export const ChatRoom: React.FC = () => {
       if (chats.length === 0) {
         await loadChats();
       }
-
       const chat = chats.find((c) => c.id === Number(chatId));
       if (chat) {
         setCurrentChat(chat);
@@ -42,7 +43,6 @@ export const ChatRoom: React.FC = () => {
       }
       setLoading(false);
     };
-
     loadChat();
   }, [chatId, chats, loadChats, setCurrentChat, loadChatMessages, navigate]);
 
@@ -62,7 +62,8 @@ export const ChatRoom: React.FC = () => {
     );
   }
 
-  const otherUser = currentChat.user1_id === user.id ? currentChat.user2 : currentChat.user1;
+  const otherUser =
+    currentChat.user1_id === user.id ? currentChat.user2 : currentChat.user1;
   const otherName = otherUser
     ? `${otherUser.first_name} ${otherUser.last_name}`
     : "Unknown";
@@ -71,29 +72,37 @@ export const ChatRoom: React.FC = () => {
     : "U";
   const isOnline = otherUser ? isUserOnline(otherUser.id) : false;
 
-  // ✅ FIX: this header used to hardcode "Online" / "Offline" only,
-  // completely ignoring last_seen. Now it mirrors the same fallback
-  // logic UserStatus.tsx already uses.
-  const statusText = isOnline
-    ? "Online"
-    : otherUser?.last_seen
-      ? `Last seen ${otherUser.last_seen}`
-      : "Offline";
+  // 🔥 آیا طرف مقابل داره تایپ می‌کنه؟
+  const currentTypingSet = typingUsers[currentChat.id] || new Set<number>();
+  const isOtherTyping = Array.from(currentTypingSet).some(
+    (id) => id !== user.id,
+  );
 
-  const userForModal = otherUser
-    ? { ...otherUser, is_online: isOnline }
-    : null;
+  const statusText = isOtherTyping
+    ? "typing..."
+    : isOnline
+      ? "Online"
+      : otherUser?.last_seen
+        ? `Last seen ${otherUser.last_seen}`
+        : "Offline";
+
+  const userForModal = otherUser ? { ...otherUser, is_online: isOnline } : null;
 
   return (
     <div className={styles.container}>
-      {/* ✅ هدر کامل موبایل با کلیک‌پذیری */}
       <div className={styles.header}>
         <button
           onClick={handleBack}
           className={styles.backBtn}
           aria-label="Back to chats"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               d="M15 18l-6-6 6-6"
               stroke="currentColor"
@@ -103,8 +112,10 @@ export const ChatRoom: React.FC = () => {
             />
           </svg>
         </button>
-
-        <div className={styles.userInfo} onClick={handleUserClick}>
+        <div
+          className={`${styles.userInfo} ${isOtherTyping ? styles.typingGlow : ""}`}
+          onClick={handleUserClick}
+        >
           <Avatar
             src={otherUser?.profile_pic_url}
             initials={otherInitials}
@@ -114,9 +125,13 @@ export const ChatRoom: React.FC = () => {
           <div className={styles.userText}>
             <span className={styles.userName}>{otherName}</span>
             <span
-              className={`${styles.userStatus} ${isOnline ? styles.online : styles.offline}`}
+              className={`${styles.userStatus} ${
+                isOtherTyping ? styles.typing : isOnline ? styles.online : styles.offline
+              }`}
             >
-              {isOnline && <span className={styles.statusDot} aria-hidden="true" />}
+              {isOnline && !isOtherTyping && (
+                <span className={styles.statusDot} aria-hidden="true" />
+              )}
               {statusText}
             </span>
           </div>

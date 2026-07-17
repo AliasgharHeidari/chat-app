@@ -3,10 +3,10 @@ import type { Chat } from "@/types";
 import { MessageList } from "./MessageList";
 import { useChat } from "@/hooks/useChat";
 import { useChatStore } from "@/store/chatStore";
+import { useSettingsStore } from "@/store/SettingsStore";
 import { useSocket } from "@/hooks/useSocket";
 import { MessageInput } from "./MessageInput";
 import { UserStatus } from "./UserStatus";
-import { TypingIndicator } from "./TypingIndicator";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { UserProfileModal } from "./UserProfileModal";
 import { api } from "@/api/rest";
@@ -42,6 +42,11 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   const messages = useChatStore((state) => state.messages[chat.id] || []);
   const isLoadingMessages = useChatStore((state) => state.isLoadingMessages);
   const loadChatMessages = useChatStore((state) => state.loadChatMessages);
+
+  // 🔥 بک‌گراند چت - از استور تنظیمات خونده می‌شه (موبایل و دسکتاپ مشترک)
+  const chatBackground = useSettingsStore((state) => state.chatBackground);
+  const backgroundImage = chatBackground || "/background-images/default-image-1.jpg";
+
   const { markAsSeen } = useSocket();
   const { isUserOnline } = useChat();
 
@@ -66,12 +71,10 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     ? `${otherUser.first_name} ${otherUser.last_name}`
     : "Unknown User";
 
-  const typingUserNames: string[] = [];
-  Array.from(typingUsers).forEach((userId) => {
-    if (userId !== currentUserId) {
-      typingUserNames.push(otherUserName);
-    }
-  });
+  // 🔥 آیا طرف مقابل داره تایپ می‌کنه؟ (خودمون رو از ست حذف می‌کنیم)
+  const isOtherUserTyping = Array.from(typingUsers).some(
+    (userId) => userId !== currentUserId,
+  );
 
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
@@ -207,7 +210,15 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   };
 
   return (
-    <div className={styles.container}>
+    <div
+      className={styles.container}
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       {!hideUserStatus && (
         <UserStatus
           userId={otherUser.id}
@@ -215,12 +226,10 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
           lastSeen={otherUser.last_seen}
           initials={otherUserInitials}
           profilePicUrl={otherUser.profile_pic_url}
+          isTyping={isOtherUserTyping}
           onClick={handleUserClick}
         />
       )}
-
-      <TypingIndicator userNames={typingUserNames} />
-
       <MessageList
         messages={messages}
         currentUserId={currentUserId}

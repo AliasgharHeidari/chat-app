@@ -1,6 +1,7 @@
 /* ======================================== */
 /*          📱 ChatRoom - پالت Slate        */
 /* ======================================== */
+/* frontend/src/components/chat/ChatRoom.module.css */
 .container {
   position: relative;
   display: flex;
@@ -8,17 +9,11 @@
   height: 100vh;
   height: 100dvh;
   background-color: var(--bg-primary, #ffffff);
-  background-image:
-    radial-gradient(rgba(0, 0, 0, 0.05) 1.5px, transparent 1.5px);
-  background-size: 22px 22px;
   overflow: hidden;
 }
 
 [data-theme="dark"] .container {
   background-color: #1a2233;
-  background-image:
-    radial-gradient(rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px);
-  background-size: 22px 22px;
 }
 
 .loadingContainer {
@@ -173,6 +168,72 @@
   border-radius: 50%;
   background: currentColor;
   flex-shrink: 0;
+}
+
+
+/* ---------------------------- */
+/* 🔥 این بلاک رو به انتهای ChatRoom.module.css اضافه کن */
+
+.userStatus.typing {
+  color: #667eea;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .userStatus.typing {
+  color: #a5b4fc;
+}
+
+/* هاله‌ی دور کل باکس پروفایل (پیل) در حالت تایپ */
+.typingGlow {
+  animation: pillGlow 1.8s ease-out infinite;
+}
+
+@keyframes pillGlow {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(102, 126, 234, 0.5),
+      0 0 16px 2px rgba(102, 126, 234, 0.35);
+  }
+  70% {
+    box-shadow:
+      0 0 0 9px rgba(102, 126, 234, 0),
+      0 0 22px 5px rgba(102, 126, 234, 0.55);
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(102, 126, 234, 0),
+      0 0 16px 2px rgba(102, 126, 234, 0.35);
+  }
+}
+
+[data-theme="dark"] .typingGlow {
+  animation: pillGlowDark 1.8s ease-out infinite;
+}
+
+@keyframes pillGlowDark {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(165, 180, 252, 0.55),
+      0 0 16px 2px rgba(165, 180, 252, 0.4);
+  }
+  70% {
+    box-shadow:
+      0 0 0 9px rgba(165, 180, 252, 0),
+      0 0 24px 5px rgba(165, 180, 252, 0.6);
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(165, 180, 252, 0),
+      0 0 16px 2px rgba(165, 180, 252, 0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typingGlow,
+  [data-theme="dark"] .typingGlow {
+    animation: none;
+    box-shadow: 0 0 14px 3px rgba(102, 126, 234, 0.45);
+  }
 }
 
 /* ======================================== */

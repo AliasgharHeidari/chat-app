@@ -15,7 +15,7 @@ interface ChatStore {
   setCurrentChat: (chat: Chat | null) => void;
   loadChats: () => Promise<void>;
   initChat: (targetUsername: string) => Promise<Chat>;
-  loadChatMessages: (chatId: number) => Promise<void>;
+  loadChatMessages: (chatId: number, limit?: number, offset?: number) => Promise<any>; // 🔥 تغییر تایپ
   addMessage: (chatId: number, message: Message) => void;
   updateMessage: (chatId: number, messageId: number, updates: Partial<Message>) => void;
   removeMessage: (chatId: number, messageId: number) => void;
@@ -77,50 +77,50 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
   },
 
-  // ✅ ساده‌ترین شکل ممکن
-loadChatMessages: async (chatId, limit = 20, offset = 0) => {
-  set({ isLoadingMessages: true, error: null });
-  try {
-    const response = await api.getChatMessages(chatId, limit, offset);
-    
-    // پیام‌ها رو به ترتیب صعودی مرتب کن (قدیمی‌ترین اول)
-    const sortedMessages = [...response.messages].sort(
-      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    );
-
-    set((state) => {
-      const existingMessages = state.messages[chatId] || [];
+  // 🔥 اصلاح شده با return
+  loadChatMessages: async (chatId, limit = 20, offset = 0) => {
+    set({ isLoadingMessages: true, error: null });
+    try {
+      const response = await api.getChatMessages(chatId, limit, offset);
       
-      // اگر offset=0 باشه، جایگزین کن
-      if (offset === 0) {
+      const sortedMessages = [...response.messages].sort(
+        (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      );
+
+      set((state) => {
+        const existingMessages = state.messages[chatId] || [];
+        
+        if (offset === 0) {
+          return {
+            messages: {
+              ...state.messages,
+              [chatId]: sortedMessages,
+            },
+            isLoadingMessages: false,
+          };
+        }
+        
+        const allMessages = [...sortedMessages, ...existingMessages];
+        const uniqueMessages = Array.from(
+          new Map(allMessages.map((msg) => [msg.id, msg])).values()
+        );
+        
         return {
           messages: {
             ...state.messages,
-            [chatId]: sortedMessages,
+            [chatId]: uniqueMessages,
           },
           isLoadingMessages: false,
         };
-      }
+      });
       
-      // اگر offset>0 باشه، به ابتدا اضافه کن (قدیمی‌ترها)
-      const allMessages = [...sortedMessages, ...existingMessages];
-      const uniqueMessages = Array.from(
-        new Map(allMessages.map((msg) => [msg.id, msg])).values()
-      );
-      
-      return {
-        messages: {
-          ...state.messages,
-          [chatId]: uniqueMessages,
-        },
-        isLoadingMessages: false,
-      };
-    });
-  } catch (error) {
-    set({ error: api.getErrorMessage(error), isLoadingMessages: false });
-  }
-},
-  // ✅ اضافه کردن به انتها
+      return response; // 🔥 برگردون
+    } catch (error) {
+      set({ error: api.getErrorMessage(error), isLoadingMessages: false });
+      return null; // 🔥 برگردون
+    }
+  },
+
   addMessage: (chatId, message) => {
     const currentMessages = get().messages[chatId] || [];
     if (currentMessages.some((m) => m.id === message.id)) return;

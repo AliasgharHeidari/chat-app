@@ -1,3 +1,5 @@
+const englishOnlyRegex = /^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+
 export const validators = {
   username: (value: string): string | null => {
     if (!value) return "Username is required";
@@ -6,6 +8,11 @@ export const validators = {
     if (!/^[a-zA-Z0-9_-]+$/.test(value)) {
       return "Username can only contain letters, numbers, hyphens, and underscores";
     }
+
+    if (!englishOnlyRegex.test(value)) {
+      return "Username must contain only English characters";
+    }
+
     return null;
   },
 
@@ -22,6 +29,11 @@ export const validators = {
   password: (value: string): string | null => {
     if (!value) return "Password is required";
     if (value.length < 8) return "Password must be at least 8 characters";
+
+    if (!englishOnlyRegex.test(value)) {
+      return "Password must contain only English characters";
+    }
+
     return null;
   },
 

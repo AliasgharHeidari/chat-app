@@ -1,9 +1,12 @@
+// frontend/src/components/common/ThemeToggle.tsx
 import React, { useEffect, useState } from "react";
 import styles from "./ThemeToggle.module.css";
 
 export const ThemeToggle: React.FC = () => {
+  // 🔥 تغییر: اگر theme در localStorage نبود، dark باشه
   const [isDark, setIsDark] = useState(() => {
-    return localStorage.getItem("theme") === "dark";
+    const saved = localStorage.getItem("theme");
+    return saved === "dark" || saved === null; 
   });
 
   useEffect(() => {

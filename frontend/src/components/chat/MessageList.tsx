@@ -39,6 +39,12 @@ export const MessageList: React.FC<MessageListProps> = ({
   const isLoadingMoreRef = useRef(false);
   const prevScrollHeightRef = useRef(0);
 
+  // ✅ فقط یه منوی action در کل لیست می‌تونه هم‌زمان باز باشه.
+  // قبلاً هر MessageItem یه state محلی مستقل داشت (showMenu) که باعث
+  // می‌شد چندتا منو هم‌زمان باز بشن. حالا این state اینجا (والد مشترک)
+  // نگه داشته می‌شه و id پیامی که منوش بازه رو ذخیره می‌کنه.
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+
   useEffect(() => {
     if (containerRef.current) {
       const scrollHeight = containerRef.current.scrollHeight;
@@ -69,10 +75,17 @@ export const MessageList: React.FC<MessageListProps> = ({
     };
   }, [messages, currentUserId, onSeen]);
 
+  // ✅ به‌محض ورود به حالت انتخاب، هر منوی بازی رو ببند
+  // (تو حالت انتخاب اصلاً نباید action menu کار کنه)
+  useEffect(() => {
+    if (isSelectMode) {
+      setOpenMenuId(null);
+    }
+  }, [isSelectMode]);
+
   const handleScroll = () => {
     if (!containerRef.current || isLoading || !onLoadMore || !hasMore) return;
     if (isLoadingMoreRef.current) return;
-
     const { scrollTop } = containerRef.current;
     if (scrollTop < 50) {
       isLoadingMoreRef.current = true;
@@ -156,6 +169,8 @@ export const MessageList: React.FC<MessageListProps> = ({
               onEdit={onEdit}
               onDelete={onDelete}
               onCopy={onCopyMessage}
+              isMenuOpen={openMenuId === message.id}
+              onOpenMenuChange={setOpenMenuId}
             />
           ))}
         </div>

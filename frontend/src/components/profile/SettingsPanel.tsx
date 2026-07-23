@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ProfileEditor } from "./ProfileEditor";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { BackgroundPicker } from "@/components/chat/BackgroundPicker";
+import { SecurityPanel } from "./SecurityPanel"; // 🔥 جدید
 import styles from "./SettingsPanel.module.css";
 
 interface SettingsPanelProps {
@@ -36,6 +37,14 @@ const ImageIcon: React.FC = () => (
   </svg>
 );
 
+// 🔥 جدید - آیکون امنیت
+const SecurityIcon: React.FC = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <polyline points="9 12 11 14 15 10" />
+  </svg>
+);
+
 const LogoutIcon: React.FC = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -58,6 +67,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const { user } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isBackgroundPickerOpen, setIsBackgroundPickerOpen] = useState(false);
+  const [isSecurityOpen, setIsSecurityOpen] = useState(false); // 🔥 جدید
 
   const handleEditProfile = () => {
     setIsProfileOpen(true);
@@ -75,12 +85,21 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     setIsBackgroundPickerOpen(false);
   };
 
+  // 🔥 جدید
+  const handleSecurityOpen = () => {
+    setIsSecurityOpen(true);
+  };
+
+  const handleSecurityClose = () => {
+    setIsSecurityOpen(false);
+  };
+
   if (!isOpen) return null;
 
   return (
     <>
       {/* پنل اصلی فقط وقتی نمایش داده می‌شه که هیچ زیرصفحه‌ای باز نباشه */}
-      {!isProfileOpen && !isBackgroundPickerOpen && (
+      {!isProfileOpen && !isBackgroundPickerOpen && !isSecurityOpen && (
         <div className={styles.overlay} onClick={onClose}>
           <div
             className={styles.panel}
@@ -147,6 +166,24 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 </button>
               </div>
 
+              {/* 🔥 جدید - گروه امنیت */}
+              <div className={styles.sectionLabel}>Security</div>
+              <div className={styles.group}>
+                <button
+                  className={styles.menuItem}
+                  onClick={handleSecurityOpen}
+                  type="button"
+                >
+                  <span className={`${styles.iconBadge} ${styles.iconEmerald}`}>
+                    <SecurityIcon />
+                  </span>
+                  <span className={styles.menuLabel}>Security</span>
+                  <span className={styles.arrow}>
+                    <ChevronIcon />
+                  </span>
+                </button>
+              </div>
+
               {/* گروه: ظاهر */}
               <div className={styles.sectionLabel}>Appearance</div>
               <div className={styles.group}>
@@ -202,6 +239,11 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
       {isBackgroundPickerOpen && (
         <BackgroundPicker onClose={handleBackgroundPickerClose} />
+      )}
+
+      {/* 🔥 جدید - Security Panel */}
+      {isSecurityOpen && (
+        <SecurityPanel isOpen={isSecurityOpen} onClose={handleSecurityClose} />
       )}
     </>
   );

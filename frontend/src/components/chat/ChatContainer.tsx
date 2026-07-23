@@ -118,6 +118,8 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   };
 
   // ✅ مدیریت انتخاب/لغو انتخاب پیام
+  // قبلاً اینجا هیچ‌وقت setIsSelectMode(true) صدا زده نمی‌شد، برای همین بعد از
+  // انتخاب پیام‌ها toolbar و چک‌باکس‌ها هیچ‌وقت نمایش داده نمی‌شدن.
   const handleToggleSelect = (messageId: number) => {
     setSelectedMessages(prev => {
       const newSet = new Set(prev);
@@ -126,21 +128,13 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       } else {
         newSet.add(messageId);
       }
-      // اگه هیچ پیامی انتخاب نشده، حالت انتخاب رو غیرفعال کن
-      if (newSet.size === 0) {
-        setIsSelectMode(false);
-      }
+      // به‌محض اینکه حداقل یه پیام انتخاب بشه، وارد حالت انتخاب می‌شیم
+      setIsSelectMode(newSet.size > 0);
       return newSet;
     });
   };
 
-  // ✅ فعال کردن حالت انتخاب (با کلیک طولانی یا دکمه)
-  const enableSelectMode = (messageId?: number) => {
-    setIsSelectMode(true);
-    if (messageId !== undefined) {
-      setSelectedMessages(new Set([messageId]));
-    }
-  };
+
 
   // ✅ لغو همه انتخاب‌ها
   const clearSelection = () => {
@@ -148,38 +142,45 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     setIsSelectMode(false);
   };
 
-  // ✅ انتخاب همه پیام‌ها
-  const selectAll = () => {
-    const allIds = messages.map(msg => msg.id);
-    setSelectedMessages(new Set(allIds));
-  };
 
   // ✅ کپی کردن پیام‌های انتخاب شده
+  // navigator.clipboard فقط تو Secure Context (https یا localhost) کار می‌کنه؛
+  // اگه در دسترس نبود، با document.execCommand('copy') به‌عنوان fallback کپی می‌کنیم.
   const copySelectedMessages = async () => {
     const selectedMsgs = messages.filter(msg => selectedMessages.has(msg.id));
     const text = selectedMsgs.map(msg => msg.message_text).join('\n');
+
     try {
-      await navigator.clipboard.writeText(text);
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        if (!successful) {
+          throw new Error('execCommand copy failed');
+        }
+      }
       alert(`${selectedMsgs.length} message(s) copied!`);
       clearSelection();
     } catch (err) {
       console.error('Failed to copy:', err);
+      alert('Copy failed. Your browser may be blocking clipboard access on this connection.');
     }
   };
 
-  // ✅ حذف پیام‌های انتخاب شده (برای خودم)
-  const deleteSelectedForMe = async () => {
-    if (!confirm(`Delete ${selectedMessages.size} message(s) for me?`)) return;
-    const ids = Array.from(selectedMessages);
-    for (const id of ids) {
-      await handleDeleteMessage(id, false);
-    }
-    clearSelection();
-  };
-
-  // ✅ حذف پیام‌های انتخاب شده (برای همه)
-  const deleteSelectedForEveryone = async () => {
-    if (!confirm(`Delete ${selectedMessages.size} message(s) for everyone?`)) return;
+  // ✅ حذف پیام‌های انتخاب شده
+  // فعلاً کاربر فقط می‌تونه پیام‌های خودش رو حذف کنه (بدون گزینه‌ی
+  // جداگانه‌ی "برای من"/"برای همه") - این دکمه فقط وقتی نمایش داده
+  // می‌شه که همه‌ی پیام‌های انتخاب‌شده متعلق به خودش باشن.
+  const deleteSelectedMessages = async () => {
+    if (!confirm(`Delete ${selectedMessages.size} message(s)?`)) return;
     const ids = Array.from(selectedMessages);
     for (const id of ids) {
       await handleDeleteMessage(id, true);
@@ -203,6 +204,14 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
 
   const otherIsOnline = isUserOnline(otherUser.id);
   const hasMore = messages.length >= offset && messages.length > 0;
+
+  // ✅ Delete فقط وقتی نمایش داده می‌شه که همه‌ی پیام‌های انتخاب‌شده
+  // متعلق به خود کاربر باشن. اگه حتی یکی از پیام‌های طرف مقابل هم
+  // انتخاب شده باشه، فقط Copy می‌مونه.
+  const selectedMessagesList = messages.filter((m) => selectedMessages.has(m.id));
+  const canDeleteSelected =
+    selectedMessagesList.length > 0 &&
+    selectedMessagesList.every((m) => m.sender_id === currentUserId);
 
   const userForModal = {
     ...otherUser,
@@ -243,7 +252,6 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
         onLoadMore={handleLoadMore}
         hasMore={hasMore}
       />
-
       {/* ✅ نوار ابزار انتخاب */}
       {isSelectMode && selectedMessages.size > 0 && (
         <div className={styles.selectionToolbar}>
@@ -258,26 +266,16 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
               </svg>
             </button>
-            <button onClick={deleteSelectedForMe} className={styles.actionBtn} title="Delete for me">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 6h18" />
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-              </svg>
-            </button>
-            <button onClick={deleteSelectedForEveryone} className={`${styles.actionBtn} ${styles.danger}`} title="Delete for everyone">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 6h18" />
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                <line x1="12" y1="11" x2="12" y2="17" />
-                <line x1="9" y1="14" x2="15" y2="14" />
-              </svg>
-            </button>
-            <button onClick={selectAll} className={styles.actionBtn} title="Select all">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="20 6 9 17 4 12" />
-                <path d="M20 18v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4" />
-              </svg>
-            </button>
+            {canDeleteSelected && (
+              <button onClick={deleteSelectedMessages} className={`${styles.actionBtn} ${styles.danger}`} title="Delete">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 6h18" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <line x1="12" y1="11" x2="12" y2="17" />
+                  <line x1="9" y1="14" x2="15" y2="14" />
+                </svg>
+              </button>
+            )}
             <button onClick={clearSelection} className={styles.actionBtn} title="Clear">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="18" y1="6" x2="6" y2="18" />
@@ -287,13 +285,11 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
           </div>
         </div>
       )}
-
       <MessageInput
         onSendMessage={handleSendMessage}
         onTyping={onTyping}
         isLoading={isSending}
       />
-
       <UserProfileModal
         user={userForModal}
         isOpen={isProfileModalOpen}

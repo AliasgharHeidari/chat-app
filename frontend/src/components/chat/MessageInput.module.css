@@ -95,6 +95,8 @@
   flex: 1;
   position: relative;
   min-height: 38px;
+  display: flex;
+  align-items: center;
 }
 
 .inputText {
@@ -152,13 +154,16 @@
   background: rgba(102, 126, 234, 0.35);
   color: transparent;
 }
+
 .hiddenInput::-moz-selection {
   background: rgba(102, 126, 234, 0.35);
   color: transparent;
 }
+
 [data-theme="dark"] .hiddenInput::selection {
   background: rgba(129, 140, 248, 0.35);
 }
+
 [data-theme="dark"] .hiddenInput::-moz-selection {
   background: rgba(129, 140, 248, 0.35);
 }
@@ -184,14 +189,17 @@
 .sendButton:hover:not(:disabled) {
   transform: scale(1.06);
 }
+
 .sendButton:active:not(:disabled) {
   transform: scale(0.94);
 }
+
 .sendButton:disabled {
   opacity: 0.4;
   cursor: not-allowed;
   transform: none;
 }
+
 [data-theme="dark"] .sendButton {
   background: linear-gradient(135deg, #203553, #3D485C);
 }
@@ -230,6 +238,7 @@
   background: #1e293b;
   border-color: #334155;
 }
+
 [data-theme="dark"] .emojiPickerContainer .EmojiPickerReact {
   --epr-bg-color: #1e293b;
   --epr-text-color: #e2e8f0;
@@ -249,7 +258,7 @@
 /* ======================================== */
 @media (max-width: 480px) {
   .container { padding: 8px 10px 12px 10px; }
-  .inputWrapper { gap: 2px; padding: 3px 3px 3px 4px; }
+  .inputWrapper { gap: 2px; padding: 3px 3px 3px 4px; align-items: center; }
   .emojiPickerContainer {
     left: 0;
     right: 0;
@@ -264,6 +273,8 @@
     border-radius: 16px 16px 0 0;
   }
   .emojiButton { font-size: 19px; width: 32px; height: 32px; }
+  /* هماهنگ با ارتفاع دکمه‌های 32px، تا باکس متن ازشون بلندتر دیده نشه */
+  .inputContainer { min-height: 32px; }
   .inputText { font-size: 13px; padding: 7px 4px; min-height: 32px; }
   .hiddenInput { padding: 7px 4px; min-height: 32px; font-size: 13px; }
   .sendButton { width: 32px; height: 32px; }
@@ -271,6 +282,8 @@
 
 @media (max-width: 380px) {
   .emojiButton { font-size: 17px; width: 28px; height: 28px; }
+  /* هماهنگ با ارتفاع دکمه‌های 28px */
+  .inputContainer { min-height: 28px; }
   .inputText { font-size: 12px; min-height: 28px; }
   .hiddenInput { min-height: 28px; font-size: 12px; }
   .sendButton { width: 28px; height: 28px; }

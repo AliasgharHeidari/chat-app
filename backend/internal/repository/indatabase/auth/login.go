@@ -21,3 +21,14 @@ func CheckIfUserExist(input model.LoginRequest) (model.User, error) {
 	}
 	return user, nil
 }
+func GetUserByID(userID uint) (*model.User, error) {
+	var user model.User
+	err := postgres.DB.First(&user, userID).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

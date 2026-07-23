@@ -48,3 +48,9 @@ type UpdateProfileRequest struct {
 	Bio           *string `json:"bio,omitempty"` // ← pointer
 	ProfilePicURL *string `json:"profile_pic_url,omitempty"`
 }
+
+
+type ChangePasswordRequest struct {
+	CurrentPassword string `json:"current_password" binding:"required"`
+	NewPassword     string `json:"new_password" binding:"required,min=8"`
+}

@@ -98,7 +98,9 @@ class ChatAPI {
   }
 
   // 🔥 جدید - ارسال مجدد کد تایید
-  async resendVerification(data: ResendVerificationRequest): Promise<{ message: string }> {
+  async resendVerification(
+    data: ResendVerificationRequest,
+  ): Promise<{ message: string }> {
     const response = await this.client.post("/auth/resend-verification", data);
     return response.data;
   }
@@ -115,6 +117,14 @@ class ChatAPI {
       return response.data.user;
     }
     return this.getProfile();
+  }
+
+  async changePassword(data: {
+    current_password: string;
+    new_password: string;
+  }): Promise<{ message: string }> {
+    const response = await this.client.put("/chat/change-password", data);
+    return response.data;
   }
 
   // Chat endpoints
@@ -163,7 +173,7 @@ class ChatAPI {
     data: DeleteMessageRequest,
   ): Promise<void> {
     await this.client({
-      method: 'delete',
+      method: "delete",
       url: `/chat/messages/${messageId}`,
       data: data,
     });
@@ -182,7 +192,11 @@ class ChatAPI {
 
   getErrorMessage(error: unknown): string {
     if (axios.isAxiosError(error)) {
-      return error.response?.data?.error || error.response?.data?.message || error.message;
+      return (
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message
+      );
     }
     return String(error);
   }

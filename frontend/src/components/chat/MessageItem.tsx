@@ -17,6 +17,10 @@ interface MessageItemProps {
   onEdit?: (messageId: number, newText: string) => void;
   onDelete?: (messageId: number, forEveryone: boolean) => void;
   onCopy?: (text: string) => void;
+  /** آیا منوی این پیام بازه (وضعیت مشترک، از MessageList میاد) */
+  isMenuOpen?: boolean;
+  /** برای باز/بستن منو - چون فقط یه منو در کل لیست باید باز باشه */
+  onOpenMenuChange?: (messageId: number | null) => void;
 }
 
 export const MessageItem: React.FC<MessageItemProps> = ({
@@ -30,27 +34,57 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   onEdit,
   onDelete,
   onCopy,
+  isMenuOpen = false,
+  onOpenMenuChange,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(message.message_text);
-  const [showMenu, setShowMenu] = useState(false);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bubbleRef = useRef<HTMLDivElement>(null);
 
   if (message.deleted_for && message.deleted_for === currentUserId) {
     return null;
   }
 
+  // ✅ فونت پیام بر اساس جهت متن، هماهنگ با MessageInput
+  // (--font-fa / --font-en / --font-emoji از index.css می‌آد)
   const direction = detectTextDirection(message.message_text);
-  const fontFamily = direction === "rtl" ? "Vazirmatn, Tahoma, sans-serif" : "Inter, sans-serif";
+  const fontFamily =
+    direction === "rtl"
+      ? "var(--font-fa), var(--font-emoji)"
+      : "var(--font-en), var(--font-emoji)";
   const textAlign = direction === "rtl" ? "right" : "left";
+
+  // ✅ همون منطق برای حالت ویرایش پیام هم اعمال می‌شه
+  const editDirection = detectTextDirection(editText);
+  const editFontFamily =
+    editDirection === "rtl"
+      ? "var(--font-fa), var(--font-emoji)"
+      : "var(--font-en), var(--font-emoji)";
+  const editTextAlign = editDirection === "rtl" ? "right" : "left";
+
+  // ✅ با کلیک هرجای بیرون از حباب این پیام، منوش بسته بشه
+  // (به‌جای انتظار ۴ ثانیه‌ای که قبلاً بود)
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (bubbleRef.current && !bubbleRef.current.contains(event.target as Node)) {
+        onOpenMenuChange?.(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMenuOpen, onOpenMenuChange]);
 
   const handleClick = () => {
     if (isSelectMode) {
       onToggleSelect?.(message.id);
       return;
     }
-    setShowMenu(true);
-    setTimeout(() => setShowMenu(false), 4000);
+    // toggle: اگه همین پیام باز بود ببندش، وگرنه بازش کن (و چون این
+    // state تو MessageList مشترکه، خودبه‌خود منوی هر پیام دیگه‌ای که
+    // باز بوده بسته می‌شه - همیشه فقط یکی باز می‌مونه)
+    onOpenMenuChange?.(isMenuOpen ? null : message.id);
   };
 
   const handleMouseDown = () => {
@@ -76,7 +110,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
 
   const handleCopy = () => {
     onCopy?.(message.message_text);
-    setShowMenu(false);
+    onOpenMenuChange?.(null);
   };
 
   const handleEditSubmit = () => {
@@ -118,11 +152,9 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           </div>
         </div>
       )}
-
       {showAvatar && !isOwn && (
         <Avatar size="small" initials={message.sender_name?.charAt(0) || "U"} />
       )}
-
       <div className={styles.messageContent}>
         {isEditing ? (
           <div className={styles.editContainer}>
@@ -131,6 +163,12 @@ export const MessageItem: React.FC<MessageItemProps> = ({
               onChange={(e) => setEditText(e.target.value)}
               className={styles.editInput}
               autoFocus
+              dir={editDirection}
+              style={{
+                direction: editDirection,
+                textAlign: editTextAlign,
+                fontFamily: editFontFamily,
+              }}
             />
             <div className={styles.editButtons}>
               <button onClick={handleEditSubmit} className={styles.saveBtn}>
@@ -143,6 +181,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           </div>
         ) : (
           <div
+            ref={bubbleRef}
             className={`${styles.messageBubble} ${isOwn ? styles.ownBubble : styles.otherBubble}`}
           >
             <p
@@ -155,7 +194,6 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                 <EmojiText text={message.message_text} size={18} />
               )}
             </p>
-
             <div className={styles.metaRow}>
               {message.is_edited && !message.is_deleted && (
                 <span className={styles.edited}>edited</span>
@@ -171,9 +209,11 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                 </span>
               )}
             </div>
-
-            {showMenu && isOwn && !message.is_deleted && !isSelectMode && (
-              <div className={styles.menu}>
+            {isMenuOpen && isOwn && !message.is_deleted && !isSelectMode && (
+              <div
+                className={styles.menu}
+                onClick={(e) => e.stopPropagation()}
+              >
                 <button
                   onClick={() => setIsEditing(true)}
                   className={`${styles.menuItem} ${styles.editItem}`}

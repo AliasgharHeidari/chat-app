@@ -1,7 +1,6 @@
 /* ======================================== */
 /*          💬 هر پیام                      */
 /* ======================================== */
-
 .container {
   display: flex;
   align-items: flex-end;
@@ -59,7 +58,16 @@
   margin: 0;
   font-size: 14px;
   line-height: 1.4;
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif !important;
+  /*
+    فونت اینجا دیگه هاردکد/!important نیست - قبلاً این خط با !important
+    همیشه روی fontFamily اینلاینِ ست‌شده در MessageItem.tsx غالب می‌شد
+    و باعث می‌شد Vazirmatn/Inter هیچ‌وقت واقعاً اعمال نشه (متن با فونت
+    پیش‌فرض ایموجی/سیستم رندر می‌شد). فونت الان کاملاً از طریق style
+    اینلاین (بر اساس جهت متن: fa یا en) کنترل می‌شه.
+    این‌جا فقط یه فالبک عمومی می‌ذاریم برای زمانی که به هر دلیلی
+    style اینلاین اعمال نشده باشه.
+  */
+  font-family: var(--font-en), var(--font-emoji);
 }
 
 .messageText img.emoji {
@@ -95,7 +103,6 @@
 /* ======================================== */
 /*          ✅ حالت انتخاب                   */
 /* ======================================== */
-
 .selectable {
   cursor: pointer;
   transition: background-color 0.15s ease;
@@ -165,7 +172,6 @@
 /* ======================================== */
 /*          📋 منوی کلیک ساده               */
 /* ======================================== */
-
 .menu {
   position: absolute;
   top: -52px;
@@ -291,7 +297,6 @@
 /* ======================================== */
 /*          ✏️ ویرایش                       */
 /* ======================================== */
-
 .editContainer {
   display: flex;
   flex-direction: column;
@@ -302,7 +307,8 @@
   padding: 8px;
   border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 12px;
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", var(--font-fa), sans-serif;
+  /* فالبک؛ فونت واقعی از style اینلاین (بر اساس جهت متن) میاد */
+  font-family: var(--font-en), var(--font-emoji);
   font-size: 14px;
   resize: none;
   min-height: 60px;
@@ -371,7 +377,6 @@
 /* ======================================== */
 /*          🎞️ انیمیشن‌ها                   */
 /* ======================================== */
-
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -386,7 +391,6 @@
 /* ======================================== */
 /*          📱 ریسپانسیو موبایل            */
 /* ======================================== */
-
 @media (max-width: 768px) {
   .messageContent {
     max-width: 82%;

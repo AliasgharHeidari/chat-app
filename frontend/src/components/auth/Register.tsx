@@ -1,3 +1,4 @@
+// frontend/src/components/auth/Register.tsx
 import React, { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { validateForm, validators } from "@/utils/validators";
@@ -5,7 +6,7 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import styles from "./Register.module.css";
 
 interface RegisterProps {
-  onSuccess?: (email: string) => void; // 🔥 تغییر - email رو به عنوان پارامتر قبول کن
+  onSuccess?: (email: string) => void;
   onSwitchToLogin?: () => void;
 }
 
@@ -131,11 +132,12 @@ export const Register: React.FC<RegisterProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // State برای قدرت پسورد
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
-  // تابع بررسی قدرت پسورد (امتیاز ۰ تا ۴)
+  // 🔥 Regex برای فقط انگلیسی
+  const englishOnlyRegex = /^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+
   const checkPasswordStrength = (password: string): number => {
     let score = 0;
     if (password.length >= 8) score++;
@@ -145,7 +147,6 @@ export const Register: React.FC<RegisterProps> = ({
     return score;
   };
 
-  // گرفتن متن و آیکون قدرت پسورد
   const getStrengthInfo = (score: number) => {
     switch (score) {
       case 0:
@@ -177,25 +178,41 @@ export const Register: React.FC<RegisterProps> = ({
     }
   };
 
-  // هندلر اختصاصی برای پسورد
+  // 🔥 هندلر اختصاصی برای username (فقط انگلیسی)
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === "" || englishOnlyRegex.test(value)) {
+      setFormData((prev) => ({ ...prev, username: value }));
+      if (errors.username) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.username;
+          return newErrors;
+        });
+      }
+    }
+  };
+
+  // 🔥 هندلر اختصاصی برای password (فقط انگلیسی)
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setFormData((prev) => ({ ...prev, password: value }));
-    const strength = checkPasswordStrength(value);
-    setPasswordStrength(strength);
-    if (errors.password) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.password;
-        return newErrors;
-      });
+    const value = e.target.value;
+    if (value === "" || englishOnlyRegex.test(value)) {
+      setFormData((prev) => ({ ...prev, password: value }));
+      const strength = checkPasswordStrength(value);
+      setPasswordStrength(strength);
+      if (errors.password) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.password;
+          return newErrors;
+        });
+      }
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // اعتبارسنجی فرم
     const fieldErrors = validateForm(formData, {
       username: validators.username,
       firstName: validators.firstName,
@@ -215,7 +232,6 @@ export const Register: React.FC<RegisterProps> = ({
       return;
     }
     
-    // جلوگیری از ثبت‌نام با پسورد ضعیف (امتیاز کمتر از ۳)
     if (passwordStrength < 3) {
       setErrors((prev) => ({
         ...prev,
@@ -232,7 +248,6 @@ export const Register: React.FC<RegisterProps> = ({
         formData.email,
         formData.password,
       );
-      // 🔥 ثبت‌نام موفق - ایمیل رو به App برگردون
       onSuccess?.(formData.email);
     } catch {
       // Error is handled by the store
@@ -307,7 +322,7 @@ export const Register: React.FC<RegisterProps> = ({
                     type="text"
                     name="username"
                     value={formData.username}
-                    onChange={handleChange}
+                    onChange={handleUsernameChange}
                     placeholder="Choose a username"
                     disabled={isLoading}
                     className={errors.username ? styles.inputError : undefined}
@@ -353,7 +368,6 @@ export const Register: React.FC<RegisterProps> = ({
                 </div>
               </div>
 
-              {/* فیلد جدید ایمیل */}
               <div className={styles.formGroup}>
                 <label htmlFor="email">Email Address</label>
                 <div className={styles.inputWrap}>
@@ -405,7 +419,6 @@ export const Register: React.FC<RegisterProps> = ({
                   </button>
                 </div>
 
-                {/* Password Strength Meter */}
                 {formData.password && (
                   <div className={styles.strengthContainer}>
                     <div className={styles.strengthBars}>
@@ -433,7 +446,6 @@ export const Register: React.FC<RegisterProps> = ({
                   </div>
                 )}
 
-                {/* لیست معیارها */}
                 {isPasswordFocused && formData.password && (
                   <ul className={styles.criteriaList}>
                     <li className={formData.password.length >= 8 ? styles.met : styles.unmet}>

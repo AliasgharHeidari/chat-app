@@ -1,3 +1,4 @@
+// frontend/src/components/profile/ProfileEditor.tsx
 import React, { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { api } from "@/api/rest";
@@ -26,6 +27,9 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
     profile_pic_url: "",
   });
 
+  // 🔥 Regex برای فقط انگلیسی
+  const englishOnlyRegex = /^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+
   useEffect(() => {
     if (user) {
       setFormData({
@@ -43,7 +47,16 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // 🔥 فقط برای username اعمال کن
+    if (name === "username") {
+      if (value === "" || englishOnlyRegex.test(value)) {
+        setFormData({ ...formData, [name]: value });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,6 +96,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
               onChange={handleChange}
               minLength={3}
               maxLength={50}
+              placeholder="English letters, numbers, and special characters only"
             />
           </div>
 

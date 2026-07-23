@@ -29,23 +29,23 @@ func Start() {
 		Format: "[${time}] ${status} - ${method} ${path}\n",
 	}))
 
-
 	api := app.Group("/auth")
 	api.Post("/register", authHandler.Register)
 	api.Post("/login", authHandler.Login)
 	api.Post("/google", authHandler.GoogleLogin)
-	
 
 	api.Post("/verify-email", authHandler.VerifyEmail)
 	api.Post("/resend-verification", authHandler.ResendVerification)
 
-	
 	app.Get("/ws/chat", Websocket.WebSocketHandler)
 
-	
 	protected := app.Group("/chat", middleware.Protected)
 	protected.Get("/me", profileHandler.GetProfile)
 	protected.Put("/me", profileHandler.ModifyProfile)
+
+	// Modify Password
+	protected.Put("/change-password", authHandler.ChangePassword)
+
 	protected.Get("/users/search", handler.SearchUsers)
 	protected.Get("/users/:username", handler.GetUserByUsername)
 

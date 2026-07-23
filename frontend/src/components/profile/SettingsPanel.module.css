@@ -267,12 +267,12 @@
 }
 
 [data-theme="dark"] .userName {
-  color: #f1f5f4;
+  color: #ebf3f1;
 }
 
 .userUsername {
   font-size: 13px;
-  color: #5c6b5c;
+  color: #505050;
   margin-top: 1px;
 }
 
@@ -282,7 +282,7 @@
 
 .userBio {
   font-size: 12.5px;
-  color: #6b6b6b;
+  color: hsl(0, 0%, 21%);
   margin-top: 5px;
   line-height: 1.4;
   display: -webkit-box;
@@ -292,7 +292,7 @@
 }
 
 [data-theme="dark"] .userBio {
-  color: #94a3b8;
+  color: #c4d1e4;
 }
 
 /* ======================================== */
@@ -304,7 +304,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6f7a6c;
+  color: #5b6359;
   margin: 0 4px 8px 4px;
 }
 

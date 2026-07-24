@@ -31,3 +31,26 @@ func ModifyMessage(messageID uint, newText string) error {
 	return nil
 
 }
+
+func MarkMessageAsSeen(messageID uint) error {
+	db := postgres.GetDB()
+
+	now := time.Now()
+	updates := map[string]interface{}{
+		"status":     "seen",
+		"seen_at":    now,
+		"updated_at": now,
+	}
+
+	res := db.Model(&model.Message{}).Where("id = ?", messageID).Updates(updates)
+
+	if res.Error != nil {
+		return customError.InternalErr
+	}
+
+	if res.RowsAffected == 0 {
+		return customError.MessageNotFoundErr
+	}
+
+	return nil
+}

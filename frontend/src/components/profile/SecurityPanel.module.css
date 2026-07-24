@@ -1,0 +1,558 @@
+/* frontend/src/components/profile/SecurityPanel.module.css */
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border-radius: 24px;
+  padding: 32px;
+  max-width: 440px;
+  width: 90%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+[data-theme="dark"] .panel {
+  background: rgba(20, 30, 45, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+[data-theme="dark"] .header h2 {
+  color: #e8e8e8;
+}
+
+.closeBtn {
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  cursor: pointer;
+  color: #333;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .closeBtn {
+  color: #ccc;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.6);
+  transform: rotate(90deg);
+}
+
+.backBtnHeader {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.backBtnHeader:hover {
+  color: #1a1a1a;
+}
+
+[data-theme="dark"] .backBtnHeader {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .backBtnHeader:hover {
+  color: #e8e8e8;
+}
+
+.content {
+  padding: 0;
+}
+
+.subtitle {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  color: #afb6c0;
+}
+
+[data-theme="dark"] .subtitle {
+  color: #94a3b8;
+}
+
+/* ======================================== */
+/*          📋 لیست گزینه‌ها                */
+/* ======================================== */
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.optionItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.optionItem:hover:not(.disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(2px);
+}
+
+.optionItem:active:not(.disabled) {
+  transform: scale(0.98);
+}
+
+.optionItem.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+[data-theme="dark"] .optionItem {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .optionItem:hover:not(.disabled) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.optionIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(102, 126, 234, 0.12);
+  color: #667eea;
+}
+
+[data-theme="dark"] .optionIcon {
+  background: rgba(102, 126, 234, 0.08);
+}
+
+.optionContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.optionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+[data-theme="dark"] .optionTitle {
+  color: #e8e8e8;
+}
+
+.optionDesc {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+.optionArrow {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.optionBadge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: rgba(100, 116, 139, 0.15);
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .optionBadge {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+}
+
+/* ======================================== */
+/*          📝 فرم تغییر پسورد              */
+/* ======================================== */
+.error {
+  background: rgba(255, 107, 107, 0.12);
+  color: #ffb3b3;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  border-left: 3px solid #ff6b6b;
+  font-size: 13px;
+}
+
+.success {
+  background: rgba(46, 204, 113, 0.12);
+  color: #8effc1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  border-left: 3px solid #2ecc71;
+  font-size: 13px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formGroup label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #9ca9bb;
+}
+
+[data-theme="dark"] .formGroup label {
+  color: #94a3b8;
+}
+
+/* ======================================== */
+/*          🔐 Password Input               */
+/* ======================================== */
+
+.passwordInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordInputWrapper input {
+  width: 100%;
+  padding: 10px 14px;
+  padding-right: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.05);
+  color: #1a1a1a;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+[data-theme="dark"] .passwordInputWrapper input {
+  color: #e8e8e8;
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.passwordInputWrapper input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.passwordInputWrapper input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.togglePasswordBtn {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  border-radius: 8px;
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+
+.togglePasswordBtn:hover {
+  color: #1a1a1a;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .togglePasswordBtn:hover {
+  color: #e8e8e8;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ======================================== */
+/*          🔐 Password Strength Meter      */
+/* ======================================== */
+
+.strengthContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.strengthBars {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.strengthBar {
+  height: 4px;
+  flex: 1;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.08);
+  transition: background 0.3s ease;
+}
+
+[data-theme="dark"] .strengthBar {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.strengthBar.active {
+  background: var(--strength-color, #2ecc71);
+}
+
+.strengthLabel {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 60px;
+  text-align: right;
+}
+
+/* ======================================== */
+/*          📋 لیست معیارها                  */
+/* ======================================== */
+
+.criteriaList {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 12px;
+  color: #94a3b8;
+  animation: slideDown 0.25s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.criteriaList li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.criteriaIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  flex-shrink: 0;
+}
+
+.met {
+  color: #2ecc71;
+}
+
+.unmet {
+  color: #ff6b6b;
+}
+
+/* ======================================== */
+/*          🔙 دکمه برگشت                   */
+/* ======================================== */
+.backBtn {
+  margin-top: 20px;
+  padding: 10px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  font-size: 14px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: center;
+}
+
+.backBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #1a1a1a;
+}
+
+[data-theme="dark"] .backBtn {
+  color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .backBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e8e8e8;
+}
+
+/* ======================================== */
+/*          🔘 Submit Button                */
+/* ======================================== */
+.submitBtn {
+  margin-top: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, #6caf66, #89cca6);
+  color: rgb(238, 236, 236);
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+[data-theme="dark"] .submitBtn {
+  margin-top: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, #3d51c5, #234b86);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(25, 175, 70, 0.35);
+}
+
+[data-theme="dark"] .submitBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35);
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ======================================== */
+/*          📱 ریسپانسیو                    */
+/* ======================================== */
+@media (max-width: 480px) {
+  .panel {
+    padding: 24px 20px;
+    max-width: 100%;
+    width: 95%;
+    border-radius: 20px;
+  }
+
+  .optionItem {
+    padding: 12px 14px;
+  }
+
+  .optionIcon {
+    width: 36px;
+    height: 36px;
+  }
+}

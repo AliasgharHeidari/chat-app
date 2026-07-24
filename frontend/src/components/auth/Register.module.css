@@ -1,0 +1,773 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap");
+
+.page {
+  --ink-950: #0d1420;
+  --ink-900: #131c2b;
+  --ink-850: #1a2536;
+  --line: rgba(255, 255, 255, 0.07);
+  --text-primary: #e6e8ee;
+  --text-muted: #7d8598;
+  --accent: #2d3d52;
+  --accent-soft: #415169;
+  --accent-2: #5e6d88;
+  --danger: #ff6b6b;
+  --danger-bg: rgba(255, 107, 107, 0.12);
+  --success: #2ecc71;
+  --warning: #f1c40f;
+  --orange: #ff8c42;
+
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  background: radial-gradient(circle at 85% 15%, #1c2839 0%, var(--ink-950) 45%),
+    var(--ink-950);
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.shell {
+  width: 100%;
+  max-width: 1000px;
+  min-height: 660px;
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  background: var(--ink-900);
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--line);
+}
+
+/* ======================================== */
+/* Brand Panel                              */
+/* ======================================== */
+
+.brandPanel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 48px 44px;
+  background: linear-gradient(200deg, #1c2839 0%, var(--ink-950) 72%);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+.brandGlow {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  bottom: -160px;
+  left: -160px;
+  background: radial-gradient(circle, rgba(94, 109, 136, 0.28) 0%, transparent 70%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.brandContent {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  gap: 40px;
+}
+
+.brandHeader,
+.mobileLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logoMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--accent-soft), var(--accent));
+  color: #e6e8ee;
+  flex-shrink: 0;
+}
+
+.brandName {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+.brandCopy {
+  max-width: 320px;
+}
+
+.brandHeading {
+  font-family: "Sora", sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+
+.brandTagline {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.bubbleStack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 280px;
+}
+
+.bubble {
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 13.5px;
+  line-height: 1.4;
+  width: fit-content;
+  animation: floatIn 0.6s ease both;
+}
+
+.bubbleIncoming {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 4px;
+  align-self: flex-start;
+  color: var(--text-primary);
+}
+
+.bubbleOutgoing {
+  background: linear-gradient(135deg, var(--accent-soft), var(--ink-850));
+  border-bottom-right-radius: 4px;
+  align-self: flex-end;
+  color: #e6e8ee;
+  animation-delay: 0.15s;
+}
+
+.typingBubble {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  animation-delay: 0.3s;
+}
+
+.typingDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  animation: bounceDot 1.2s infinite ease-in-out;
+}
+
+.typingDot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typingDot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes bounceDot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ======================================== */
+/* Form Panel                               */
+/* ======================================== */
+
+.formPanel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 44px 40px;
+  background: var(--ink-900);
+}
+
+.formWrap {
+  width: 100%;
+  max-width: 380px;
+}
+
+.mobileLogo {
+  display: none;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+}
+
+.title {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: "Sora", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  margin: 8px 0 24px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.error {
+  background: var(--danger-bg);
+  color: #ffb3b3;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  border-left: 3px solid var(--danger);
+  font-size: 13.5px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formGroup label {
+  font-weight: 500;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 14px;
+  display: flex;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.formGroup input,
+.formGroup textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-primary);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.inputWrap input {
+  padding-left: 42px;
+}
+
+.formGroup input::placeholder,
+.formGroup textarea::placeholder {
+  color: #4c5468;
+}
+
+.formGroup input:hover,
+.formGroup textarea:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: var(--accent-2);
+  background: rgba(45, 61, 82, 0.25);
+  box-shadow: 0 0 0 3px rgba(65, 81, 105, 0.28);
+}
+
+.formGroup input:focus-visible,
+.formGroup textarea:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 1px;
+}
+
+.formGroup input:disabled,
+.formGroup textarea:disabled {
+  background-color: rgba(255, 255, 255, 0.015);
+  cursor: not-allowed;
+}
+
+.plainInput {
+  padding: 11px 14px !important;
+}
+
+.inputError {
+  border-color: var(--danger) !important;
+}
+
+.toggleVisibility {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.toggleVisibility:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.fieldError {
+  color: #ff8a8a;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* ======================================== */
+/* 🔐 Password Strength Meter              */
+/* ======================================== */
+
+.strengthContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 4px 0;
+}
+
+.strengthBars {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.strengthBar {
+  height: 4px;
+  flex: 1;
+  border-radius: 4px;
+  background: var(--line);
+  transition: background 0.4s ease, transform 0.2s ease;
+}
+
+.strengthBar.active {
+  background: var(--accent-2);
+  transform: scaleY(1.2);
+}
+
+.strengthLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 90px;
+  text-align: right;
+  transition: color 0.3s ease;
+  justify-content: flex-end;
+}
+
+.strengthIconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ======================================== */
+/* 📋 Criteria List                        */
+/* ======================================== */
+
+.criteriaList {
+  list-style: none;
+  padding: 8px 0 0 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  animation: slideDown 0.25s ease;
+}
+
+.criteriaList li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 12.5px;
+  transition: color 0.2s ease;
+}
+
+.criteriaIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.met {
+  color: var(--success);
+}
+
+.met .criteriaIcon {
+  color: var(--success);
+}
+
+.unmet {
+  color: var(--danger);
+}
+
+.unmet .criteriaIcon {
+  color: var(--danger);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ======================================== */
+/* 🎯 Submit Button                        */
+/* ======================================== */
+
+.submitButton {
+  margin-top: 6px;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--accent-2), var(--accent-soft));
+  color: #f4f4f7;
+  border: none;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: "Sora", sans-serif;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(29, 40, 57, 0.55);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.switchText {
+  margin-top: 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13.5px;
+}
+
+.switchButton {
+  background: none;
+  border: none;
+  color: var(--accent-2);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.switchButton:hover {
+  color: #8fa0bf;
+  text-decoration: underline;
+}
+
+/* ======================================== */
+/* 📱 Responsive                           */
+/* ======================================== */
+
+@media (max-width: 900px) {
+  .shell {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+    min-height: auto;
+    border-radius: 24px;
+  }
+  
+  .brandPanel {
+    display: none;
+  }
+  
+  .mobileLogo {
+    display: flex;
+  }
+  
+  .formPanel {
+    padding: 32px 24px;
+  }
+  
+  .formWrap {
+    max-width: 100%;
+  }
+  
+  .strengthContainer {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .strengthLabel {
+    min-width: 80px;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 16px 12px;
+  }
+  
+  .shell {
+    border-radius: 20px;
+  }
+  
+  .formPanel {
+    padding: 24px 16px;
+  }
+  
+  .title {
+    font-size: 20px;
+  }
+  
+  .brandHeading {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .strengthContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  
+  .strengthLabel {
+    justify-content: flex-start;
+    min-width: auto;
+    font-size: 11px;
+  }
+  
+  .criteriaList {
+    gap: 3px;
+  }
+  
+  .criteriaList li {
+    font-size: 11.5px;
+    padding: 3px 0;
+  }
+  
+  .criteriaIcon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .formGroup input,
+  .formGroup textarea {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+  
+  .inputWrap input {
+    padding-left: 36px;
+  }
+  
+  .submitButton {
+    font-size: 14px;
+    padding: 12px;
+  }
+  
+  .bubbleStack {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .formPanel {
+    padding: 16px 12px;
+  }
+  
+  .form {
+    gap: 12px;
+  }
+  
+  .formGroup {
+    gap: 4px;
+  }
+  
+  .strengthBars {
+    gap: 3px;
+  }
+  
+  .strengthBar {
+    height: 3px;
+  }
+}
+
+/* ======================================== */
+/* ♿ Accessibility & Reduced Motion       */
+/* ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble,
+  .typingDot,
+  .criteriaList,
+  .strengthBar {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .strengthBar.active {
+    transform: none !important;
+  }
+}
+
+/* ======================================== */
+/* 🔥 Focus States for Keyboard Navigation */
+/* ======================================== */
+
+.switchButton:focus-visible,
+.toggleVisibility:focus-visible,
+.submitButton:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 2px;
+}
+
+/* ======================================== */
+/* 🎨 Scrollbar Styling                    */
+/* ======================================== */
+
+.formWrap::-webkit-scrollbar {
+  width: 4px;
+}
+
+.formWrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.formWrap::-webkit-scrollbar-thumb {
+  background: var(--accent-soft);
+  border-radius: 4px;
+}
+
+.formWrap::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-2);
+}
+
+/* ======================================== */
+/* 📝 Textarea Specific                    */
+/* ======================================== */
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 60px;
+  max-height: 120px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.formGroup textarea:focus {
+  min-height: 70px;
+}
+
+/* ======================================== */
+/* 🏷️ Label Animation                     */
+/* ======================================== */
+
+.formGroup label {
+  transition: color 0.2s ease;
+}
+
+.formGroup:focus-within label {
+  color: var(--text-primary);
+}
+
+/* ======================================== */
+/* 💫 Error State Animation                */
+/* ======================================== */
+
+.fieldError {
+  animation: shakeError 0.3s ease;
+}
+
+@keyframes shakeError {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+/* ======================================== */
+/* 🎨 Dark Mode Enhancement               */
+/* ======================================== */
+
+@media (prefers-color-scheme: light) {
+  /* این استایل برای حالت دارک هست، نیازی به تغییر نیست */
+}

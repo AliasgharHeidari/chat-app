@@ -1,11 +1,14 @@
 package handler
 
 import (
+	"encoding/json"
 	"strconv"
+	"time"
 
 	customError "github.com/AliasgharHeidari/chat-app/internal/errors"
 	"github.com/AliasgharHeidari/chat-app/internal/model"
 	service "github.com/AliasgharHeidari/chat-app/internal/service/chat"
+	websocketPkg "github.com/AliasgharHeidari/chat-app/internal/websocket"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -59,6 +62,28 @@ func ModifyMessage(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{
 			"error": "internal server error",
 		})
+	}
+
+	// Broadcast edit event to other participant(s)
+	chat, err2 := service.GetChatByChatID(userID, updatedMessage.ChatID)
+	if err2 == nil {
+		otherID := chat.GetOtherUser(userID)
+		editedAtStr := ""
+		if updatedMessage.EditedAt != nil {
+			editedAtStr = updatedMessage.EditedAt.Format(time.RFC3339)
+		}
+		wsMsg := model.WSMessage{
+			Type: model.WSMessageMessageEdited,
+			Data: model.WSMessageEditedData{
+				MessageID: updatedMessage.ID,
+				NewText:   updatedMessage.MessageText,
+				EditedAt:  editedAtStr,
+			},
+		}
+		b, _ := json.Marshal(wsMsg)
+		// send to other participant and to the editor (in case they have other sessions)
+		websocketPkg.HubInstance.SendToUser(otherID, b)
+		websocketPkg.HubInstance.SendToUser(userID, b)
 	}
 
 	return c.Status(200).JSON(fiber.Map{

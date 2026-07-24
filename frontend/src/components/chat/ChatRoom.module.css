@@ -1,0 +1,346 @@
+/* ======================================== */
+/*          📱 ChatRoom - پالت Slate        */
+/* ======================================== */
+/* frontend/src/components/chat/ChatRoom.module.css */
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  background-color: var(--bg-primary, #ffffff);
+  overflow: hidden;
+}
+
+[data-theme="dark"] .container {
+  background-color: #1a2233;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: var(--bg-secondary, #f1f5f9);
+}
+
+/* ======================================== */
+/*          🧠 هدر کامل موبایل              */
+/* ======================================== */
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  background: transparent;
+  flex-shrink: 0;
+  gap: 12px;
+  min-height: 66px;
+}
+
+.backBtn {
+  position: absolute;
+  left: 14px;
+  z-index: 2;
+  background: rgba(148, 163, 184, 0.16);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  color: var(--text-primary, #1a1a1a);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: background 0.2s ease, transform 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.backBtn:hover {
+  background: rgba(148, 163, 184, 0.28);
+  transform: translateX(-1px);
+}
+
+.backBtn:active {
+  transform: scale(0.92) translateX(-1px);
+}
+
+[data-theme="dark"] .backBtn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-primary, #e2e8f0);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .backBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  cursor: pointer;
+  padding: 6px 14px 6px 8px;
+  min-width: 0;
+  width: fit-content;
+  max-width: calc(100% - 60px);
+  border-radius: 999px;
+  background: rgba(168, 168, 168, 0.45);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.userInfo:hover {
+  background: rgba(221, 221, 221, 0.62);
+}
+
+.userInfo:active {
+  transform: scale(0.99);
+}
+
+[data-theme="dark"] .userInfo {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .userInfo:hover {
+  background: rgba(30, 41, 59, 0.68);
+}
+
+.userText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+}
+
+.userName {
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.3s ease;
+}
+
+[data-theme="dark"] .userName {
+  color: var(--text-primary, #e2e8f0);
+}
+
+.userStatus {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: var(--text-secondary, #64748b);
+  transition: color 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="dark"] .userStatus {
+  color: var(--text-secondary, #94a3b8);
+}
+
+.userStatus.online {
+  color: #22c55e;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* ======================================== */
+/*          🔥 تایپ ایندیکیتور              */
+/* ======================================== */
+
+.userStatus.typing {
+  color: #667eea;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .userStatus.typing {
+  color: #a5b4fc;
+}
+
+/* نقطه‌های تایپ */
+.typingDots {
+  display: inline-flex;
+  gap: 2px;
+  margin-right: 4px;
+}
+
+.typingDots span {
+  animation: typingBounce 1.4s infinite ease-in-out;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.typingDots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typingDots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingBounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* هاله‌ی دور باکس پروفایل (پیل) */
+.typingGlow {
+  animation: pillGlow 1.8s ease-out infinite;
+}
+
+@keyframes pillGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(72, 100, 228, 0.5), 0 0 16px 2px rgba(102, 126, 234, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 9px rgba(102, 126, 234, 0), 0 0 22px 5px rgba(102, 126, 234, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0), 0 0 16px 2px rgba(102, 126, 234, 0.35);
+  }
+}
+
+[data-theme="dark"] .typingGlow {
+  animation: pillGlowDark 1.8s ease-out infinite;
+}
+
+@keyframes pillGlowDark {
+  0% {
+    box-shadow: 0 0 0 0 rgba(165, 180, 252, 0.55), 0 0 16px 2px rgba(165, 180, 252, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 9px rgba(165, 180, 252, 0), 0 0 24px 5px rgba(165, 180, 252, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(165, 180, 252, 0), 0 0 16px 2px rgba(165, 180, 252, 0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typingDots span {
+    animation: none !important;
+  }
+  .typingGlow,
+  [data-theme="dark"] .typingGlow {
+    animation: none !important;
+    box-shadow: 0 0 14px 3px rgba(102, 126, 234, 0.45);
+  }
+}
+
+/* ======================================== */
+/*          📦 محتوای چت                    */
+/* ======================================== */
+.chatWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* ======================================== */
+/*          📱 ریسپانسیو (موبایل)           */
+/* ======================================== */
+@media (max-width: 480px) {
+  .header {
+    padding: 8px 10px;
+    min-height: 58px;
+    gap: 8px;
+  }
+  .backBtn {
+    left: 10px;
+    width: 34px;
+    height: 34px;
+  }
+  .userInfo {
+    padding: 4px 10px 4px 6px;
+    gap: 8px;
+    max-width: calc(100% - 52px);
+  }
+  .userName {
+    font-size: 14.5px;
+  }
+  .userStatus {
+    font-size: 11.5px;
+  }
+
+  /*
+    chatWrapper رو دیگه با margin-top/height به زیر هدر هل نمی‌دیم.
+    هدر position:absolute و شفاف با بلوره تا پس‌زمینه‌ی چت (که روی
+    ChatContainer.module.css گذاشته شده) از پشتش دیده بشه. اگه
+    chatWrapper رو پایین هل بدیم، پشت هدر دیگه عکس نیست و رنگ ساده‌ی
+    .container یه باکس/نوار نشون می‌ده. فاصله‌ی لازم از هدر و باکس پیام
+    الان داخل MessageList.module.css با padding-top/padding-bottom
+    تنظیم می‌شه (چون chatWrapper هیچ کلاس message-list/message-input
+    نداره - این‌ها کامپوننت‌های جدا با CSS Module خودشون هستن).
+  */
+  .typingDots span {
+    animation: typingBounce 1.4s infinite ease-in-out !important;
+  }
+
+  .typingGlow {
+    animation: pillGlow 1.8s ease-out infinite !important;
+  }
+
+  [data-theme="dark"] .typingGlow {
+    animation: pillGlowDark 1.8s ease-out infinite !important;
+  }
+}
+
+/* 🔥 برای صفحه‌های خیلی کوچک (زیر 380px) */
+@media (max-width: 380px) {
+  .header {
+    min-height: 52px !important;
+    padding: 6px 8px !important;
+  }
+  .backBtn {
+    width: 30px !important;
+    height: 30px !important;
+    left: 8px !important;
+  }
+  .userInfo {
+    padding: 3px 8px 3px 4px !important;
+    gap: 6px !important;
+    max-width: calc(100% - 44px) !important;
+  }
+  .userName {
+    font-size: 13px !important;
+  }
+  .userStatus {
+    font-size: 10.5px !important;
+  }
+
+}

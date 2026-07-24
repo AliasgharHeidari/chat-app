@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ======================================== */
+/* 🎨 فونت‌های پروژه                      */
+/* ======================================== */
+
+/* ❌ این خط رو حذف کن (دیگه نیازی نیست) */
+/* @import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap"); */
+/* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"); */
+
+:root {
+  --font-fa: "Vazirmatn", "Segoe UI", Tahoma, sans-serif;
+  --font-en: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-emoji:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Symbola",
+    sans-serif;
+
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-message-other: #e8ecf1;
+  --bg-message-other-dark: #2d3748;
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --border-color: #c5ccd4;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #121212;
+  --bg-secondary: #1c1c1c;
+  --text-primary: #e2e8f0;
+  --text-secondary: #a0aec0;
+  --border-color: #2d3748;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ======================================== */
+/* 🌍 تنظیمات پایه                        */
+/* ======================================== */
+
+* {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-en), var(--font-emoji);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ✅ کلاس برای متون فارسی (RTL) با وزن بیشتر */
+.fa-text {
+  font-family: var(--font-fa), var(--font-emoji);
+  direction: rtl;
+  text-align: right;
+  font-weight: 500;
+}
+
+/* ✅ کلاس برای متون انگلیسی (LTR) */
+.en-text {
+  font-family: var(--font-en), var(--font-emoji);
+  direction: ltr;
+  text-align: left;
+  font-weight: 400;
+}
+
+/* ✅ اموجی‌ها */
+.emoji-text {
+  font-family: var(--font-emoji);
+}
+
+/* ======================================== */
+/* 🎨 اسکرول بار                          */
+/* ======================================== */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ✅ حذف هایلایت آبی موبایل */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ✅ بهبود خوانایی */
+p,
+span,
+div {
+  letter-spacing: 0.02em;
+}

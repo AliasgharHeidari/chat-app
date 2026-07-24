@@ -1,0 +1,192 @@
+import React, { useState, useRef, useEffect, useCallback, memo } from "react";
+import { validators } from "@/utils/validators";
+import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
+import { getSelfHostedEmojiUrl } from "@/utils/emojiAssets";
+import { EmojiText } from "@/utils/EmojiText";
+import { detectTextDirection } from "@/utils/direction";
+import styles from "./MessageInput.module.css";
+
+const MemoizedEmojiText = memo(EmojiText);
+
+interface MessageInputProps {
+  onSendMessage: (text: string) => void;
+  onTyping?: (isTyping: boolean) => void;
+  isLoading?: boolean;
+}
+
+export const MessageInput: React.FC<MessageInputProps> = ({
+  onSendMessage,
+  onTyping,
+  isLoading = false,
+}) => {
+  const [text, setText] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isDarkTheme, setIsDarkTheme] = useState(
+    () => document.documentElement.getAttribute("data-theme") === "dark",
+  );
+  const [direction, setDirection] = useState<'rtl' | 'ltr'>('ltr');
+
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isTypingRef = useRef(false);
+  const pickerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setDirection(detectTextDirection(text));
+  }, [text]);
+
+  useEffect(() => {
+    const target = document.documentElement;
+    const observer = new MutationObserver(() => {
+      setIsDarkTheme(target.getAttribute("data-theme") === "dark");
+    });
+    observer.observe(target, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const stopTyping = useCallback(() => {
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
+    }
+    isTypingRef.current = false;
+    onTyping?.(false);
+  }, [onTyping]);
+
+  const handleTyping = useCallback((value: string) => {
+    setText(value);
+    setError(null);
+    if (!isTypingRef.current) {
+      isTypingRef.current = true;
+      onTyping?.(true);
+    }
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(stopTyping, 1000);
+  }, [onTyping, stopTyping]);
+
+  const sendMessage = useCallback(() => {
+    const validationError = validators.messageText(text);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+    onSendMessage(text.trim());
+    setText("");
+    stopTyping();
+    setShowEmojiPicker(false);
+    if (inputRef.current) {
+      inputRef.current.innerText = "";
+      inputRef.current.focus();
+    }
+  }, [text, onSendMessage, stopTyping]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendMessage();
+  };
+
+  const onEmojiClick = useCallback((emojiData: any) => {
+    const inputEl = inputRef.current;
+    if (!inputEl || isLoading) return;
+
+    const newText = text + emojiData.emoji;
+    setText(newText);
+    inputEl.innerText = newText;
+    inputEl.focus();
+
+    const range = document.createRange();
+    const sel = window.getSelection();
+    range.selectNodeContents(inputEl);
+    range.collapse(false);
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+  }, [text, isLoading]);
+
+  // ✅ فونت بر اساس جهت
+  const fontFamily = direction === 'rtl' ? 'Vazirmatn, sans-serif' : 'Inter, sans-serif';
+
+  return (
+    <form onSubmit={handleSubmit} className={styles.container}>
+      {error && <div className={styles.error}>{error}</div>}
+      <div className={styles.inputWrapper}>
+        <button
+          type="button"
+          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          className={styles.emojiButton}
+          aria-label="Add emoji"
+        >
+          <svg width="22" height="22" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="4">
+            <circle cx="50" cy="50" r="42" />
+            <circle cx="35" cy="42" r="3" fill="currentColor" stroke="none" />
+            <circle cx="65" cy="42" r="3" fill="currentColor" stroke="none" />
+            <path d="M 32 58 Q 50 76 68 58" strokeLinecap="round" />
+          </svg>
+        </button>
+
+        <div className={styles.inputContainer}>
+          <div
+            className={styles.inputText}
+            dir={direction}
+            style={{
+              textAlign: direction === 'rtl' ? 'right' : 'left',
+              fontFamily, // ✅ فونت پویا
+            }}
+          >
+            <MemoizedEmojiText text={text} size={20} />
+          </div>
+
+          <div
+            ref={inputRef}
+            className={styles.hiddenInput}
+            dir={direction}
+            style={{ fontFamily }} // ✅ فونت پویا
+            contentEditable={!isLoading}
+            onInput={(e) => handleTyping(e.currentTarget.innerText || "")}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+              }
+            }}
+            suppressContentEditableWarning
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isLoading || !text.trim()}
+          className={styles.sendButton}
+          aria-label="Send message"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.4 20.6 21 12 3.4 3.4 3.4 10l12 2-12 2z" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
+
+      {showEmojiPicker && (
+        <div ref={pickerRef} className={styles.emojiPickerContainer}>
+          <EmojiPicker
+            onEmojiClick={onEmojiClick}
+            emojiStyle={EmojiStyle.APPLE}
+            theme={isDarkTheme ? Theme.DARK : Theme.LIGHT}
+            getEmojiUrl={(unified) => getSelfHostedEmojiUrl(unified)}
+            searchPlaceholder="Search emoji..."
+            previewConfig={{ showPreview: true, defaultEmoji: "😊" }}
+          />
+        </div>
+      )}
+    </form>
+  );
+};

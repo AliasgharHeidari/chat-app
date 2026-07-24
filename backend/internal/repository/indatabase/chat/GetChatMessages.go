@@ -12,16 +12,17 @@ func GetChatMessages(chatID uint, currentUserID uint, limit, offset int) ([]mode
 	var messages []model.Message
 
 	res := db.
-	Preload("Sender").
-	Where("chat_id = ? AND is_deleted = ? AND deleted_for IS NULL OR deleted_for != ?", chatID, false, currentUserID).
-	Limit(limit).
-	Offset(offset).
-	Find(&messages)
+		Preload("Sender").
+		Select("id, chat_id, sender_id, message_text, status, is_edited, is_deleted, deleted_for, seen_at, created_at, updated_at, link_preview").
+		Where("chat_id = ? AND is_deleted = ? AND (deleted_for IS NULL OR deleted_for != ?)", chatID, false, currentUserID).
+		Order("created_at DESC").
+		Limit(limit).
+		Offset(offset).
+		Find(&messages)
 
 	if res.Error != nil {
 		return nil, customError.InternalErr
 	}
 
 	return messages, nil
-
 }

@@ -1,5 +1,6 @@
 package model
 
+
 type WSMessageType string
 
 const (
@@ -20,13 +21,14 @@ type WSMessage struct {
 }
 
 type WSNewMessageData struct {
-	MessageID   uint   `json:"message_id"`
-	ChatID      uint   `json:"chat_id"`
-	SenderID    uint   `json:"sender_id"`
-	SenderName  string `json:"sender_name"`
-	MessageText string `json:"message_text"`
-	Status      string `json:"status"`
-	CreatedAt   string `json:"created_at"`
+	MessageID   uint                   `json:"message_id"`
+	ChatID      uint                   `json:"chat_id"`
+	SenderID    uint                   `json:"sender_id"`
+	SenderName  string                 `json:"sender_name"`
+	MessageText string                 `json:"message_text"`
+	Status      string                 `json:"status"`
+	CreatedAt   string                 `json:"created_at"`
+	LinkPreview *LinkPreviewData `json:"link_preview,omitempty"`
 }
 
 type WSMessageStatusData struct {

@@ -1,0 +1,141 @@
+import React, { useState } from "react";
+import { useChat } from "@/hooks/useChat";
+import type { Chat } from "@/types";
+import { Avatar } from "@/components/common/Avatar";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import styles from "./UserList.module.css";
+
+interface UserListProps {
+  chats: Chat[];
+  currentChat: Chat | null;
+  currentUserId: number;
+  isLoading?: boolean;
+  onChatSelect: (chat: Chat) => void;
+  onNewChat?: () => void;
+}
+
+export const UserList: React.FC<UserListProps> = ({
+  chats,
+  currentChat,
+  currentUserId,
+  isLoading = false,
+  onChatSelect,
+  onNewChat,
+}) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const { isUserOnline } = useChat();
+
+  const filteredChats = chats.filter((chat) => {
+    const otherUser = chat.user1_id === currentUserId ? chat.user2 : chat.user1;
+    if (!otherUser) return false;
+    const fullName =
+      `${otherUser.first_name} ${otherUser.last_name}`.toLowerCase();
+    return fullName.includes(searchQuery.toLowerCase());
+  });
+
+  const getOtherUser = (chat: Chat) => {
+    return chat.user1_id === currentUserId ? chat.user2 : chat.user1;
+  };
+
+  const getChatName = (chat: Chat) => {
+    const otherUser = getOtherUser(chat);
+    return otherUser
+      ? `${otherUser.first_name} ${otherUser.last_name}`
+      : "Unknown User";
+  };
+
+  const getChatInitials = (chat: Chat) => {
+    const otherUser = getOtherUser(chat);
+    if (!otherUser) return "U";
+    return `${otherUser.first_name[0]}${otherUser.last_name[0]}`.toUpperCase();
+  };
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Chats</h1>
+        <button
+          onClick={onNewChat}
+          className={styles.newChatButton}
+          title="Start new chat"
+          aria-label="Start new chat"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
+      </div>
+
+      <div className={styles.searchBox}>
+        <svg
+          className={styles.searchIcon}
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M20 20l-3.2-3.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search chats..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className={styles.searchInput}
+        />
+      </div>
+
+      <div className={styles.listContainer}>
+        {isLoading && chats.length === 0 ? (
+          <div className={styles.center}>
+            <LoadingSpinner size="small" />
+          </div>
+        ) : filteredChats.length === 0 ? (
+          <div className={styles.empty}>
+            <p>No chats yet</p>
+          </div>
+        ) : (
+          <div className={styles.list}>
+            {filteredChats.map((chat) => {
+              const otherUser = getOtherUser(chat);
+              return (
+                <div
+                  key={chat.id}
+                  className={`${styles.chatItem} ${
+                    currentChat?.id === chat.id ? styles.active : ""
+                  }`}
+                  onClick={() => onChatSelect(chat)}
+                >
+                  <Avatar
+                    size="medium"
+                    src={otherUser?.profile_pic_url}
+                    initials={getChatInitials(chat)}
+                    isOnline={isUserOnline(otherUser?.id || 0)}
+                  />
+                  <div className={styles.chatInfo}>
+                    <div className={styles.chatTopRow}>
+                      <h3 className={styles.chatName}>{getChatName(chat)}</h3>
+                    </div>
+                    <p className={styles.chatPreview}>Tap to open</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};

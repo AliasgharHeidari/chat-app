@@ -1,0 +1,591 @@
+/* ======================================== */
+/*          💬 هر پیام                      */
+/* ======================================== */
+.container {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 4px;
+  animation: slideIn 0.25s ease-out;
+}
+
+.own {
+  justify-content: flex-end;
+}
+
+.other {
+  justify-content: flex-start;
+}
+
+.messageContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 68%;
+}
+
+.messageBubble {
+  position: relative;
+  padding: 8px 12px 6px 12px;
+  border-radius: 18px;
+  word-wrap: break-word;
+}
+
+.ownBubble {
+  border-radius: 18px 18px 4px 18px;
+  background: #97a583;
+  color: #ffffff;
+}
+
+.otherBubble {
+  border-radius: 18px 18px 18px 4px;
+  background-image: linear-gradient(135deg, #b6b8b8 10%, #bec2c1 100%);
+  color: var(--text-primary, #1a1a1a);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .ownBubble {
+  background: linear-gradient(
+    90deg,
+    rgba(69, 77, 105, 0.97) 26%,
+    rgba(61, 72, 92, 1) 56%
+  );
+  color: #ffffff;
+}
+
+[data-theme="dark"] .otherBubble {
+  background-image: linear-gradient(135deg, #272727 10%, #252525 100%);
+  color: #e2e8f0;
+}
+
+.messageText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  /*
+    فونت اینجا دیگه هاردکد/!important نیست - قبلاً این خط با !important
+    همیشه روی fontFamily اینلاینِ ست‌شده در MessageItem.tsx غالب می‌شد
+    و باعث می‌شد Vazirmatn/Inter هیچ‌وقت واقعاً اعمال نشه (متن با فونت
+    پیش‌فرض ایموجی/سیستم رندر می‌شد). فونت الان کاملاً از طریق style
+    اینلاین (بر اساس جهت متن: fa یا en) کنترل می‌شه.
+    این‌جا فقط یه فالبک عمومی می‌ذاریم برای زمانی که به هر دلیلی
+    style اینلاین اعمال نشده باشه.
+  */
+  font-family: var(--font-en), var(--font-emoji);
+}
+
+.messageText img.emoji {
+  height: 1.2em;
+  width: 1.2em;
+  vertical-align: -0.2em;
+  margin: 0 1px;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  margin-top: 2px;
+  font-size: 11px;
+  opacity: 0.75;
+  line-height: 1;
+}
+
+.edited {
+  font-style: italic;
+}
+
+.time {
+  white-space: nowrap;
+}
+
+.status {
+  font-weight: bold;
+}
+
+/* ======================================== */
+/*          ✅ حالت انتخاب                   */
+/* ======================================== */
+.selectable {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-radius: 8px;
+  padding: 4px 0;
+  margin: 0 -8px;
+}
+
+.selectable:hover {
+  background-color: rgba(102, 126, 234, 0.04);
+}
+
+.selected {
+  background-color: rgba(102, 126, 234, 0.08) !important;
+}
+
+[data-theme="dark"] .selected {
+  background-color: rgba(129, 140, 248, 0.12) !important;
+}
+
+.checkboxWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.own .checkboxWrapper {
+  order: 1;
+  margin-left: 0;
+  margin-right: 4px;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color, #cbd5e1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background: var(--bg-primary, #ffffff);
+}
+
+[data-theme="dark"] .checkbox {
+  border-color: var(--border-color, #475569);
+  background: var(--bg-primary, #0f172a);
+}
+
+.checkbox.checked {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+[data-theme="dark"] .checkbox.checked {
+  background: #818cf8;
+  border-color: #818cf8;
+}
+
+.checkbox.checked svg {
+  stroke: white;
+}
+
+/* ======================================== */
+/*          📋 منوی کلیک ساده               */
+/* ======================================== */
+.menu {
+  position: absolute;
+  top: -52px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 130px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 14px;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.04);
+  z-index: 10;
+  overflow: hidden;
+  animation: menuSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 6px 0;
+}
+
+[data-theme="dark"] .menu {
+  background: rgba(30, 41, 59, 0.75);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-primary, #1a1a1a);
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease;
+  white-space: nowrap;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.menuItem:hover {
+  transform: scale(1.02);
+}
+
+.menuItem:active {
+  transform: scale(0.96);
+}
+
+[data-theme="dark"] .menuItem {
+  color: var(--text-primary, #e2e8f0);
+}
+
+.menuItem svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.menuItem:hover svg {
+  opacity: 1;
+}
+
+.editItem {
+  color: #3b82f6;
+}
+
+.editItem:hover {
+  background: rgba(59, 130, 246, 0.08);
+}
+
+[data-theme="dark"] .editItem:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.copyItem {
+  color: #10b981;
+}
+
+.copyItem:hover {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+[data-theme="dark"] .copyItem:hover {
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.deleteItem {
+  color: #ef4444;
+}
+
+.deleteItem:hover {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+[data-theme="dark"] .deleteItem:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.deleteItem {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .deleteItem {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@keyframes menuSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ======================================== */
+/*          ✏️ ویرایش                       */
+/* ======================================== */
+.editContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.editInput {
+  padding: 8px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  /* فالبک؛ فونت واقعی از style اینلاین (بر اساس جهت متن) میاد */
+  font-family: var(--font-en), var(--font-emoji);
+  font-size: 14px;
+  resize: none;
+  min-height: 60px;
+  background-color: var(--bg-primary, #ffffff);
+  color: var(--text-primary, #1a1a1a);
+}
+
+[data-theme="dark"] .editInput {
+  background-color: var(--bg-primary, #1e293b);
+  border-color: var(--border-color, #334155);
+  color: var(--text-primary, #e2e8f0);
+}
+
+.editButtons {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.saveBtn,
+.cancelBtn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.saveBtn {
+  background-color: #667eea;
+  color: white;
+}
+
+.saveBtn:hover {
+  background-color: #5568d3;
+}
+
+[data-theme="dark"] .saveBtn {
+  background-color: #475569;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .saveBtn:hover {
+  background-color: #334155;
+}
+
+.cancelBtn {
+  background-color: var(--bg-secondary, #f1f5f9);
+  color: var(--text-primary, #1a1a1a);
+}
+
+.cancelBtn:hover {
+  background-color: var(--border-color, #e2e8f0);
+}
+
+[data-theme="dark"] .cancelBtn {
+  background-color: var(--bg-secondary, #334155);
+  color: var(--text-primary, #e2e8f0);
+}
+
+[data-theme="dark"] .cancelBtn:hover {
+  background-color: var(--border-color, #475569);
+}
+
+/* frontend/src/components/chat/MessageItem.module.css */
+
+.linkPreview {
+  display: block;
+  margin-top: 6px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.2s ease;
+  max-width: 320px;
+}
+
+.linkPreview:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .linkPreview {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .linkPreview:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.linkImage {
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.linkImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.linkContent {
+  padding: 10px 14px;
+}
+
+.linkFavicon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.linkTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .linkTitle {
+  color: var(--text-primary, #e2e8f0);
+}
+
+.linkDescription {
+  font-size: 12px;
+  color: var(--text-secondary, #64748b);
+  margin-top: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .linkDescription {
+  color: var(--text-secondary, #94a3b8);
+}
+
+.linkSite {
+  font-size: 11px;
+  color: var(--text-secondary, #64748b);
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+[data-theme="dark"] .linkSite {
+  color: var(--text-secondary, #94a3b8);
+}
+
+/* Own message - lighter background */
+.ownBubble .linkPreview {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ownBubble .linkPreview:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .ownBubble .linkPreview {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ======================================== */
+/*          🎞️ انیمیشن‌ها                   */
+/* ======================================== */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ======================================== */
+/*          📱 ریسپانسیو موبایل            */
+/* ======================================== */
+@media (max-width: 768px) {
+  .messageContent {
+    max-width: 82%;
+  }
+  .messageBubble {
+    padding: 7px 10px 5px 10px;
+  }
+  .messageText {
+    font-size: 14px;
+  }
+  .metaRow {
+    font-size: 10px;
+  }
+  .menu {
+    min-width: 110px;
+    top: -44px;
+    right: 4px;
+  }
+  .menuItem {
+    padding: 8px 14px;
+    font-size: 12.5px;
+  }
+  .editInput {
+    font-size: 13px;
+    padding: 6px 10px;
+    min-height: 50px;
+  }
+  .saveBtn,
+  .cancelBtn {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .messageContent {
+    max-width: 90%;
+  }
+  .messageBubble {
+    padding: 6px 9px 5px 9px;
+  }
+  .messageText {
+    font-size: 13px;
+    line-height: 1.3;
+  }
+  .metaRow {
+    font-size: 9px;
+    gap: 4px;
+  }
+  .menu {
+    min-width: 100px;
+    top: -40px;
+    right: 2px;
+    padding: 4px 0;
+    border-radius: 12px;
+  }
+  .menuItem {
+    padding: 6px 12px;
+    font-size: 11.5px;
+    gap: 8px;
+  }
+  .menuItem svg {
+    width: 15px;
+    height: 15px;
+  }
+  .editInput {
+    font-size: 12px;
+    padding: 4px 8px;
+    min-height: 40px;
+  }
+  .saveBtn,
+  .cancelBtn {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+  .container {
+    gap: 4px;
+    margin-bottom: 3px;
+  }
+  .messageContent {
+    gap: 2px;
+  }
+}

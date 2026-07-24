@@ -1,0 +1,290 @@
+/* ======================================== */
+/*  📝 ورودی پیام — شناور روی لیست پیام‌ها  */
+/* ======================================== */
+.container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 14px 16px 14px;
+  background: transparent;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ======================================== */
+/*          ❌ خطا                          */
+/* ======================================== */
+.error {
+  color: #ef4444;
+  font-size: 12px;
+  margin-bottom: 4px;
+  padding: 0 4px;
+  pointer-events: none;
+}
+
+/* ======================================== */
+/*   📦 پیل ورودی — خودِ باکس شناور         */
+/* ======================================== */
+.inputWrapper {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+  background: var(--bg-primary, #ffffff);
+  border-radius: 26px;
+  padding: 4px 4px 4px 6px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+  transition: box-shadow 0.2s ease;
+  pointer-events: auto;
+}
+
+.inputWrapper:focus-within {
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(102, 126, 234, 0.25);
+}
+
+[data-theme="dark"] .inputWrapper {
+  background: var(--bg-secondary, #1e293b);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="dark"] .inputWrapper:focus-within {
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45), 0 0 0 2px rgba(129, 140, 248, 0.3);
+}
+
+/* ======================================== */
+/*          😊 دکمه ایموجی                  */
+/* ======================================== */
+.emojiButton {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  transition: transform 0.2s, color 0.2s;
+  color: var(--text-secondary, #64748b);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  width: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.emojiButton:hover {
+  transform: scale(1.1);
+  color: var(--text-primary, #1a1a1a);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .emojiButton {
+  color: var(--text-secondary, #94a3b8);
+}
+
+[data-theme="dark"] .emojiButton:hover {
+  color: var(--text-primary, #e2e8f0);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ======================================== */
+/*          📝 ورودی متن (با EmojiText)    */
+/* ======================================== */
+.inputContainer {
+  flex: 1;
+  position: relative;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+}
+
+.inputText {
+  padding: 9px 6px;
+  font-size: 14px;
+  line-height: 1.4;
+  min-height: 38px;
+  color: var(--text-primary, #1a1a1a);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', var(--font-fa), sans-serif;
+  pointer-events: none;
+  user-select: none;
+}
+
+.inputText :is(img, svg) {
+  vertical-align: middle;
+  display: inline-block;
+}
+
+[data-theme="dark"] .inputText {
+  color: var(--text-primary, #e2e8f0);
+}
+
+/* ✅ ورودی مخفی با contentEditable */
+.hiddenInput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 9px 6px;
+  font-size: 14px;
+  line-height: 1.4;
+  min-height: 38px;
+  outline: none;
+  border: none;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--text-primary, #1a1a1a);
+  font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', var(--font-fa), sans-serif;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  overflow: hidden;
+  z-index: 1;
+  user-select: text;
+}
+
+[data-theme="dark"] .hiddenInput {
+  caret-color: var(--text-primary, #e2e8f0);
+}
+
+/* ✅ هایلایت selection */
+.hiddenInput::selection {
+  background: rgba(102, 126, 234, 0.35);
+  color: transparent;
+}
+
+.hiddenInput::-moz-selection {
+  background: rgba(102, 126, 234, 0.35);
+  color: transparent;
+}
+
+[data-theme="dark"] .hiddenInput::selection {
+  background: rgba(129, 140, 248, 0.35);
+}
+
+[data-theme="dark"] .hiddenInput::-moz-selection {
+  background: rgba(129, 140, 248, 0.35);
+}
+
+/* ======================================== */
+/*          📤 دکمه ارسال (دایره‌ای)        */
+/* ======================================== */
+.sendButton {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  height: 38px;
+  width: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sendButton:hover:not(:disabled) {
+  transform: scale(1.06);
+}
+
+.sendButton:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.sendButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+[data-theme="dark"] .sendButton {
+  background: linear-gradient(135deg, #203553, #3D485C);
+}
+
+/* ======================================== */
+/*          📦 پنل ایموجی (لایت مود)       */
+/* ======================================== */
+.emojiPickerContainer {
+  position: absolute;
+  bottom: 78px;
+  right: 10px;
+  z-index: 1000;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  max-height: 400px;
+  animation: slideUp 0.2s ease;
+  pointer-events: auto;
+}
+
+.emojiPickerContainer .EmojiPickerReact {
+  --epr-picker-border-radius: 18px;
+  --epr-category-label-bg-color: #f8fafc;
+  --epr-bg-color: #ffffff;
+  --epr-text-color: #1a1a1a;
+  --epr-category-label-text-color: #64748b;
+  --epr-hover-bg-color: #f1f5f9;
+  --epr-emoji-variation-picker-bg-color: #ffffff;
+  width: 320px !important;
+  height: 350px !important;
+}
+
+[data-theme="dark"] .emojiPickerContainer {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .emojiPickerContainer .EmojiPickerReact {
+  --epr-bg-color: #1e293b;
+  --epr-text-color: #e2e8f0;
+  --epr-category-label-bg-color: #0f172a;
+  --epr-category-label-text-color: #94a3b8;
+  --epr-hover-bg-color: #334155;
+  --epr-emoji-variation-picker-bg-color: #1e293b;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ======================================== */
+/*          📱 ریسپانسیو موبایل            */
+/* ======================================== */
+@media (max-width: 480px) {
+  .container { padding: 8px 10px 12px 10px; }
+  .inputWrapper { gap: 2px; padding: 3px 3px 3px 4px; align-items: center; }
+  .emojiPickerContainer {
+    left: 0;
+    right: 0;
+    bottom: 64px;
+    border-radius: 16px 16px 0 0;
+    max-height: 300px;
+    border-bottom: none;
+  }
+  .emojiPickerContainer .EmojiPickerReact {
+    width: 100% !important;
+    height: 300px !important;
+    border-radius: 16px 16px 0 0;
+  }
+  .emojiButton { font-size: 19px; width: 32px; height: 32px; }
+  /* هماهنگ با ارتفاع دکمه‌های 32px، تا باکس متن ازشون بلندتر دیده نشه */
+  .inputContainer { min-height: 32px; }
+  .inputText { font-size: 13px; padding: 7px 4px; min-height: 32px; }
+  .hiddenInput { padding: 7px 4px; min-height: 32px; font-size: 13px; }
+  .sendButton { width: 32px; height: 32px; }
+}
+
+@media (max-width: 380px) {
+  .emojiButton { font-size: 17px; width: 28px; height: 28px; }
+  /* هماهنگ با ارتفاع دکمه‌های 28px */
+  .inputContainer { min-height: 28px; }
+  .inputText { font-size: 12px; min-height: 28px; }
+  .hiddenInput { min-height: 28px; font-size: 12px; }
+  .sendButton { width: 28px; height: 28px; }
+}

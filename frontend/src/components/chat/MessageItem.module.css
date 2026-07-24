@@ -45,7 +45,11 @@
 }
 
 [data-theme="dark"] .ownBubble {
-  background: linear-gradient(90deg, rgba(69, 77, 105, 0.97) 26%, rgba(61, 72, 92, 1) 56%);
+  background: linear-gradient(
+    90deg,
+    rgba(69, 77, 105, 0.97) 26%,
+    rgba(61, 72, 92, 1) 56%
+  );
   color: #ffffff;
 }
 
@@ -184,7 +188,9 @@
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 14px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.04);
   z-index: 10;
   overflow: hidden;
   animation: menuSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -210,7 +216,9 @@
   font-size: 13.5px;
   font-weight: 500;
   color: var(--text-primary, #1a1a1a);
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease;
   white-space: nowrap;
   font-family: inherit;
   width: 100%;
@@ -372,6 +380,113 @@
 
 [data-theme="dark"] .cancelBtn:hover {
   background-color: var(--border-color, #475569);
+}
+
+/* frontend/src/components/chat/MessageItem.module.css */
+
+.linkPreview {
+  display: block;
+  margin-top: 6px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.2s ease;
+  max-width: 320px;
+}
+
+.linkPreview:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .linkPreview {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .linkPreview:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.linkImage {
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.linkImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.linkContent {
+  padding: 10px 14px;
+}
+
+.linkFavicon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.linkTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .linkTitle {
+  color: var(--text-primary, #e2e8f0);
+}
+
+.linkDescription {
+  font-size: 12px;
+  color: var(--text-secondary, #64748b);
+  margin-top: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .linkDescription {
+  color: var(--text-secondary, #94a3b8);
+}
+
+.linkSite {
+  font-size: 11px;
+  color: var(--text-secondary, #64748b);
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+[data-theme="dark"] .linkSite {
+  color: var(--text-secondary, #94a3b8);
+}
+
+/* Own message - lighter background */
+.ownBubble .linkPreview {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ownBubble .linkPreview:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .ownBubble .linkPreview {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 /* ======================================== */

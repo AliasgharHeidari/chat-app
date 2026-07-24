@@ -1,3 +1,4 @@
+// frontend/src/api/socket.ts
 import type {
   WSMessage,
   WSNewMessage,
@@ -58,7 +59,7 @@ class WebSocketManager {
   private isIntentionallyClosed = false;
   private messageBuffer: WSMessage<unknown>[] = [];
   private maxBufferSize = 100;
-  private pingInterval: ReturnType<typeof setInterval> | null = null; // ✅ اصلاح شد
+  private pingInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -119,14 +120,14 @@ class WebSocketManager {
     });
   }
 
-disconnect() {
-    this.isIntentionallyClosed = true; // ✅ جلوگیری از reconnect
+  disconnect() {
+    this.isIntentionallyClosed = true;
     this.stopPingPong();
     if (this.ws) {
-        this.ws.close();
-        this.ws = null;
+      this.ws.close();
+      this.ws = null;
     }
-}
+  }
 
   private attemptReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
@@ -170,6 +171,12 @@ disconnect() {
     if (type === "pong") {
       return;
     }
+
+    // 🔥 لاگ برای دیباگ
+    if (type === "new_message") {
+      console.log("🔥 WS new_message received:", message.data);
+    }
+
     this.emit(type, message.data as WSEventMap[typeof type]);
   }
 

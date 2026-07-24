@@ -155,6 +155,7 @@ func handleMessage(client *websocketPkg.Client, msg model.WSMessage) {
 				MessageText: savedMsg.MessageText,
 				Status:      string(savedMsg.Status),
 				CreatedAt:   savedMsg.CreatedAt.Format(time.RFC3339),
+				LinkPreview: savedMsg.LinkPreview,
 			},
 		}
 

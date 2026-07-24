@@ -1,3 +1,4 @@
+// frontend/src/components/chat/MessageItem.tsx
 import React, { useState, useRef, useEffect } from "react";
 import type { Message } from "@/types";
 import { formatTime } from "@/utils/dateFormatter";
@@ -5,6 +6,15 @@ import { Avatar } from "@/components/common/Avatar";
 import { EmojiText } from "@/utils/EmojiText";
 import { detectTextDirection } from "@/utils/direction";
 import styles from "./MessageItem.module.css";
+
+interface LinkPreviewData {
+  url: string;
+  title: string;
+  description: string;
+  image: string;
+  site_name: string;
+  favicon: string;
+}
 
 interface MessageItemProps {
   message: Message;
@@ -17,11 +27,42 @@ interface MessageItemProps {
   onEdit?: (messageId: number, newText: string) => void;
   onDelete?: (messageId: number, forEveryone: boolean) => void;
   onCopy?: (text: string) => void;
-  /** آیا منوی این پیام بازه (وضعیت مشترک، از MessageList میاد) */
   isMenuOpen?: boolean;
-  /** برای باز/بستن منو - چون فقط یه منو در کل لیست باید باز باشه */
   onOpenMenuChange?: (messageId: number | null) => void;
 }
+
+// 🔥 کامپوننت Link Preview Card
+const LinkPreviewCard: React.FC<{ preview: LinkPreviewData }> = ({ preview }) => {
+  if (!preview) return null;
+
+  return (
+    <a
+      href={preview.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={styles.linkPreview}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {preview.image && (
+        <div className={styles.linkImage}>
+          <img src={preview.image} alt={preview.title || "Link preview"} />
+        </div>
+      )}
+      <div className={styles.linkContent}>
+        {preview.favicon && (
+          <img src={preview.favicon} alt="" className={styles.linkFavicon} />
+        )}
+        {preview.title && (
+          <div className={styles.linkTitle}>{preview.title}</div>
+        )}
+        {preview.description && (
+          <div className={styles.linkDescription}>{preview.description}</div>
+        )}
+        <div className={styles.linkSite}>{preview.site_name || preview.url}</div>
+      </div>
+    </a>
+  );
+};
 
 export const MessageItem: React.FC<MessageItemProps> = ({
   message,
@@ -46,8 +87,6 @@ export const MessageItem: React.FC<MessageItemProps> = ({
     return null;
   }
 
-  // ✅ فونت پیام بر اساس جهت متن، هماهنگ با MessageInput
-  // (--font-fa / --font-en / --font-emoji از index.css می‌آد)
   const direction = detectTextDirection(message.message_text);
   const fontFamily =
     direction === "rtl"
@@ -55,7 +94,6 @@ export const MessageItem: React.FC<MessageItemProps> = ({
       : "var(--font-en), var(--font-emoji)";
   const textAlign = direction === "rtl" ? "right" : "left";
 
-  // ✅ همون منطق برای حالت ویرایش پیام هم اعمال می‌شه
   const editDirection = detectTextDirection(editText);
   const editFontFamily =
     editDirection === "rtl"
@@ -63,8 +101,6 @@ export const MessageItem: React.FC<MessageItemProps> = ({
       : "var(--font-en), var(--font-emoji)";
   const editTextAlign = editDirection === "rtl" ? "right" : "left";
 
-  // ✅ با کلیک هرجای بیرون از حباب این پیام، منوش بسته بشه
-  // (به‌جای انتظار ۴ ثانیه‌ای که قبلاً بود)
   useEffect(() => {
     if (!isMenuOpen) return;
     const handleClickOutside = (event: MouseEvent) => {
@@ -81,9 +117,6 @@ export const MessageItem: React.FC<MessageItemProps> = ({
       onToggleSelect?.(message.id);
       return;
     }
-    // toggle: اگه همین پیام باز بود ببندش، وگرنه بازش کن (و چون این
-    // state تو MessageList مشترکه، خودبه‌خود منوی هر پیام دیگه‌ای که
-    // باز بوده بسته می‌شه - همیشه فقط یکی باز می‌مونه)
     onOpenMenuChange?.(isMenuOpen ? null : message.id);
   };
 
@@ -194,6 +227,12 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                 <EmojiText text={message.message_text} size={18} />
               )}
             </p>
+
+            {/* 🔥 Link Preview */}
+            {!message.is_deleted && message.link_preview && (
+              <LinkPreviewCard preview={message.link_preview} />
+            )}
+
             <div className={styles.metaRow}>
               {message.is_edited && !message.is_deleted && (
                 <span className={styles.edited}>edited</span>
@@ -209,6 +248,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                 </span>
               )}
             </div>
+
             {isMenuOpen && isOwn && !message.is_deleted && !isSelectMode && (
               <div
                 className={styles.menu}

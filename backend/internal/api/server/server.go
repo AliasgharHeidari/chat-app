@@ -58,5 +58,7 @@ func Start() {
 	protected.Put("/messages/:message_id", handler.ModifyMessage)
 	protected.Delete("/messages/:message_id", handler.DeleteMessage)
 
+	protected.Post("/link-preview", handler.GetLinkPreview)
+
 	app.Listen(cfg.Host + cfg.Port)
 }

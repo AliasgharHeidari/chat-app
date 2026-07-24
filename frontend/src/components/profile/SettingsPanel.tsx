@@ -159,16 +159,11 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   <span className={`${styles.iconBadge} ${styles.iconIndigo}`}>
                     <EditIcon />
                   </span>
-                  <span className={styles.menuLabel}>Edit Profile</span>
+                  <span className={styles.menuLabel}>Profile</span>
                   <span className={styles.arrow}>
                     <ChevronIcon />
                   </span>
                 </button>
-              </div>
-
-              {/* 🔥 جدید - گروه امنیت */}
-              <div className={styles.sectionLabel}>Security</div>
-              <div className={styles.group}>
                 <button
                   className={styles.menuItem}
                   onClick={handleSecurityOpen}
@@ -183,6 +178,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   </span>
                 </button>
               </div>
+
 
               {/* گروه: ظاهر */}
               <div className={styles.sectionLabel}>Appearance</div>

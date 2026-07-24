@@ -12,19 +12,20 @@ import (
 
 // MessageResponse transforms Message model to match frontend expectations
 type MessageResponse struct {
-	ID          uint        `json:"id"`
-	ChatID      uint        `json:"chat_id"`
-	SenderID    uint        `json:"sender_id"`
-	SenderName  string      `json:"sender_name"`
-	MessageText string      `json:"message_text"`
-	Status      string      `json:"status"`
-	IsEdited    bool        `json:"is_edited"`
-	EditedAt    interface{} `json:"edited_at,omitempty"`
-	IsDeleted   bool        `json:"is_deleted"`
-	DeletedFor  *uint       `json:"deleted_for,omitempty"`
-	SeenAt      interface{} `json:"seen_at,omitempty"`
-	CreatedAt   string      `json:"created_at"`
-	UpdatedAt   string      `json:"updated_at"`
+	ID          uint                   `json:"id"`
+	ChatID      uint                   `json:"chat_id"`
+	SenderID    uint                   `json:"sender_id"`
+	SenderName  string                 `json:"sender_name"`
+	MessageText string                 `json:"message_text"`
+	Status      string                 `json:"status"`
+	IsEdited    bool                   `json:"is_edited"`
+	EditedAt    interface{}            `json:"edited_at,omitempty"`
+	IsDeleted   bool                   `json:"is_deleted"`
+	DeletedFor  *uint                  `json:"deleted_for,omitempty"`
+	SeenAt      interface{}            `json:"seen_at,omitempty"`
+	CreatedAt   string                 `json:"created_at"`
+	UpdatedAt   string                 `json:"updated_at"`
+	LinkPreview *model.LinkPreviewData `json:"link_preview,omitempty"`
 }
 
 func transformMessage(msg *model.Message) MessageResponse {
@@ -47,6 +48,7 @@ func transformMessage(msg *model.Message) MessageResponse {
 		SeenAt:      msg.SeenAt,
 		CreatedAt:   msg.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		UpdatedAt:   msg.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		LinkPreview: msg.LinkPreview,
 	}
 }
 

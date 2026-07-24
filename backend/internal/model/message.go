@@ -25,11 +25,22 @@ type Message struct {
 	SeenAt      *time.Time    `json:"seen_at,omitempty"`
 	CreatedAt   time.Time     `json:"created_at"`
 	UpdatedAt   time.Time     `json:"updated_at"`
+	
+	LinkPreview *LinkPreviewData `gorm:"serializer:json" json:"link_preview,omitempty"`
 
 	// relations
 
 	Chat   Chat `gorm:"foreignKey:ChatID" json:"-"`
 	Sender User `gorm:"foreignKey:SenderID" json:"sender,omitempty"`
+}
+
+type LinkPreviewData struct {
+	URL         string `json:"url"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Image       string `json:"image"`
+	SiteName    string `json:"site_name"`
+	Favicon     string `json:"favicon"`
 }
 
 func (m *Message) GetDisplayText() string {

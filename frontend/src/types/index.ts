@@ -84,6 +84,16 @@ export interface Message {
   seen_at?: string;
   created_at: string;
   updated_at: string;
+  link_preview?: LinkPreviewData;
+}
+
+export interface LinkPreviewData {
+  url: string;
+  title: string;
+  description: string;
+  image: string;
+  site_name: string;
+  favicon: string;
 }
 
 export interface SendMessageRequest {
@@ -114,6 +124,7 @@ export interface WSNewMessage {
   message_text: string;
   status: MessageStatus;
   created_at: string;
+  link_preview?: LinkPreviewData; 
 }
 
 export interface WSNewMessageRequest {

@@ -1,3 +1,4 @@
+// frontend/src/hooks/useSocket.ts
 import { useEffect, useState, useCallback, useRef } from "react";
 import { wsManager } from "@/api/socket";
 import { useAuthStore } from "@/store/authStore";
@@ -98,7 +99,10 @@ export function useSocket() {
       }
     });
 
+    // 🔥 اصلاح شده با link_preview
     const unsubNewMessage = wsManager.on("new_message", (data) => {
+      console.log("🔥 WS new_message data:", data);
+      
       const message: Message = {
         id: data.message_id,
         chat_id: data.chat_id,
@@ -110,7 +114,9 @@ export function useSocket() {
         is_deleted: false,
         created_at: data.created_at,
         updated_at: data.created_at,
+        link_preview: data.link_preview, // 🔥 اضافه کن
       };
+      
       addMessage(data.chat_id, message);
       updateChatLastMessage(data.chat_id, message);
     });
@@ -133,7 +139,6 @@ export function useSocket() {
       }
     });
 
-    // ✅ اصلاح شده با لاگ
     const unsubUserStatus = wsManager.on("user_status", (data) => {
       console.log("📡 user_status received:", data);
       if (data.is_online) {
@@ -245,13 +250,13 @@ export function useSocket() {
     });
   }, []);
 
-const disconnect = useCallback(() => {
+  const disconnect = useCallback(() => {
     wsManager.disconnect();
     setIsConnected(false);
     if (user?.id) {
-        setUserOffline(user.id);
+      setUserOffline(user.id);
     }
-}, [user?.id, setUserOffline]);
+  }, [user?.id, setUserOffline]);
 
   return {
     isConnected,

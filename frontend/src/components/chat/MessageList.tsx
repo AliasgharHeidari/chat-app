@@ -156,7 +156,7 @@ export const MessageList: React.FC<MessageListProps> = ({
           <div className={styles.dateLabel}>
             {getDateLabel(group.messages[0].created_at)}
           </div>
-          {group.messages.map((message, index) => (
+          {group.messages.map((message) => (
             <MessageItem
               key={message.id}
               message={message}

@@ -10,6 +10,7 @@ import (
 	customError "github.com/AliasgharHeidari/chat-app/internal/errors"
 	"github.com/AliasgharHeidari/chat-app/internal/model"
 	indatabase "github.com/AliasgharHeidari/chat-app/internal/repository/indatabase/auth"
+	"github.com/AliasgharHeidari/chat-app/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -41,10 +42,19 @@ func Register(input model.RegisterRequest) error {
 	err := indatabase.CheckAvailability(input)
 	if errors.Is(err, customError.UsernameAlreadyExistErr) {
 		return customError.UsernameAlreadyExistErr
+	} 
+	if err != nil {
+		return customError.InternalErr
 	}
 
+		if !utils.IsGmailAddress(input.Email) {
+			return customError.InvalidEmailDomain
+		}
+
+	  normalizedEmail := utils.NormalizeGmailAddress(input.Email)
+
 	// چک کردن وجود کاربر با ایمیل
-	existingUser, err := indatabase.GetUserByEmail(input.Email)
+	existingUser, err := indatabase.GetUserByEmail(normalizedEmail)
 	if err != nil {
 		return customError.InternalErr
 	}

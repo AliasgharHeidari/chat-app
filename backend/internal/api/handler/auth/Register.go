@@ -19,13 +19,13 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	err = service.Register(RegisterInput)
-	
+
 	if errors.Is(err, customError.InternalErr) {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "internal server error, please try again later",
 		})
 	}
-	
+
 	if errors.Is(err, customError.ShortUsernameErr) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "username must have at least 5 characters",
@@ -37,13 +37,13 @@ func Register(c *fiber.Ctx) error {
 			"error": "email is required",
 		})
 	}
-	
+
 	if errors.Is(err, customError.InvalidEmailErr) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "please enter a valid email address",
 		})
 	}
-	
+
 	if errors.Is(err, customError.EmailAlreadyExistErr) {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
 			"error": "this email is already registered",
@@ -65,6 +65,12 @@ func Register(c *fiber.Ctx) error {
 	if errors.Is(err, customError.UsernameAlreadyExistErr) {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
 			"error": "this username is already taken",
+		})
+	}
+
+	if errors.Is(err, customError.InvalidEmailDomain) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "only Gmail domain is accepted",
 		})
 	}
 

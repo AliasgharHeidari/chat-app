@@ -2,6 +2,8 @@ package indatabase
 
 import (
 	"errors"
+
+	customError "github.com/AliasgharHeidari/chat-app/internal/errors"
 	"github.com/AliasgharHeidari/chat-app/internal/model"
 	postgres "github.com/AliasgharHeidari/chat-app/internal/repository"
 	"gorm.io/gorm"
@@ -12,7 +14,7 @@ func CheckAvailability(input model.RegisterRequest) error {
 	var user model.User
 	err := postgres.DB.Where("username = ?", input.Username).First(&user).Error
 	if err == nil {
-		return errors.New("username already exists")
+		return customError.UsernameAlreadyExistErr
 	}
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err

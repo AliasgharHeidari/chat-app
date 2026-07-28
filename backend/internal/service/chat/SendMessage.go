@@ -7,6 +7,7 @@ import (
 	customError "github.com/AliasgharHeidari/chat-app/internal/errors"
 	"github.com/AliasgharHeidari/chat-app/internal/model"
 	indatabase "github.com/AliasgharHeidari/chat-app/internal/repository/indatabase/chat"
+	"github.com/AliasgharHeidari/chat-app/internal/utils"
 )
 
 // 🔥 Regex برای تشخیص لینک
@@ -23,10 +24,12 @@ func SendMessage(chatID uint, senderID uint, MessageText string) (*model.Message
 		return nil, customError.AccessDeniedErr
 	}
 
+	cleanText := utils.SanitizeMessage(MessageText)
+
 	message := &model.Message{
 		ChatID:      chatID,
 		SenderID:    senderID,
-		MessageText: MessageText,
+		MessageText: cleanText,
 		Status:      model.MessageStatusSent,
 	}
 

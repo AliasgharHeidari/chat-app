@@ -42,16 +42,16 @@ func Register(input model.RegisterRequest) error {
 	err := indatabase.CheckAvailability(input)
 	if errors.Is(err, customError.UsernameAlreadyExistErr) {
 		return customError.UsernameAlreadyExistErr
-	} 
+	}
 	if err != nil {
 		return customError.InternalErr
 	}
 
-		if !utils.IsGmailAddress(input.Email) {
-			return customError.InvalidEmailDomain
-		}
+	if !utils.IsGmailAddress(input.Email) {
+		return customError.InvalidEmailDomain
+	}
 
-	  normalizedEmail := utils.NormalizeGmailAddress(input.Email)
+	normalizedEmail := utils.NormalizeGmailAddress(input.Email)
 
 	// چک کردن وجود کاربر با ایمیل
 	existingUser, err := indatabase.GetUserByEmail(normalizedEmail)
@@ -68,14 +68,27 @@ func Register(input model.RegisterRequest) error {
 		return customError.InternalErr
 	}
 
+	cleanUsername := utils.SanitizeInput(input.Username)
+	cleanFirstName := utils.SanitizeInput(input.FirstName)
+	cleanLastName := utils.SanitizeInput(input.LastName)
+	cleanBio := utils.SanitizeInput(input.Bio)
+
+	cleanInput := &model.RegisterRequest{
+		Username:  cleanUsername,
+		FirstName: cleanFirstName,
+		LastName:  cleanLastName,
+		Bio:       cleanBio,
+		Email:     normalizedEmail,
+	}
+
 	// ثبت‌نام کاربر
-	err = indatabase.Register(input, hashedPassword)
+	err = indatabase.Register(*cleanInput, hashedPassword)
 	if err != nil {
 		return customError.InternalErr
 	}
 
 	// 🔥 دریافت کاربر جدید برای ذخیره توکن
-	user, err := indatabase.GetUserByEmail(input.Email)
+	user, err := indatabase.GetUserByEmail(normalizedEmail)
 	if err != nil {
 		return customError.InternalErr
 	}

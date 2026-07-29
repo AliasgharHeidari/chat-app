@@ -7,7 +7,7 @@ import { useChatStore } from "@/store/chatStore";
 import type { Message } from "@/types";
 
 export function useSocket() {
-  const { token, user } = useAuthStore();
+  const { user } = useAuthStore();
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const wasConnectedRef = useRef(false);
@@ -63,9 +63,6 @@ export function useSocket() {
   // ============================================
 
   useEffect(() => {
-    if (!token) return;
-
-    wsManager.setToken(token);
     setIsConnecting(true);
 
     wsManager
@@ -99,10 +96,7 @@ export function useSocket() {
       }
     });
 
-    // 🔥 اصلاح شده با link_preview
     const unsubNewMessage = wsManager.on("new_message", (data) => {
-      console.log("🔥 WS new_message data:", data);
-      
       const message: Message = {
         id: data.message_id,
         chat_id: data.chat_id,
@@ -114,9 +108,9 @@ export function useSocket() {
         is_deleted: false,
         created_at: data.created_at,
         updated_at: data.created_at,
-        link_preview: data.link_preview, // 🔥 اضافه کن
+        link_preview: data.link_preview,
       };
-      
+
       addMessage(data.chat_id, message);
       updateChatLastMessage(data.chat_id, message);
     });
@@ -140,7 +134,6 @@ export function useSocket() {
     });
 
     const unsubUserStatus = wsManager.on("user_status", (data) => {
-      console.log("📡 user_status received:", data);
       if (data.is_online) {
         setUserOnline(data.user_id);
       } else {
@@ -174,7 +167,6 @@ export function useSocket() {
       unsubMessageEdited();
     };
   }, [
-    token,
     user?.id,
     currentChat,
     addMessage,

@@ -1,11 +1,10 @@
 package service
 
 import (
-	"encoding/base64"
-	"encoding/json"
+	"context"
 	"errors"
 	"fmt"
-	"net/http"
+	"log"
 	"strings"
 	"time"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/AliasgharHeidari/chat-app/internal/model"
 	auth "github.com/AliasgharHeidari/chat-app/internal/repository/indatabase/auth"
 	"github.com/golang-jwt/jwt"
+	"google.golang.org/api/idtoken"
 )
 
 type GoogleAuthService struct{}
@@ -28,89 +28,43 @@ type GoogleUserInfo struct {
 	Picture       string `json:"picture"`
 }
 
-type GooglePublicKeys struct {
-	Keys []struct {
-		Kid string `json:"kid"`
-		N   string `json:"n"`
-		E   string `json:"e"`
-	} `json:"keys"`
-}
+// VerifyGoogleToken
+// ✅ قبلاً این تابع دستی JWT رو parse می‌کرد و kid رو پیدا می‌کرد ولی
+// هیچ‌وقت امضای واقعی رو با کلید عمومی گوگل verify نمی‌کرد - یعنی از نظر
+// امنیتی هر توکن جعلی با aud/iss درست قبول می‌شد. پکیج رسمی
+// google.golang.org/api/idtoken این کار رو کامل و درست انجام می‌ده:
+// امضا (signature)، issuer، audience و expiry رو واقعاً چک می‌کنه.
+func (s *GoogleAuthService) VerifyGoogleToken(idTokenStr string) (*GoogleUserInfo, error) {
+	clientID := config.AppConfig.GoogleClientID
 
-func (s *GoogleAuthService) VerifyGoogleToken(idToken string) (*GoogleUserInfo, error) {
-	resp, err := http.Get("https://www.googleapis.com/oauth2/v3/certs")
+	payload, err := idtoken.Validate(context.Background(), idTokenStr, clientID)
 	if err != nil {
-		return nil, errors.New("failed to fetch Google public keys")
-	}
-	defer resp.Body.Close()
-
-	var keys GooglePublicKeys
-	if err := json.NewDecoder(resp.Body).Decode(&keys); err != nil {
-		return nil, errors.New("failed to parse Google public keys")
-	}
-
-	parts := strings.Split(idToken, ".")
-	if len(parts) != 3 {
-		return nil, errors.New("invalid token format")
+		// 🔍 لاگ موقت برای دیباگ - دقیقاً می‌گه کدوم چک شکست خورده
+		// (audience mismatch، signature نامعتبر، expired و ...).
+		// بعد از پیدا کردن علت اصلی می‌تونید این لاگ رو بردارید یا
+		// به یه سیستم لاگ‌گیری مناسب‌تر منتقلش کنید.
+		log.Printf("[GoogleAuth] token validation failed: %v", err)
+		return nil, fmt.Errorf("google token validation failed: %w", err)
 	}
 
-	headerBytes, err := base64.RawURLEncoding.DecodeString(parts[0])
-	if err != nil {
-		return nil, errors.New("invalid token header")
+	email, _ := payload.Claims["email"].(string)
+	if email == "" {
+		return nil, errors.New("email claim missing from google token")
 	}
-	var header map[string]interface{}
-	if err := json.Unmarshal(headerBytes, &header); err != nil {
-		return nil, errors.New("invalid token header")
-	}
-
-	kid, ok := header["kid"].(string)
-	if !ok {
-		return nil, errors.New("kid not found in token header")
-	}
-
-	var n, e string
-	for _, key := range keys.Keys {
-		if key.Kid == kid {
-			n = key.N
-			e = key.E
-			break
-		}
-	}
-	if n == "" || e == "" {
-		return nil, errors.New("public key not found")
-	}
-
-	claimsBytes, err := base64.RawURLEncoding.DecodeString(parts[1])
-	if err != nil {
-		return nil, errors.New("invalid token claims")
-	}
-	var claims map[string]interface{}
-	if err := json.Unmarshal(claimsBytes, &claims); err != nil {
-		return nil, errors.New("invalid token claims")
-	}
-
-	iss, ok := claims["iss"].(string)
-	if !ok || (iss != "https://accounts.google.com" && iss != "accounts.google.com") {
-		return nil, errors.New("invalid issuer")
-	}
-
-	aud, ok := claims["aud"].(string)
-	if !ok || aud != config.AppConfig.GoogleClientID {
-		return nil, errors.New("invalid audience")
-	}
-
-	exp, ok := claims["exp"].(float64)
-	if !ok || int64(exp) < time.Now().Unix() {
-		return nil, errors.New("token expired")
-	}
+	emailVerified, _ := payload.Claims["email_verified"].(bool)
+	name, _ := payload.Claims["name"].(string)
+	givenName, _ := payload.Claims["given_name"].(string)
+	familyName, _ := payload.Claims["family_name"].(string)
+	picture, _ := payload.Claims["picture"].(string)
 
 	userInfo := &GoogleUserInfo{
-		ID:            claims["sub"].(string),
-		Email:         claims["email"].(string),
-		EmailVerified: claims["email_verified"].(bool),
-		Name:          claims["name"].(string),
-		GivenName:     claims["given_name"].(string),
-		FamilyName:    claims["family_name"].(string),
-		Picture:       claims["picture"].(string),
+		ID:            payload.Subject,
+		Email:         email,
+		EmailVerified: emailVerified,
+		Name:          name,
+		GivenName:     givenName,
+		FamilyName:    familyName,
+		Picture:       picture,
 	}
 
 	return userInfo, nil

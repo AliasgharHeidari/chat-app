@@ -1,3 +1,4 @@
+// backend/internal/api/handler/websocket/websocket.go
 package handler
 
 import (
@@ -14,7 +15,6 @@ import (
 	"github.com/gofiber/websocket/v2"
 )
 
-// use the shared hub instance from websocket package
 var hub = websocketPkg.HubInstance
 
 func WebSocketHandler(c *fiber.Ctx) error {
@@ -22,7 +22,11 @@ func WebSocketHandler(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Upgrade required"})
 	}
 
-	token := c.Query("token")
+	// 👇 اول از کوکی بخون، اگه نبود fallback به query (برای سازگاری با کدهای قدیمی/تست)
+	token := c.Cookies("auth_token")
+	if token == "" {
+		token = c.Query("token")
+	}
 	if token == "" {
 		return c.Status(401).JSON(fiber.Map{"error": "Token required"})
 	}
@@ -31,15 +35,12 @@ func WebSocketHandler(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(401).JSON(fiber.Map{"error": "Invalid token"})
 	}
-
 	userID := claims.UserID
 
 	return websocket.New(func(conn *websocket.Conn) {
 		client := websocketPkg.NewClient(userID, conn)
 		hub.Register(client)
 
-		// Notify existing clients about this user's online status (exclude self)
-		// and send current online users to newly connected client
 		online := hub.GetOnlineUsers()
 		for _, uid := range online {
 			if uid == client.ID {
@@ -56,7 +57,6 @@ func WebSocketHandler(c *fiber.Ctx) error {
 			client.Send <- b
 		}
 
-		// Broadcast that this client is now online to others
 		onlineMsg := model.WSMessage{
 			Type: model.WSMessageUserStatus,
 			Data: model.WSUserStatusData{
@@ -67,13 +67,9 @@ func WebSocketHandler(c *fiber.Ctx) error {
 		onlineBytes, _ := json.Marshal(onlineMsg)
 		hub.Broadcast(onlineBytes, client.ID)
 
-		// done is closed the moment the read loop dies (connection closed/error).
-		// This lets the write loop below stop waiting on client.Send and return,
-		// which in turn runs the deferred cleanup/offline-broadcast.
 		done := make(chan struct{})
 
 		defer func() {
-			// On disconnect, unregister and broadcast offline status
 			hub.Unregister(client)
 			lastSeen := time.Now().Format(time.RFC3339)
 			offlineMsg := model.WSMessage{

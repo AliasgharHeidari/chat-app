@@ -48,8 +48,21 @@ func GoogleLogin(c *fiber.Ctx) error {
 		})
 	}
 
+	// 🔥 تنظیم کوکی HttpOnly
+	cookie := &fiber.Cookie{
+		Name:     "auth_token",
+		Value:    token,
+		HTTPOnly: true,
+		Secure:   false, // توی تولید true کن
+		SameSite: "Strict",
+		MaxAge:   24 * 60 * 60, // ۲۴ ساعت
+		Path:     "/",
+	}
+	c.Cookie(cookie)
+
+	// ❌ دیگه توکن رو توی JSON برنمی‌گردونیم
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"user":  user,
-		"token": token,
+		"message": "google login successful",
+		"user":    user,
 	})
 }

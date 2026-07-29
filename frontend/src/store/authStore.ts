@@ -1,50 +1,38 @@
+// frontend/src/store/authStore.ts
 import { create } from "zustand";
 import type { User } from "@/types";
 import { api } from "@/api/rest";
 
 interface AuthStore {
   user: User | null;
-  token: string | null;
   isLoading: boolean;
   error: string | null;
   setUser: (user: User | null) => void;
-  setToken: (token: string | null) => void;
   setError: (error: string | null) => void;
   register: (
     username: string,
     firstName: string,
     lastName: string,
-    email: string, // 🔥 جدید
+    email: string,
     password: string,
   ) => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
-  loginWithGoogle: (idToken: string) => Promise<void>; // 🔥 جدید
-  verifyEmail: (email: string, code: string) => Promise<void>; // 🔥 جدید
-  resendVerification: (email: string) => Promise<void>; // 🔥 جدید
-  logout: () => void;
+  loginWithGoogle: (idToken: string) => Promise<void>;
+  verifyEmail: (email: string, code: string) => Promise<void>;
+  resendVerification: (email: string) => Promise<void>;
+  logout: () => Promise<void>;
   getCurrentUser: () => Promise<void>;
   updateProfile: (updates: Partial<User>) => Promise<void>;
 }
 
-const initialToken = localStorage.getItem("auth_token");
-if (initialToken) {
-  api.setToken(initialToken);
-}
-
 export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
-  token: initialToken,
   isLoading: false,
   error: null,
 
   setUser: (user) => set({ user }),
-  setToken: (token) => {
-    api.setToken(token);
-    set({ token });
-  },
   setError: (error) => set({ error }),
 
-  // 🔥 ثبت‌نام با ایمیل
   register: async (username, firstName, lastName, email, password) => {
     set({ isLoading: true, error: null });
     try {
@@ -68,13 +56,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
   login: async (username, password) => {
     set({ isLoading: true, error: null });
     try {
-      const result = await api.login({ username, password });
-      set({
-        user: result.user,
-        token: result.token,
-        isLoading: false,
-      });
-      api.setToken(result.token);
+      const { user } = await api.login({ username, password });
+      set({ user, isLoading: false });
     } catch (error) {
       set({
         error: api.getErrorMessage(error),
@@ -84,17 +67,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
     }
   },
 
-  // 🔥 جدید - لاگین با گوگل
   loginWithGoogle: async (idToken) => {
     set({ isLoading: true, error: null });
     try {
-      const result = await api.loginWithGoogle(idToken);
-      set({
-        user: result.user,
-        token: result.token,
-        isLoading: false,
-      });
-      api.setToken(result.token);
+      const { user } = await api.loginWithGoogle(idToken);
+      set({ user, isLoading: false });
     } catch (error) {
       set({
         error: api.getErrorMessage(error),
@@ -104,7 +81,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
     }
   },
 
-  // 🔥 جدید - تایید ایمیل
   verifyEmail: async (email, code) => {
     set({ isLoading: true, error: null });
     try {
@@ -119,7 +95,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
     }
   },
 
-  // 🔥 جدید - ارسال مجدد کد تایید
   resendVerification: async (email) => {
     set({ isLoading: true, error: null });
     try {
@@ -134,27 +109,38 @@ export const useAuthStore = create<AuthStore>((set) => ({
     }
   },
 
-  logout: () => {
-    set({
-      user: null,
-      token: null,
-      error: null,
-    });
-    api.setToken(null);
-  },
+// frontend/src/store/authStore.ts
 
-  getCurrentUser: async () => {
+logout: async () => {
+    set({ isLoading: true });
+    try {
+        await api.logout();
+        set({ 
+            user: null, 
+            isLoading: false,
+            error: null 
+        });
+    } catch (error) {
+        // 🔥 حتی اگه خطا باشه، کاربر رو پاک کن
+        set({ 
+            user: null, 
+            isLoading: false,
+            error: api.getErrorMessage(error) 
+        });
+    }
+},
+
+getCurrentUser: async () => {
     set({ isLoading: true });
     try {
       const user = await api.getProfile();
       set({ user, isLoading: false });
     } catch (error) {
-      set({
-        error: api.getErrorMessage(error),
-        isLoading: false,
-      });
+      // 🔥 این یه چک پس‌زمینه‌ست (silent session check)، نه اقدام مستقیم کاربر
+      // نباید error رو ست کنیم، چون باعث نمایش پیام گمراه‌کننده میشه
+      set({ user: null, isLoading: false });
     }
-  },
+},
 
   updateProfile: async (updates) => {
     set({ isLoading: true, error: null });

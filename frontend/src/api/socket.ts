@@ -13,6 +13,7 @@ import type {
 } from "@/types";
 
 type WSEventHandler<T = unknown> = (data: T) => void;
+
 type WSEventType =
   | "new_message"
   | "message_status"
@@ -51,7 +52,6 @@ interface WSSendMap {
 class WebSocketManager {
   private ws: WebSocket | null = null;
   private url: string;
-  private token: string | null = null;
   private handlers: Map<WSEventType, Set<WSEventHandler<unknown>>> = new Map();
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
@@ -66,24 +66,22 @@ class WebSocketManager {
     this.url = apiUrl.replace(/^http/, "ws");
   }
 
-  setToken(token: string | null) {
-    this.token = token;
-  }
+  // 🔥 توکن دیگه از جاوااسکریپت خونده نمی‌شه.
+  // کوکی auth_token با HttpOnly ست شده، پس اصلاً در دسترس document.cookie نیست
+  // و لازم هم نیست باشه — مرورگر خودش موقع handshake وب‌سوکت، کوکی رو می‌فرسته.
 
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (!this.token) {
-        reject(new Error("Token not set"));
-        return;
-      }
-
       try {
         this.isIntentionallyClosed = false;
-        const wsUrl = `${this.url}/ws/chat?token=${this.token}`;
+
+        // 👇 دیگه چیزی به URL اضافه نمی‌کنیم؛ کوکی HttpOnly خودکار همراه درخواست میره
+        const wsUrl = `${this.url}/ws/chat`;
+        console.log("🔌 Connecting to WebSocket");
         this.ws = new WebSocket(wsUrl);
 
         this.ws.onopen = () => {
-          console.log("WebSocket connected");
+          console.log("✅ WebSocket connected");
           this.reconnectAttempts = 0;
           this.startPingPong();
           this.flushMessageBuffer();
@@ -101,13 +99,13 @@ class WebSocketManager {
         };
 
         this.ws.onerror = (event) => {
-          console.error("WebSocket error:", event);
+          console.error("❌ WebSocket error:", event);
           this.emit("error", { message: "WebSocket connection error" });
           reject(new Error("WebSocket connection failed"));
         };
 
         this.ws.onclose = () => {
-          console.log("WebSocket disconnected");
+          console.log("🔌 WebSocket disconnected");
           this.stopPingPong();
           if (!this.isIntentionallyClosed) {
             this.emit("disconnect", undefined);
@@ -131,17 +129,15 @@ class WebSocketManager {
 
   private attemptReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error("Max reconnect attempts reached");
+      console.error("❌ Max reconnect attempts reached");
       this.emit("error", {
         message: "Connection lost. Please refresh the page.",
       });
       return;
     }
-
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-    console.log(`Attempting to reconnect in ${delay}ms...`);
-
+    console.log(`🔄 Attempting to reconnect in ${delay}ms...`);
     setTimeout(() => {
       if (!this.isIntentionallyClosed) {
         this.connect().catch((error) => {
@@ -171,12 +167,6 @@ class WebSocketManager {
     if (type === "pong") {
       return;
     }
-
-    // 🔥 لاگ برای دیباگ
-    if (type === "new_message") {
-      console.log("🔥 WS new_message received:", message.data);
-    }
-
     this.emit(type, message.data as WSEventMap[typeof type]);
   }
 
@@ -195,7 +185,6 @@ class WebSocketManager {
       data,
       timestamp: Date.now(),
     };
-
     if (this.isConnected() && this.ws) {
       try {
         this.ws.send(JSON.stringify(message));

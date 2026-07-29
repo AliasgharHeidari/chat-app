@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "@/hooks/useAuth";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
@@ -63,6 +63,23 @@ export const Login: React.FC<LoginProps> = ({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
+
+  // ✅ GoogleLogin فقط عرض پیکسلی قبول می‌کنه، نه درصد ("100%" باعث
+  // وارنینگ "Provided button width is invalid" می‌شد). این‌جا عرض
+  // واقعی wrapper رو اندازه می‌گیریم و به‌صورت عدد پاس می‌دیم.
+  const googleButtonWrapperRef = useRef<HTMLDivElement>(null);
+  const [googleButtonWidth, setGoogleButtonWidth] = useState(320);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (googleButtonWrapperRef.current) {
+        setGoogleButtonWidth(googleButtonWrapperRef.current.offsetWidth);
+      }
+    };
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -161,7 +178,7 @@ export const Login: React.FC<LoginProps> = ({
               </div>
             )}
 
-            <div className={styles.googleButtonWrapper}>
+            <div className={styles.googleButtonWrapper} ref={googleButtonWrapperRef}>
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={handleGoogleError}
@@ -170,7 +187,7 @@ export const Login: React.FC<LoginProps> = ({
                 size="large"
                 text="continue_with"
                 shape="pill"
-                width="100%"
+                width={String(googleButtonWidth)}
               />
             </div>
 

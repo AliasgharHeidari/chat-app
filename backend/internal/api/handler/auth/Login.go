@@ -1,3 +1,4 @@
+// backend/internal/api/handler/auth/Login.go
 package handler
 
 import (
@@ -5,7 +6,8 @@ import (
 
 	customError "github.com/AliasgharHeidari/chat-app/internal/errors"
 	"github.com/AliasgharHeidari/chat-app/internal/model"
-	service "github.com/AliasgharHeidari/chat-app/internal/service/auth"
+	authService "github.com/AliasgharHeidari/chat-app/internal/service/auth"
+	service "github.com/AliasgharHeidari/chat-app/internal/service/chat"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -18,32 +20,31 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	token, err := service.Login(input)
-	
+	token, err := authService.Login(input)
+
 	if errors.Is(err, customError.InternalErr) {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "unexpected error, please try again in a while",
 		})
 	}
-	
+
 	if errors.Is(err, customError.ShortPasswordErr) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "password must be at least 8 characters",
 		})
 	}
-	
+
 	if errors.Is(err, customError.InvalidCredenntialsErr) {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "invalid username or password",
 		})
 	}
 
-	// 🔥 جدید - خطای تایید ایمیل
 	if err != nil && err.Error() == "please verify your email before logging in" {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"error":  "please verify your email before logging in",
-			"code":   "EMAIL_NOT_VERIFIED",
-			"email":  input.Username, // یا ایمیل کاربر رو برگردون
+			"error": "please verify your email before logging in",
+			"code":  "EMAIL_NOT_VERIFIED",
+			"email": input.Username,
 		})
 	}
 
@@ -53,7 +54,33 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(fiber.StatusAccepted).JSON(fiber.Map{
-		"token": token,
+	// 🔥 دریافت اطلاعات کاربر
+	user, err := service.GetUserByUsername(input.Username)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "internal server error",
+		})
+	}
+	if user == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "user not found",
+		})
+	}
+
+	// 🔥 تنظیم کوکی HttpOnly
+	cookie := &fiber.Cookie{
+		Name:     "auth_token",
+		Value:    token,
+		HTTPOnly: true,
+		Secure:   false, // توی production: true
+		SameSite: "Strict",
+		MaxAge:   24 * 60 * 60,
+		Path:     "/",
+	}
+	c.Cookie(cookie)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "login successful",
+		"user":    user,
 	})
 }

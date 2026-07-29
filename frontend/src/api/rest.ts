@@ -1,3 +1,4 @@
+// frontend/src/api/rest.ts
 import axios, { AxiosInstance } from "axios";
 import type {
   User,
@@ -10,7 +11,6 @@ import type {
   SendMessageRequest,
   EditMessageRequest,
   DeleteMessageRequest,
-  AuthResponse,
   SearchUsersResponse,
   GetMessagesResponse,
   VerifyEmailRequest,
@@ -21,7 +21,6 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 class ChatAPI {
   private client: AxiosInstance;
-  private token: string | null = null;
 
   constructor() {
     this.client = axios.create({
@@ -29,75 +28,48 @@ class ChatAPI {
       headers: {
         "Content-Type": "application/json",
       },
+      withCredentials: true, // 🔥 کوکی رو همراه درخواست می‌فرسته
     });
-
-    this.client.interceptors.request.use((config) => {
-      if (this.token) {
-        config.headers.Authorization = `Bearer ${this.token}`;
-      }
-      return config;
-    });
-
-    const storedToken = localStorage.getItem("auth_token");
-    if (storedToken) {
-      this.token = storedToken;
-    }
-  }
-
-  setToken(token: string | null) {
-    this.token = token;
-    if (token) {
-      localStorage.setItem("auth_token", token);
-    } else {
-      localStorage.removeItem("auth_token");
-    }
-  }
-
-  getToken() {
-    return this.token;
   }
 
   // 🔥 Auth endpoints
-  async register(data: RegisterRequest): Promise<AuthResponse> {
+  async register(data: RegisterRequest): Promise<{ message: string }> {
     const response = await this.client.post("/auth/register", data);
-    // بعد از ثبت‌نام، توکنی برنمی‌گرده (فقط پیام موفقیت)
     return response.data;
   }
 
-  async login(data: LoginRequest): Promise<AuthResponse> {
+  async login(data: LoginRequest): Promise<{ user: User }> {
     const response = await this.client.post("/auth/login", data);
-    const token = response.data.token;
-    if (!token) {
-      throw new Error("Login response did not include token");
+    // 🔥 توکن توی کوکی هست، فقط user رو برگردون
+    if (!response.data.user) {
+      throw new Error("Login response did not include user");
     }
-    this.setToken(token);
-    if (response.data.user) {
-      return { token, user: response.data.user };
-    }
-    const profileResponse = await this.client.get("/chat/me");
-    const profileData = profileResponse.data.user ?? profileResponse.data;
-    return { token, user: profileData };
+    return { user: response.data.user };
   }
 
-  // 🔥 جدید - لاگین با گوگل
-  async loginWithGoogle(idToken: string): Promise<AuthResponse> {
+  async loginWithGoogle(idToken: string): Promise<{ user: User }> {
     const response = await this.client.post("/auth/google", {
       id_token: idToken,
     });
-    const { token, user } = response.data;
-    if (token) {
-      this.setToken(token);
-    }
-    return { token, user };
+    return { user: response.data.user };
   }
 
-  // 🔥 جدید - تایید ایمیل
+// frontend/src/api/rest.ts
+
+async logout(): Promise<void> {
+    try {
+        await this.client.post("/auth/logout");
+    } catch (error) {
+        // حتی اگه خطا باشه، ignore کن (کوکی حذف میشه)
+        console.warn("Logout error:", error);
+    }
+}
+
   async verifyEmail(data: VerifyEmailRequest): Promise<{ message: string }> {
     const response = await this.client.post("/auth/verify-email", data);
     return response.data;
   }
 
-  // 🔥 جدید - ارسال مجدد کد تایید
   async resendVerification(
     data: ResendVerificationRequest,
   ): Promise<{ message: string }> {
@@ -154,7 +126,6 @@ class ChatAPI {
     return response.data;
   }
 
-  // Message endpoints
   async sendMessage(data: SendMessageRequest): Promise<Message> {
     const response = await this.client.post("/chat/messages", data);
     return response.data;
@@ -179,7 +150,6 @@ class ChatAPI {
     });
   }
 
-  // User endpoints
   async searchUsers(query: string): Promise<SearchUsersResponse[]> {
     const response = await this.client.get(`/chat/users/search?q=${query}`);
     return response.data.users ?? [];

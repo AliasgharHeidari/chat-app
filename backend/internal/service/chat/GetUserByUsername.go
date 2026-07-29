@@ -9,18 +9,12 @@ import (
 )
 
 func GetUserByUsername(username string) (*model.SearchUsersResponse, error) {
-	if len(username) < 5 {
-		return nil, nil
-	}
-
-	user, err := indatabase.GetUserByUsername(username)
+	user, err := indatabase.GetUserByUsernameForSearch(username)
 	if errors.Is(err, customError.NotFoundErr) {
 		return nil, customError.NotFoundErr
 	}
-	if errors.Is(err, customError.InternalErr) {
+	if err != nil {
 		return nil, customError.InternalErr
 	}
-
 	return user, nil
-
 }

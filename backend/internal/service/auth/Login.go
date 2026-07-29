@@ -8,7 +8,8 @@ import (
 	"github.com/AliasgharHeidari/chat-app/internal/config"
 	customError "github.com/AliasgharHeidari/chat-app/internal/errors"
 	"github.com/AliasgharHeidari/chat-app/internal/model"
-	indatabase "github.com/AliasgharHeidari/chat-app/internal/repository/indatabase/auth"
+	authIndatabase "github.com/AliasgharHeidari/chat-app/internal/repository/indatabase/auth"
+	indatabase "github.com/AliasgharHeidari/chat-app/internal/repository/indatabase/chat"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -18,7 +19,7 @@ func Login(input model.LoginRequest) (string, error) {
 		return "", customError.ShortPasswordErr
 	}
 
-	user, err := indatabase.CheckIfUserExist(input)
+	user, err := authIndatabase.CheckIfUserExist(input)
 	if errors.Is(err, customError.InvalidCredenntialsErr) {
 		return "", customError.InvalidCredenntialsErr
 	}
@@ -31,7 +32,6 @@ func Login(input model.LoginRequest) (string, error) {
 		return "", customError.InvalidCredenntialsErr
 	}
 
-	// 🔥 جدید - چک کردن تایید ایمیل
 	if !user.EmailVerified {
 		return "", errors.New("please verify your email before logging in")
 	}
@@ -51,4 +51,9 @@ func Login(input model.LoginRequest) (string, error) {
 	}
 
 	return t, nil
+}
+
+// 🔥 جدید - GetUserByUsername (برای برگردوندن user بعد از لاگین)
+func GetUserByUsername(username string) (*model.User, error) {
+	return indatabase.GetUserByUsername(username)
 }

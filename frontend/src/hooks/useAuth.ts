@@ -1,46 +1,61 @@
-import { useEffect, useState } from "react";
+// frontend/src/hooks/useAuth.ts
+import { useEffect, useState, useRef } from "react";
 import { useAuthStore } from "@/store/authStore";
+import { useNavigate } from "react-router-dom";
 
 export function useAuth() {
   const {
     user,
-    token,
     isLoading,
     error,
     login,
     logout,
     register,
-    loginWithGoogle, // 🔥 جدید
-    verifyEmail, // 🔥 جدید
-    resendVerification, // 🔥 جدید
+    loginWithGoogle,
+    verifyEmail,
+    resendVerification,
     getCurrentUser,
     updateProfile,
   } = useAuthStore();
   const [isInitialized, setIsInitialized] = useState(false);
+  const hasCheckedRef = useRef(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (token && !user) {
-      getCurrentUser().finally(() => setIsInitialized(true));
-    } else {
-      setIsInitialized(true);
+    // فقط یکبار اجرا بشه
+    if (!hasCheckedRef.current) {
+      hasCheckedRef.current = true;
+      if (!user) {
+        getCurrentUser()
+          .catch(() => {})
+          .finally(() => setIsInitialized(true));
+      } else {
+        setIsInitialized(true);
+      }
     }
-  }, [token, user, getCurrentUser]);
+  }, []); // ← وابستگی خالی
 
-  const isAuthenticated = !!token && !!user;
+  const handleLogout = async () => {
+    await logout();
+    // ریست کن برای لاگین بعدی
+    hasCheckedRef.current = false;
+    navigate("/login");
+  };
+
+  const isAuthenticated = !!user;
 
   return {
     user,
-    token,
     isLoading,
     error,
     isAuthenticated,
     isInitialized,
     login,
-    logout,
+    logout: handleLogout,
     register,
-    loginWithGoogle, // 🔥 جدید
-    verifyEmail, // 🔥 جدید
-    resendVerification, // 🔥 جدید
+    loginWithGoogle,
+    verifyEmail,
+    resendVerification,
     updateProfile,
   };
 }

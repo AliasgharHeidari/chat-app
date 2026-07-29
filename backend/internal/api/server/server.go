@@ -33,6 +33,7 @@ func Start() {
 	api.Post("/register", authHandler.Register)
 	api.Post("/login", authHandler.Login)
 	api.Post("/google", authHandler.GoogleLogin)
+	api.Post("/logout", authHandler.Logout)
 
 	api.Post("/verify-email", authHandler.VerifyEmail)
 	api.Post("/resend-verification", authHandler.ResendVerification)

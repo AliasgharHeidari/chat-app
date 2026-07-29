@@ -98,7 +98,12 @@ const EmptyState: React.FC = () => (
           strokeWidth="1.4"
           strokeLinejoin="round"
         />
-        <path d="M8 9h8M8 12.5h5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        <path
+          d="M8 9h8M8 12.5h5"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+        />
       </svg>
       <p className={styles.placeholderTitle}>Select a chat</p>
       <p className={styles.placeholderSubtitle}>
@@ -158,12 +163,14 @@ export const MainLayout: React.FC = () => {
     setShowSearchUsers(false);
   }, []);
 
-  // ✅ خروج با قطع WebSocket
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
   const handleLogout = useCallback(() => {
-    disconnect(); // WebSocket رو قطع کن
-    logout(); // خروج از حساب
-    navigate("/login");
-  }, [disconnect, logout, navigate]);
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    disconnect();
+    logout();
+  }, [disconnect, logout, navigate, isLoggingOut]);
 
   // ========================================
   // ♻️ محاسبات memoized

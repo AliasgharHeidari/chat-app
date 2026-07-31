@@ -93,8 +93,11 @@
 /* ======================================== */
 .inputContainer {
   flex: 1;
+  min-width: 0;
   position: relative;
   min-height: 38px;
+  max-height: 120px;
+  overflow-y: auto;
   display: flex;
   align-items: center;
 }
@@ -110,6 +113,7 @@
   font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', var(--font-fa), sans-serif;
   pointer-events: none;
   user-select: none;
+  overflow: hidden;
 }
 
 .inputText :is(img, svg) {
@@ -132,6 +136,8 @@
   font-size: 14px;
   line-height: 1.4;
   min-height: 38px;
+  max-height: 100%;
+  overflow-y: auto;
   outline: none;
   border: none;
   background: transparent;
@@ -140,7 +146,6 @@
   font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', var(--font-fa), sans-serif;
   word-wrap: break-word;
   white-space: pre-wrap;
-  overflow: hidden;
   z-index: 1;
   user-select: text;
 }
@@ -273,8 +278,7 @@
     border-radius: 16px 16px 0 0;
   }
   .emojiButton { font-size: 19px; width: 32px; height: 32px; }
-  /* هماهنگ با ارتفاع دکمه‌های 32px، تا باکس متن ازشون بلندتر دیده نشه */
-  .inputContainer { min-height: 32px; }
+  .inputContainer { min-height: 32px; max-height: 90px; }
   .inputText { font-size: 13px; padding: 7px 4px; min-height: 32px; }
   .hiddenInput { padding: 7px 4px; min-height: 32px; font-size: 13px; }
   .sendButton { width: 32px; height: 32px; }
@@ -282,8 +286,7 @@
 
 @media (max-width: 380px) {
   .emojiButton { font-size: 17px; width: 28px; height: 28px; }
-  /* هماهنگ با ارتفاع دکمه‌های 28px */
-  .inputContainer { min-height: 28px; }
+  .inputContainer { min-height: 28px; max-height: 80px; }
   .inputText { font-size: 12px; min-height: 28px; }
   .hiddenInput { min-height: 28px; font-size: 12px; }
   .sendButton { width: 28px; height: 28px; }

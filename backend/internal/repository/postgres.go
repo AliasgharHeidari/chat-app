@@ -38,6 +38,7 @@ func AutoMigrate() {
 		&model.Chat{},
 		&model.User{},
 		&model.Message{},
+		&model.CachedLinkPreview{},
 	); err != nil {
 		log.Fatal("failed to migrate database:", err)
 	}

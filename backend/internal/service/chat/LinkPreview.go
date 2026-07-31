@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -18,27 +19,31 @@ type LinkPreviewService struct {
 	httpClient *http.Client
 }
 
-// NewLinkPreviewService ایجاد سرویس جدید
 func NewLinkPreviewService() *LinkPreviewService {
 	return &LinkPreviewService{
 		httpClient: utils.HTTPClientWithTimeout(5 * time.Second),
 	}
 }
 
-// ExtractLinkPreview استخراج اطلاعات لینک
 func (s *LinkPreviewService) ExtractLinkPreview(rawURL string) (*model.LinkPreview, error) {
-	// ۱. اعتبارسنجی URL
+	// 🔥 ۱. اعتبارسنجی URL
 	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
 		return nil, errors.New("invalid URL")
 	}
 
-	// فقط http و https مجاز
 	if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
 		return nil, errors.New("only HTTP/HTTPS URLs are supported")
 	}
 
-	// ۲. چک کردن کش
+	// 🔥 ۲. SSRF Protection - این اولین خط دفاعیه (قبل از هر درخواست)
+	log.Printf("🔍 SSRF Check for: %s", rawURL)
+	if err := utils.ValidateURLForSSRF(rawURL); err != nil {
+		log.Printf("🚫 SSRF Blocked: %s - %v", rawURL, err)
+		return nil, errors.New("access to this URL is not allowed")
+	}
+
+	// ۳. چک کردن کش
 	cached, err := chat.GetCachedLinkPreview(rawURL)
 	if err == nil && cached != nil {
 		return &model.LinkPreview{
@@ -51,7 +56,7 @@ func (s *LinkPreviewService) ExtractLinkPreview(rawURL string) (*model.LinkPrevi
 		}, nil
 	}
 
-	// ۳. درخواست به صفحه
+	// ۴. درخواست به صفحه
 	resp, err := s.httpClient.Get(rawURL)
 	if err != nil {
 		return nil, errors.New("failed to fetch URL")
@@ -64,16 +69,15 @@ func (s *LinkPreviewService) ExtractLinkPreview(rawURL string) (*model.LinkPrevi
 		return nil, errors.New("not an HTML page")
 	}
 
-	// ۴. پارس کردن HTML
+	// ۵. پارس کردن HTML
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		return nil, errors.New("failed to parse HTML")
 	}
 
-	// ۵. استخراج اطلاعات
+	// ۶. استخراج اطلاعات
 	preview := s.extractOpenGraph(doc, rawURL)
 
-	// ۶. اگر اطلاعات Open Graph ناقص بود، از فالبک استفاده کن
 	if preview.Title == "" {
 		preview.Title = s.extractTitle(doc)
 	}

@@ -1,9 +1,11 @@
+// frontend/src/components/chat/MessageInput.tsx
 import React, { useState, useRef, useEffect, useCallback, memo } from "react";
 import { validators } from "@/utils/validators";
 import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
 import { getSelfHostedEmojiUrl } from "@/utils/emojiAssets";
 import { EmojiText } from "@/utils/EmojiText";
 import { detectTextDirection } from "@/utils/direction";
+import { wsManager } from "@/api/socket"; // 🔥 جدید - برای گوش دادن به خطای سرور
 import styles from "./MessageInput.module.css";
 
 const MemoizedEmojiText = memo(EmojiText);
@@ -13,6 +15,12 @@ interface MessageInputProps {
   onTyping?: (isTyping: boolean) => void;
   isLoading?: boolean;
 }
+
+// چند ثانیه‌ای که منتظر می‌مونیم ببینیم آیا سرور خطا برمی‌گردونه یا نه.
+// اگه ظرف این بازه خطایی نیاد، یعنی ارسال موفق بوده و دیگه چیزی رو
+// بازگردانی نمی‌کنیم (جلوگیری از بازگردانی اشتباهیِ متنِ جدیدی که
+// کاربر شروع به تایپش کرده).
+const PENDING_SEND_TIMEOUT = 4000;
 
 export const MessageInput: React.FC<MessageInputProps> = ({
   onSendMessage,
@@ -25,12 +33,16 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const [isDarkTheme, setIsDarkTheme] = useState(
     () => document.documentElement.getAttribute("data-theme") === "dark",
   );
-  const [direction, setDirection] = useState<'rtl' | 'ltr'>('ltr');
+  const [direction, setDirection] = useState<"rtl" | "ltr">("ltr");
 
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTypingRef = useRef(false);
   const pickerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
+
+  // 🔥 جدید: نگه‌داشتن متنی که همین الان ارسال شده ولی هنوز تأیید نشده
+  const pendingSentTextRef = useRef<string | null>(null);
+  const pendingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setDirection(detectTextDirection(text));
@@ -55,6 +67,44 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // 🔥 جدید: اگه سرور برای همین ارسال اخیر خطا برگردوند (مثلاً ریت‌لیمیت)،
+  // متنی که پاک کرده بودیم رو برمی‌گردونیم به باکس تایپ.
+  useEffect(() => {
+    const unsubError = wsManager.on("error", () => {
+      if (pendingSentTextRef.current === null) {
+        // هیچ ارسال در انتظار تأییدی نداریم، این خطا ربطی به ما نداره
+        return;
+      }
+
+      const restoredText = pendingSentTextRef.current;
+      pendingSentTextRef.current = null;
+      if (pendingTimeoutRef.current) {
+        clearTimeout(pendingTimeoutRef.current);
+        pendingTimeoutRef.current = null;
+      }
+
+      setText(restoredText);
+      if (inputRef.current) {
+        inputRef.current.innerText = restoredText;
+        inputRef.current.focus();
+        // کرسر رو انتهای متن ببر
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(inputRef.current);
+        range.collapse(false);
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+      }
+    });
+
+    return () => {
+      unsubError();
+      if (pendingTimeoutRef.current) {
+        clearTimeout(pendingTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const stopTyping = useCallback(() => {
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
@@ -64,16 +114,19 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     onTyping?.(false);
   }, [onTyping]);
 
-  const handleTyping = useCallback((value: string) => {
-    setText(value);
-    setError(null);
-    if (!isTypingRef.current) {
-      isTypingRef.current = true;
-      onTyping?.(true);
-    }
-    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-    typingTimeoutRef.current = setTimeout(stopTyping, 1000);
-  }, [onTyping, stopTyping]);
+  const handleTyping = useCallback(
+    (value: string) => {
+      setText(value);
+      setError(null);
+      if (!isTypingRef.current) {
+        isTypingRef.current = true;
+        onTyping?.(true);
+      }
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(stopTyping, 1000);
+    },
+    [onTyping, stopTyping],
+  );
 
   const sendMessage = useCallback(() => {
     const validationError = validators.messageText(text);
@@ -81,7 +134,21 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       setError(validationError);
       return;
     }
-    onSendMessage(text.trim());
+
+    const sentText = text.trim();
+    onSendMessage(sentText);
+
+    // 🔥 قبل از پاک کردن باکس، متن رو به‌عنوان "در انتظار تأیید" نگه می‌داریم.
+    // اگه سرور ظرف چند ثانیه خطا برگردونه (مثلاً ریت‌لیمیت)، همینو برمی‌گردونیم.
+    pendingSentTextRef.current = sentText;
+    if (pendingTimeoutRef.current) clearTimeout(pendingTimeoutRef.current);
+    pendingTimeoutRef.current = setTimeout(() => {
+      // اگه ظرف این بازه خطایی نیومد، یعنی ارسال موفق بوده؛ دیگه نیازی
+      // به نگه‌داشتنش نیست.
+      pendingSentTextRef.current = null;
+      pendingTimeoutRef.current = null;
+    }, PENDING_SEND_TIMEOUT);
+
     setText("");
     stopTyping();
     setShowEmojiPicker(false);
@@ -96,25 +163,25 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     sendMessage();
   };
 
-  const onEmojiClick = useCallback((emojiData: any) => {
-    const inputEl = inputRef.current;
-    if (!inputEl || isLoading) return;
+  const onEmojiClick = useCallback(
+    (emojiData: any) => {
+      const inputEl = inputRef.current;
+      if (!inputEl || isLoading) return;
+      const newText = text + emojiData.emoji;
+      setText(newText);
+      inputEl.innerText = newText;
+      inputEl.focus();
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.selectNodeContents(inputEl);
+      range.collapse(false);
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+    },
+    [text, isLoading],
+  );
 
-    const newText = text + emojiData.emoji;
-    setText(newText);
-    inputEl.innerText = newText;
-    inputEl.focus();
-
-    const range = document.createRange();
-    const sel = window.getSelection();
-    range.selectNodeContents(inputEl);
-    range.collapse(false);
-    sel?.removeAllRanges();
-    sel?.addRange(range);
-  }, [text, isLoading]);
-
-  // ✅ فونت بر اساس جهت
-  const fontFamily = direction === 'rtl' ? 'Vazirmatn, sans-serif' : 'Inter, sans-serif';
+  const fontFamily = direction === "rtl" ? "Vazirmatn, sans-serif" : "Inter, sans-serif";
 
   return (
     <form onSubmit={handleSubmit} className={styles.container}>
@@ -136,21 +203,10 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
         <div className={styles.inputContainer}>
           <div
-            className={styles.inputText}
-            dir={direction}
-            style={{
-              textAlign: direction === 'rtl' ? 'right' : 'left',
-              fontFamily, // ✅ فونت پویا
-            }}
-          >
-            <MemoizedEmojiText text={text} size={20} />
-          </div>
-
-          <div
             ref={inputRef}
             className={styles.hiddenInput}
-            dir={direction}
-            style={{ fontFamily }} // ✅ فونت پویا
+            dir="auto"
+            style={{ fontFamily }}
             contentEditable={!isLoading}
             onInput={(e) => handleTyping(e.currentTarget.innerText || "")}
             onKeyDown={(e) => {
@@ -161,6 +217,17 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             }}
             suppressContentEditableWarning
           />
+          <div
+            className={styles.inputText}
+            dir="auto"
+            style={{
+              textAlign: direction === "rtl" ? "right" : "left",
+              fontFamily,
+            }}
+            aria-hidden="true"
+          >
+            <MemoizedEmojiText text={text} size={20} />
+          </div>
         </div>
 
         <button

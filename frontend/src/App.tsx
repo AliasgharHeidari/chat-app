@@ -8,6 +8,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { ChatRoom } from "@/components/chat/ChatRoom";
 import { ProtectedRoute } from "@/components/common/ProtectedRoute";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { ToastContainer } from "@/components/common/Toast";
 import styles from "./App.module.css";
 
 function AppContent() {
@@ -38,14 +39,14 @@ function AppContent() {
     return (
       <div className={styles.authContainer}>
         {currentPage === "login" ? (
-          <Login 
+          <Login
             onSuccess={() => {
               window.location.href = "/";
             }}
             onSwitchToRegister={() => setCurrentPage("register")}
           />
         ) : (
-          <Register 
+          <Register
             onSuccess={() => {
               // بعد از ثبت‌نام موفق، بره به صفحه تایید ایمیل
               setCurrentPage("verify");
@@ -73,6 +74,8 @@ function App() {
   return (
     <BrowserRouter>
       <AppContent />
+      {/* 🔥 قبلاً import شده بود ولی هیچ‌جا رندر نمی‌شد، پس toast هیچ‌وقت دیده نمی‌شد */}
+      <ToastContainer />
     </BrowserRouter>
   );
 }

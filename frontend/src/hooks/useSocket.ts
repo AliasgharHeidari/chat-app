@@ -4,6 +4,7 @@ import { wsManager } from "@/api/socket";
 import { useAuthStore } from "@/store/authStore";
 import { useChat } from "./useChat";
 import { useChatStore } from "@/store/chatStore";
+import { useToast } from "./useToast"; // 🔥 جدید
 import type { Message } from "@/types";
 
 export function useSocket() {
@@ -11,6 +12,7 @@ export function useSocket() {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const wasConnectedRef = useRef(false);
+  const { show: showToast } = useToast(); // 🔥 جدید
 
   const {
     addMessage,
@@ -22,7 +24,6 @@ export function useSocket() {
     setUserNotTyping,
     currentChat,
   } = useChat();
-
   const updateChatLastMessage = useChatStore((state) => state.updateChatLastMessage);
   const loadChatMessages = useChatStore((state) => state.loadChatMessages);
   const loadChats = useChatStore((state) => state.loadChats);
@@ -30,14 +31,12 @@ export function useSocket() {
   // ============================================
   // 🧠 مدیریت قطع اتصال توسط مرورگر
   // ============================================
-
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden" && user?.id) {
         setUserOffline(user.id);
       }
     };
-
     const handleBeforeUnload = () => {
       if (user?.id) {
         setUserOffline(user.id);
@@ -48,10 +47,8 @@ export function useSocket() {
         });
       }
     };
-
     document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("beforeunload", handleBeforeUnload);
-
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -61,10 +58,8 @@ export function useSocket() {
   // ============================================
   // 🔌 اتصال WebSocket
   // ============================================
-
   useEffect(() => {
     setIsConnecting(true);
-
     wsManager
       .connect()
       .then(() => {
@@ -110,7 +105,6 @@ export function useSocket() {
         updated_at: data.created_at,
         link_preview: data.link_preview,
       };
-
       addMessage(data.chat_id, message);
       updateChatLastMessage(data.chat_id, message);
     });
@@ -156,6 +150,18 @@ export function useSocket() {
       }
     });
 
+    // 🔥 جدید: خطاهای اومده از سرور روی وب‌سوکت (شامل ریت‌لیمیت پیام)
+    // بک‌اند فعلی شما برای ریت‌لیمیت، data = { message: "..." } می‌فرسته.
+    // (اگه بعداً یه فیلد "code" هم به بک‌اند اضافه کردی، می‌تونی اینجا
+    // بر اساس data.code رفتار متفاوتی نشون بدی؛ فعلاً هر خطای این کانال
+    // رو به‌صورت toast هشدار نشون میدیم چون تنها خطای فعلی همینه.)
+    const unsubError = wsManager.on("error", (data: any) => {
+      const message =
+        (data && typeof data === "object" && data.message) ||
+        "خطایی رخ داد. لطفاً دوباره تلاش کنید.";
+      showToast(message, "warning", 3000);
+    });
+
     return () => {
       unsubConnect();
       unsubDisconnect();
@@ -165,6 +171,7 @@ export function useSocket() {
       unsubUserStatus();
       unsubMessageDeleted();
       unsubMessageEdited();
+      unsubError();
     };
   }, [
     user?.id,
@@ -177,12 +184,12 @@ export function useSocket() {
     setUserTyping,
     setUserNotTyping,
     updateChatLastMessage,
+    showToast,
   ]);
 
   // ============================================
   // 🔄 وقتی WebSocket وصل شد، داده‌ها رو رفرش کن
   // ============================================
-
   useEffect(() => {
     if (isConnected) {
       loadChats();
@@ -195,10 +202,8 @@ export function useSocket() {
   // ============================================
   // 🧠 Heartbeat برای تشخیص قطعی اینترنت
   // ============================================
-
   useEffect(() => {
     if (!isConnected) return;
-
     const interval = setInterval(() => {
       if (!wsManager.isConnected() && wasConnectedRef.current) {
         wasConnectedRef.current = false;
@@ -208,14 +213,12 @@ export function useSocket() {
         }
       }
     }, 5000);
-
     return () => clearInterval(interval);
   }, [isConnected, user?.id, setUserOffline]);
 
   // ============================================
   // 📤 توابع عمومی
   // ============================================
-
   const sendMessage = useCallback((chatId: number, messageText: string) => {
     wsManager.send("new_message", {
       chat_id: chatId,

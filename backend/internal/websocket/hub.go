@@ -3,23 +3,39 @@ package websocket
 import (
 	"log"
 	"sync"
+	"time"
 )
 
 type Hub struct {
-	Clients map[uint]*Client
-	mu      sync.RWMutex
+	Clients          map[uint]*Client
+	mu               sync.RWMutex
+	connectionCounts map[string]int // IP -> تعداد اتصالات
+	connectionMu     sync.Mutex
 }
 
 func NewHub() *Hub {
 	return &Hub{
-		Clients: make(map[uint]*Client),
+		Clients:          make(map[uint]*Client),
+		connectionCounts: make(map[string]int),
 	}
 }
 
 // HubInstance is the shared hub used across the application.
 var HubInstance = NewHub()
 
+// maxConnectionsPerIP حداکثر تعداد اتصال از هر IP در بازه زمانی
+const maxConnectionsPerIP = 5
+const connectionWindow = 10 * time.Second
+
 func (h *Hub) Register(client *Client) {
+	// 🔥 محدودیت تعداد اتصال از هر IP
+	ip := client.Conn.RemoteAddr().String()
+	if !h.checkAndRecordConnection(ip) {
+		log.Printf("🚫 WebSocket - Too many connections from IP: %s", ip)
+		client.Conn.Close()
+		return
+	}
+
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -36,9 +52,7 @@ func (h *Hub) Unregister(client *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	// Only remove if this is still the currently-registered client for this
-	// user ID. Prevents a stale/old connection's cleanup (e.g. after being
-	// force-closed by a new Register call) from deleting a fresh reconnect.
+	// فقط اگه کلاینت فعلی باشه حذف کن
 	if existing, ok := h.Clients[client.ID]; ok && existing == client {
 		delete(h.Clients, client.ID)
 		log.Printf("❌ User %d is OFFLINE", client.ID)
@@ -96,4 +110,31 @@ func (h *Hub) IsOnline(userID uint) bool {
 
 	_, ok := h.Clients[userID]
 	return ok
+}
+
+// 🔥 محدودیت اتصال WebSocket
+func (h *Hub) checkAndRecordConnection(ip string) bool {
+	h.connectionMu.Lock()
+	defer h.connectionMu.Unlock()
+
+	// پاک کردن اتصالات قدیمی‌تر از بازه زمانی
+	if count, ok := h.connectionCounts[ip]; ok {
+		if count >= maxConnectionsPerIP {
+			return false
+		}
+	}
+
+	// ثبت اتصال جدید
+	h.connectionCounts[ip]++
+	go func() {
+		time.Sleep(connectionWindow)
+		h.connectionMu.Lock()
+		defer h.connectionMu.Unlock()
+		h.connectionCounts[ip]--
+		if h.connectionCounts[ip] <= 0 {
+			delete(h.connectionCounts, ip)
+		}
+	}()
+
+	return true
 }

@@ -118,6 +118,20 @@ func handleMessage(client *websocketPkg.Client, msg model.WSMessage) {
 
 	switch msg.Type {
 	case "new_message":
+		// ✅ ریت‌لیمیت - چون این مسیر از میدل‌ور Fiber (messageLimiter)
+		// رد نمی‌شه، اینجا مستقیم چک می‌کنیم.
+		if !client.MsgLimiter.Allow() {
+			log.Printf("🚫 Message rate limit exceeded for user %d", client.ID)
+			errBytes, _ := json.Marshal(model.WSMessage{
+				Type: "error",
+				Data: map[string]string{
+					"message": "You're sending messages too fast. Please slow down.",
+				},
+			})
+			client.Send <- errBytes
+			return
+		}
+
 		data, ok := msg.Data.(map[string]interface{})
 		if !ok {
 			log.Println("❌ Invalid data")

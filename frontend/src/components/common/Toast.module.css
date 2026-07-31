@@ -1,0 +1,67 @@
+/* frontend/src/components/common/Toast.module.css */
+.container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  cursor: pointer;
+  padding: 10px 18px;
+  border-radius: 22px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #ffffff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.25s ease-out;
+  white-space: nowrap;
+  max-width: 90vw;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.info {
+  background: #334155;
+}
+
+.warning {
+  background: #d97706;
+}
+
+.error {
+  background: #dc2626;
+}
+
+.success {
+  background: #16a34a;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    bottom: 16px;
+    width: calc(100% - 32px);
+  }
+  .toast {
+    white-space: normal;
+    text-align: center;
+    width: 100%;
+  }
+}
